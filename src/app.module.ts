@@ -3,14 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { User } from './users/user.entity';
-import { UsersModule } from './users/users.module';
+import { User } from './auth/user.entity';
+import { AuthModule } from './auth/auth';
 import { ConfigModule } from '@nestjs/config';
 
 @Global()
 @Module({
   imports: [
-    UsersModule,
+    AuthModule,
     ConfigModule.forRoot({ ignoreEnvFile: true }),
     TypeOrmModule.forRoot({
       type: 'mysql',
