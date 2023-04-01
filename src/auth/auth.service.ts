@@ -7,6 +7,7 @@ import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { SignInDto } from './dtos/sign-in-dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -36,7 +37,8 @@ export class AuthService {
     return user;
   }
 
-  async signin(email: string, password: string) {
+  async signin(signInDto: SignInDto) {
+    const { email, password } = signInDto;
     const [user] = await this.usersService.findByEmail(email);
 
     if (!user) throw new NotFoundException('user not found');
