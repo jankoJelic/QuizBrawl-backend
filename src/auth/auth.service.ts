@@ -8,12 +8,16 @@ import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in-dto';
+import { JwtService } from '@nestjs/jwt';
 
 const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
   async signup(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
@@ -32,7 +36,10 @@ export class AuthService {
     const result = salt + '.' + hash.toString('hex');
 
     // create a new user and save it to the database
-    const user = await this.usersService.create(createUserDto);
+    const user = await this.usersService.create({
+      ...createUserDto,
+      password: result,
+    });
 
     return user;
   }
@@ -49,6 +56,8 @@ export class AuthService {
     if (storedHash !== hash.toString('hex')) {
       throw new BadRequestException('bad password');
     }
-    return user;
+
+    const accessToken = this.jwtService.sign({ email });
+    return { accessToken };
   }
 }

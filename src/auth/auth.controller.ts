@@ -19,7 +19,9 @@ export class AuthController {
   }
 
   @Post('/signin')
-  async signIn(@Body() body: SignInDto) {}
+  async signIn(@Body() body: SignInDto) {
+    return await this.authService.signin(body);
+  }
 
   @Get('/users')
   async getAllUsers() {
