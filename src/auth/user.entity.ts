@@ -1,5 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()

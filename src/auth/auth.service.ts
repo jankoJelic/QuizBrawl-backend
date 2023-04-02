@@ -21,9 +21,9 @@ export class AuthService {
 
   async signup(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
-    const users = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
 
-    if (users.length) throw new BadRequestException('Email in use');
+    if (user) throw new BadRequestException('Email in use');
 
     // hash the user's password
     // Generate a salt
@@ -36,17 +36,17 @@ export class AuthService {
     const result = salt + '.' + hash.toString('hex');
 
     // create a new user and save it to the database
-    const user = await this.usersService.create({
+    const newUser = await this.usersService.create({
       ...createUserDto,
       password: result,
     });
 
-    return user;
+    return { ...newUser, password: 'SECURED' };
   }
 
   async signin(signInDto: SignInDto) {
     const { email, password } = signInDto;
-    const [user] = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
 
     if (!user) throw new NotFoundException('user not found');
 
