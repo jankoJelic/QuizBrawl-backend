@@ -19,7 +19,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
     const user = await this.usersService.findByEmail(email);
 
@@ -44,7 +44,7 @@ export class AuthService {
     return { ...newUser, password: 'SECURED' };
   }
 
-  async signin(signInDto: SignInDto) {
+  async login(signInDto: SignInDto) {
     const { email, password } = signInDto;
     const user = await this.usersService.findByEmail(email);
 
@@ -57,7 +57,7 @@ export class AuthService {
       throw new BadRequestException('bad password');
     }
 
-    const accessToken = this.jwtService.sign({ email });
-    return { accessToken };
+    const accessToken = await this.jwtService.signAsync({ email, id: user.id });
+    return accessToken;
   }
 }

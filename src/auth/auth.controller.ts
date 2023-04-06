@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Post,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -15,7 +16,8 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in-dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
-
+import { JWT_SECRET } from './constants/authConstants';
+import { AuthGuard } from './guards/auth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -25,7 +27,7 @@ export class AuthController {
     private configService: ConfigService,
   ) {}
   async isTokenValid(bearerToken: string): Promise<User | null> {
-    const verifyOptions = { secret: this.configService.get('JWT_SECRET') };
+    const verifyOptions = { secret: this.configService.get(JWT_SECRET) };
 
     try {
       const payload = await this.jwtService.verifyAsync(
@@ -46,16 +48,16 @@ export class AuthController {
     return null;
   }
 
-  @Post('/signup')
+  @Post('/register')
   async createUser(@Body() body: CreateUserDto) {
-    const user = await this.authService.signup(body);
+    const user = await this.authService.register(body);
 
     return user;
   }
 
-  @Post('/signin')
+  @Post('/login')
   async signIn(@Body() body: SignInDto) {
-    return await this.authService.signin(body);
+    return await this.authService.login(body);
   }
 
   @Get('/users')
@@ -63,6 +65,7 @@ export class AuthController {
     return await this.usersService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get('/me')
   async getMyInfo(@Headers('Authorization') authorization = '') {
     let bearer: string = '';
@@ -76,6 +79,7 @@ export class AuthController {
 
     const { email } = await this.isTokenValid(bearer);
 
-    return await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
+    return { ...user, password: 'SECURED' };
   }
 }
