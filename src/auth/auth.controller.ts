@@ -7,7 +7,6 @@ import {
   HttpStatus,
   Post,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -17,7 +16,7 @@ import { SignInDto } from './dtos/sign-in-dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { JWT_SECRET } from './constants/authConstants';
-import { AuthGuard } from './guards/auth.guard';
+import { Public } from './decorators/Public.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -48,6 +47,7 @@ export class AuthController {
     return null;
   }
 
+  @Public()
   @Post('/register')
   async createUser(@Body() body: CreateUserDto) {
     const user = await this.authService.register(body);
@@ -55,6 +55,7 @@ export class AuthController {
     return user;
   }
 
+  @Public()
   @Post('/login')
   async signIn(@Body() body: SignInDto) {
     return await this.authService.login(body);
@@ -65,7 +66,6 @@ export class AuthController {
     return await this.usersService.findAll();
   }
 
-  @UseGuards(AuthGuard)
   @Get('/me')
   async getMyInfo(@Headers('Authorization') authorization = '') {
     let bearer: string = '';

@@ -7,6 +7,8 @@ import { UsersService } from './users.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JWT_EXP, JWT_SECRET } from './constants/authConstants';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
 
 const jwtFactory = {
   imports: [ConfigModule],
@@ -28,7 +30,11 @@ const jwtFactory = {
     JwtModule.registerAsync(jwtFactory),
   ],
   controllers: [AuthController],
-  providers: [UsersService, AuthService],
+  providers: [
+    UsersService,
+    AuthService,
+    { provide: APP_GUARD, useClass: AuthGuard },
+  ],
   exports: [TypeOrmModule, JwtModule],
 })
 export class AuthModule {}
