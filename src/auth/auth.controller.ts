@@ -1,11 +1,15 @@
 import {
   Body,
   Controller,
+  Delete,
+  ExecutionContext,
   Get,
   Headers,
   HttpException,
   HttpStatus,
   Post,
+  Req,
+  Request,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -16,7 +20,8 @@ import { SignInDto } from './dtos/sign-in-dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { JWT_SECRET } from './constants/authConstants';
-import { Public } from './decorators/Public.decorator';
+import { Public } from './decorators/public.decorator';
+import { GetRefreshToken } from './decorators/get-refresh-token.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -80,6 +85,13 @@ export class AuthController {
     const { email } = await this.isTokenValid(bearer);
 
     const user = await this.usersService.findByEmail(email);
+
     return { ...user, password: 'SECURED' };
+  }
+
+  @Get('/refreshToken')
+  async refreshToken(@Req() req: any, @GetRefreshToken() refreshToken: string) {
+    const { email } = req || {};
+    this.usersService.updateRefreshToken(refreshToken, email);
   }
 }

@@ -1,22 +1,26 @@
 import {
   BadRequestException,
+  ExecutionContext,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { randomBytes, scrypt as _scrypt } from 'crypto';
-import { promisify } from 'util';
+import { scrypt as _scrypt } from 'crypto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in-dto';
 import { JwtService } from '@nestjs/jwt';
-
-const scrypt = promisify(_scrypt);
+import { User } from './user.entity';
+import { entryMatchesHash, hashAndSalt } from './util/hashAndSalt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
@@ -25,23 +29,27 @@ export class AuthService {
 
     if (user) throw new BadRequestException('Email in use');
 
-    // hash the user's password
-    // Generate a salt
-    const salt = randomBytes(8).toString('hex');
+    const hashedPassword = await hashAndSalt(password);
 
-    // Hash the password with the salt
-    const hash = (await scrypt(password, salt, 32)) as Buffer;
+    const refreshToken = await this.jwtService.signAsync({
+      email,
+      refresh: true,
+    });
+    const hashedRefreshToken = await hashAndSalt(refreshToken);
 
-    // Join the hashed password with the salt
-    const result = salt + '.' + hash.toString('hex');
-
-    // create a new user and save it to the database
     const newUser = await this.usersService.create({
       ...createUserDto,
-      password: result,
+      password: hashedPassword,
+      refreshToken: hashedRefreshToken,
     });
 
-    return { ...newUser, password: 'SECURED' };
+    const accessToken = await this.jwtService.signAsync({
+      email,
+      id: newUser.id,
+      refreshToken,
+    });
+
+    return { accessToken };
   }
 
   async login(signInDto: SignInDto) {
@@ -50,14 +58,31 @@ export class AuthService {
 
     if (!user) throw new NotFoundException('user not found');
 
-    const [salt, storedHash] = user.password.split('.');
-    const hash = (await scrypt(password, salt, 32)) as Buffer;
+    const passwordIsCorrect = await entryMatchesHash(password, user.password);
 
-    if (storedHash !== hash.toString('hex')) {
-      throw new BadRequestException('bad password');
-    }
+    if (!passwordIsCorrect) throw new BadRequestException('bad password');
 
-    const accessToken = await this.jwtService.signAsync({ email, id: user.id });
-    return accessToken;
+    const refreshToken = await this.jwtService.signAsync({
+      email,
+      id: user.id,
+      refresh: true,
+    });
+    const accessToken = await this.jwtService.signAsync({
+      email,
+      id: user.id,
+      refreshToken,
+    });
+
+    const hashedRefreshToken = await hashAndSalt(refreshToken);
+
+    this.usersRepository.update(user.id, {
+      refreshToken: hashedRefreshToken,
+    });
+
+    return { accessToken };
+  }
+
+  async refreshToken(context: ExecutionContext) {
+    // this.usersService.updateRefreshToken()
   }
 }

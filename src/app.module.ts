@@ -6,12 +6,20 @@ import { DataSource } from 'typeorm';
 import { User } from './auth/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import * as Joi from 'joi';
 
 @Global()
 @Module({
   imports: [
     AuthModule,
-    ConfigModule.forRoot({ ignoreEnvFile: true }),
+    ConfigModule.forRoot({
+      validationSchema: Joi.object({
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXP: Joi.string().required(),
+        JWT_REFRESH_SECRET: Joi.string().required(),
+        JWT_REFRESH_EXP: Joi.string().required(),
+      }),
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

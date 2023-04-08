@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -40,4 +41,8 @@ export class User {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  // @Exclude()
+  refreshToken?: string;
 }
