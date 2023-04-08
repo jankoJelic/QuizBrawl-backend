@@ -1,26 +1,21 @@
 import {
   BadRequestException,
-  ExecutionContext,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { scrypt as _scrypt } from 'crypto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in-dto';
 import { JwtService } from '@nestjs/jwt';
-import { User } from './user.entity';
 import { entryMatchesHash, hashAndSalt } from './util/hashAndSalt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
@@ -49,7 +44,7 @@ export class AuthService {
       refreshToken,
     });
 
-    return { accessToken };
+    return accessToken;
   }
 
   async login(signInDto: SignInDto) {
@@ -62,27 +57,42 @@ export class AuthService {
 
     if (!passwordIsCorrect) throw new BadRequestException('bad password');
 
+    const { accessToken } = await this.createNewTokens(email, user.id);
+
+    return accessToken;
+  }
+
+  async updateRefreshToken(refreshToken: string, email: string) {
+    const user = await this.usersService.findByEmail(email);
+
+    const refreshTokenMatchesHash = await entryMatchesHash(
+      refreshToken,
+      user.refreshToken,
+    );
+
+    if (!refreshTokenMatchesHash) throw new UnauthorizedException();
+
+    const { accessToken } = await this.createNewTokens(user.email, user.id);
+
+    return accessToken;
+  }
+
+  async createNewTokens(email: string, id: number) {
     const refreshToken = await this.jwtService.signAsync({
       email,
-      id: user.id,
+      id,
       refresh: true,
     });
     const accessToken = await this.jwtService.signAsync({
       email,
-      id: user.id,
+      id,
       refreshToken,
     });
 
     const hashedRefreshToken = await hashAndSalt(refreshToken);
 
-    this.usersRepository.update(user.id, {
-      refreshToken: hashedRefreshToken,
-    });
+    this.usersService.updateRefreshToken(id, hashedRefreshToken);
 
-    return { accessToken };
-  }
-
-  async refreshToken(context: ExecutionContext) {
-    // this.usersService.updateRefreshToken()
+    return { refreshToken, accessToken };
   }
 }

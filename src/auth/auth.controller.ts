@@ -92,6 +92,6 @@ export class AuthController {
   @Get('/refreshToken')
   async refreshToken(@Req() req: any, @GetRefreshToken() refreshToken: string) {
     const { email } = req || {};
-    this.usersService.updateRefreshToken(refreshToken, email);
+    this.authService.updateRefreshToken(refreshToken, email);
   }
 }

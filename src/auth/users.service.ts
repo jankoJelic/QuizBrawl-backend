@@ -43,18 +43,9 @@ export class UsersService {
     } catch (e) {}
   }
 
-  async updateRefreshToken(refreshToken: string, email: string) {
-    const user = await this.findByEmail(email);
-
-    const refreshTokenMatchesHash = await entryMatchesHash(
-      refreshToken,
-      user.refreshToken,
-    );
-
-    if (!refreshTokenMatchesHash) throw new UnauthorizedException();
-
-    // return await this.usersRepository.update(userId, {
-    //   refreshToken: currentHashedRefreshToken,
-    // });
+  async updateRefreshToken(id: number, hashedToken: string) {
+    this.usersRepository.update(id, {
+      refreshToken: hashedToken,
+    });
   }
 }
