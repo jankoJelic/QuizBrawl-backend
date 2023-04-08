@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -23,9 +24,11 @@ export class User {
   @Column()
   email: string;
 
+  @ApiHideProperty()
   @Column({ default: false })
   isAdmin: boolean;
 
+  @ApiHideProperty()
   @Column()
   password: string;
 
@@ -42,6 +45,7 @@ export class User {
   })
   updatedAt: Date;
 
+  @ApiHideProperty()
   @Column({ nullable: true })
   // @Exclude()
   refreshToken?: string;

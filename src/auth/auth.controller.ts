@@ -16,7 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { SignInDto } from './dtos/sign-in-dto';
+import { SignInDto } from './dtos/sign-in.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { JWT_SECRET } from './constants/authConstants';
@@ -86,7 +86,7 @@ export class AuthController {
 
     const user = await this.usersService.findByEmail(email);
 
-    return { ...user, password: 'SECURED' };
+    return { ...user, password: 'SECURED', refreshToken: 'SECURED' };
   }
 
   @Get('/refreshToken')

@@ -7,7 +7,7 @@ import {
 import { UsersService } from './users.service';
 import { scrypt as _scrypt } from 'crypto';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { SignInDto } from './dtos/sign-in-dto';
+import { SignInDto } from './dtos/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { entryMatchesHash, hashAndSalt } from './util/hashAndSalt';
 

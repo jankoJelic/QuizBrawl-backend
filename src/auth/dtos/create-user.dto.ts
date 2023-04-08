@@ -1,4 +1,5 @@
 import { IsEmail, IsString } from 'class-validator';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
   @IsEmail()
@@ -13,5 +14,6 @@ export class CreateUserDto {
   @IsString()
   lastName: string;
 
-  refreshToken: string;
+  @ApiHideProperty()
+  refreshToken?: string;
 }
