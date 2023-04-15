@@ -6,7 +6,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
 import { ApiHideProperty } from '@nestjs/swagger';
 
 @UseInterceptors(ClassSerializerInterceptor)

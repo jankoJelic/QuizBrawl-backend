@@ -98,8 +98,7 @@ export class AuthController {
     await this.authService.updateRefreshToken(refreshToken, email);
   }
 
-  // @UseGuards(AdminGuard)
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   @Delete('')
   deleteUser(@Query('id') id: string) {
     this.usersService.deleteUser(id);

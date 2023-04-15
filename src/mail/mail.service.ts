@@ -48,6 +48,7 @@ export class MailService {
 
   public async sendUserConfirmation(user: CreateUserDto, code: string) {
     await this.setTransport();
+    
     this.mailerService
       .sendMail({
         transporterName: 'gmail',
