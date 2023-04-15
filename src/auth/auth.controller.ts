@@ -2,15 +2,15 @@ import {
   Body,
   Controller,
   Delete,
-  ExecutionContext,
   Get,
   Headers,
   HttpException,
   HttpStatus,
   Post,
+  Query,
   Req,
-  Request,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -22,6 +22,8 @@ import { UsersService } from './users.service';
 import { JWT_SECRET } from './constants/authConstants';
 import { Public } from './decorators/public.decorator';
 import { GetRefreshToken } from './decorators/get-refresh-token.decorator';
+import { AdminGuard } from './guards/admin.guard';
+import { MailService } from 'src/mail/mail.service';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -29,6 +31,7 @@ export class AuthController {
     private authService: AuthService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private mailService: MailService,
   ) {}
   async isTokenValid(bearerToken: string): Promise<User | null> {
     const verifyOptions = { secret: this.configService.get(JWT_SECRET) };
@@ -93,5 +96,22 @@ export class AuthController {
   async refreshToken(@Req() req: any, @GetRefreshToken() refreshToken: string) {
     const { email } = req || {};
     await this.authService.updateRefreshToken(refreshToken, email);
+  }
+
+  // @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
+  @Delete('')
+  deleteUser(@Query('id') id: string) {
+    this.usersService.deleteUser(id);
+    return `deleted user ${id}`;
+  }
+
+  @Public()
+  @Get('/testemail')
+  testEmail() {
+    this.mailService.sendUserConfirmation(
+      { email: 'janko.jelic99@gmail.com', firstName: 'Janko' } as CreateUserDto,
+      '123321',
+    );
   }
 }

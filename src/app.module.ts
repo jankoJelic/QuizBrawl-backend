@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { User } from './auth/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { MailModule } from './mail/mail.module';
 import * as Joi from 'joi';
 
 @Global()
@@ -31,6 +32,7 @@ import * as Joi from 'joi';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

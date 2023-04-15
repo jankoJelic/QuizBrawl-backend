@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JWT_EXP, JWT_SECRET } from './constants/authConstants';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
+import { MailModule } from 'src/mail/mail.module';
 
 const jwtFactory = {
   imports: [ConfigModule],
@@ -28,6 +29,7 @@ const jwtFactory = {
     }),
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync(jwtFactory),
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [

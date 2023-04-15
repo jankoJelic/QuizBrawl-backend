@@ -10,16 +10,18 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { entryMatchesHash, hashAndSalt } from './util/hashAndSalt';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
+    const { email, password, firstName } = createUserDto;
     const user = await this.usersService.findByEmail(email);
 
     if (user) throw new BadRequestException('Email in use');
@@ -44,6 +46,8 @@ export class AuthService {
       refreshToken,
     });
 
+    this.mailService.sendUserConfirmation(createUserDto, '999999');
+
     return accessToken;
   }
 
@@ -57,7 +61,11 @@ export class AuthService {
 
     if (!passwordIsCorrect) throw new BadRequestException('bad password');
 
-    const { accessToken } = await this.createNewTokens(email, user.id);
+    const { accessToken } = await this.createNewTokens({
+      email,
+      id: user.id,
+      isAdmin: user.isAdmin,
+    });
 
     return accessToken;
   }
@@ -72,21 +80,27 @@ export class AuthService {
 
     if (!refreshTokenMatchesHash) throw new UnauthorizedException();
 
-    const { accessToken } = await this.createNewTokens(user.email, user.id);
+    const { accessToken } = await this.createNewTokens({
+      email: user.email,
+      id: user.id,
+      isAdmin: user.isAdmin,
+    });
 
     return accessToken;
   }
 
-  async createNewTokens(email: string, id: number) {
+  async createNewTokens({ email, id, isAdmin }) {
     const refreshToken = await this.jwtService.signAsync({
       email,
       id,
       refresh: true,
+      isAdmin,
     });
     const accessToken = await this.jwtService.signAsync({
       email,
       id,
       refreshToken,
+      isAdmin,
     });
 
     const hashedRefreshToken = await hashAndSalt(refreshToken);
