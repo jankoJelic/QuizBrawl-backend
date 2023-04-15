@@ -11,6 +11,7 @@ import { SignInDto } from './dtos/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { entryMatchesHash, hashAndSalt } from './util/hashAndSalt';
 import { MailService } from 'src/mail/mail.service';
+import { createOtpCode } from './util/createOtpCode';
 
 @Injectable()
 export class AuthService {
@@ -34,10 +35,13 @@ export class AuthService {
     });
     const hashedRefreshToken = await hashAndSalt(refreshToken);
 
+    const registrationOtpCode = createOtpCode();
+
     const newUser = await this.usersService.create({
       ...createUserDto,
       password: hashedPassword,
       refreshToken: hashedRefreshToken,
+      registrationOtpCode
     });
 
     const accessToken = await this.jwtService.signAsync({
@@ -46,7 +50,7 @@ export class AuthService {
       refreshToken,
     });
 
-    this.mailService.sendUserConfirmation(createUserDto, '999999');
+    this.mailService.sendUserConfirmation(createUserDto, registrationOtpCode);
 
     return accessToken;
   }

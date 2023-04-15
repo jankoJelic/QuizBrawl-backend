@@ -16,4 +16,7 @@ export class CreateUserDto {
 
   @ApiHideProperty()
   refreshToken?: string;
+
+  @ApiHideProperty()
+  registrationOtpCode?: string;
 }

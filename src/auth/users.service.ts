@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './user.entity';
-import { AdminGuard } from './guards/admin.guard';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class UsersService {
@@ -47,5 +51,17 @@ export class UsersService {
 
   deleteUser(id: string) {
     this.usersRepository.delete(id);
+  }
+
+  async updateUser(id: number, data: Partial<User>) {
+    await this.usersRepository.update(id, data);
+  }
+
+  async confirmEmail(otpCode: string, id: number) {
+    const { registrationOtpCode } = await this.findOne(id);
+
+    if (otpCode !== registrationOtpCode) throw new BadRequestException();
+
+    this.updateUser(id, { isEmailConfirmed: true, registrationOtpCode: '' });
   }
 }

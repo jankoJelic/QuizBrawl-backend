@@ -105,6 +105,14 @@ export class AuthController {
     return `deleted user ${id}`;
   }
 
+  @Post('/confirmEmail')
+  async confirmEmail(@Body() otpCode: string, @Req() req) {
+    const { userId } = req || {};
+    this.usersService.confirmEmail(otpCode, userId);
+
+    return 'email confirmed';
+  }
+
   @Public()
   @Get('/testemail')
   testEmail() {

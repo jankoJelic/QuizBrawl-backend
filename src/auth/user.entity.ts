@@ -49,6 +49,9 @@ export class User {
 
   @ApiHideProperty()
   @Column({ nullable: true })
-  // @Exclude()
   refreshToken?: string;
+
+  @ApiHideProperty()
+  @Column()
+  registrationOtpCode: string;
 }
