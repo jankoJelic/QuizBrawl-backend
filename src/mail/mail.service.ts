@@ -46,34 +46,17 @@ export class MailService {
     this.mailerService.addTransporter('gmail', config);
   }
 
-  // async sendUserConfirmation(user: CreateUserDto, code: string = '000000') {
-  //   await this.mailerService.sendMail({
-  //     to: user.email,
-  //     // from: '"Support Team" <support@example.com>', // override default from
-  //     subject: 'Welcome to HumorMe! Confirm your Email',
-  //     template: './confirmation', // `.hbs` extension is appended automatically
-  //     context: {
-  //       // ✏️ filling curly brackets with content
-  //       name: user.firstName,
-  //       code,
-  //     },
-  //   });
-
-  //   console.log('email sent');
-  // }
-
   public async sendUserConfirmation(user: CreateUserDto, code: string) {
     await this.setTransport();
     this.mailerService
       .sendMail({
         transporterName: 'gmail',
-        to: 'janko.jelic99@gmail.com', // list of receivers
-        from: 'noreply@humorme.com', // sender address
-        subject: 'Verification Code', // Subject line
+        to: user.email,
+        from: 'noreply@humorme.com',
+        subject: 'Verification Code',
         template: 'confirmation',
         context: {
-          // Data to be sent to template engine..
-          code: '123321',
+          code,
           name: user.firstName,
         },
       })
