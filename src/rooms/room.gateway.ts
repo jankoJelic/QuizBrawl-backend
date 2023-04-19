@@ -15,6 +15,6 @@ export class RoomGateway {
 
   @SubscribeMessage('room')
   handleMessage(client, data) {
-    this.server.emit();
+    // this.server.emit();
   }
 }

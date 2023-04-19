@@ -7,7 +7,7 @@ import { User } from './auth/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
-import { RoomModule } from './rooms/room.module';
+import { RoomsModule } from './rooms/rooms.module';
 import * as Joi from 'joi';
 
 @Global()
@@ -34,7 +34,7 @@ import * as Joi from 'joi';
       synchronize: true,
     }),
     MailModule,
-    RoomModule,
+    RoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
