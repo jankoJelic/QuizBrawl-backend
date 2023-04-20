@@ -12,6 +12,27 @@ export class QuizesService {
     private quizesRepository: Repository<Quiz>,
   ) {}
   async createQuiz(user: User, createQuizDto: CreateQuizDto) {
-    return await this.quizesRepository.save({ ...createQuizDto, user });
+    const quiz = this.quizesRepository.create(createQuizDto);
+    quiz.user = user;
+
+    return await this.quizesRepository.save(quiz);
+  }
+
+  async updateQuiz(
+    quizId: string,
+    createQuizDto: CreateQuizDto,
+    userId: number,
+  ) {}
+
+  async getQuizById(id: number) {
+    return await this.quizesRepository.findOneBy({ id });
+  }
+
+  async deleteQuiz(id: number) {
+    this.quizesRepository.delete(id);
+  }
+
+  async getQuizesForUser(userId: number) {
+    return await this.quizesRepository.find({ where: { user } });
   }
 }
