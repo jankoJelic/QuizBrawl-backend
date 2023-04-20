@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Room } from './room.entity';
 import { Repository } from 'typeorm';
 import { CreateRoomDto } from './dtos/create-room.dto';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class RoomsService {
@@ -11,10 +12,10 @@ export class RoomsService {
     private roomsRepository: Repository<Room>,
   ) {}
 
-  async createRoom(body: CreateRoomDto & { userId: number }) {
+  async createRoom(body: CreateRoomDto & { userId: number; players: User[] }) {
     const room = this.roomsRepository.create(body);
 
-    return room;
+    return this.roomsRepository.save(room);
   }
 
   async deleteRoom(roomId: number) {

@@ -17,6 +17,7 @@ import { AuthGuard } from './auth/guards/auth.guard';
 @Module({
   imports: [
     AuthModule,
+    RoomsModule,
     ConfigModule.forRoot({
       validationSchema: Joi.object({
         JWT_SECRET: Joi.string().required(),
@@ -37,7 +38,6 @@ import { AuthGuard } from './auth/guards/auth.guard';
       synchronize: true,
     }),
     MailModule,
-    RoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],

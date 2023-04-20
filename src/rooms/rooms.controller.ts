@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dtos/create-room.dto';
+import { User } from 'src/auth/user.entity';
 
 @Controller('rooms')
 export class RoomsController {
@@ -23,12 +24,13 @@ export class RoomsController {
   }
 
   @Post('/create')
-  async createRoom(@Req() req, @Body() body: CreateRoomDto) {
+  async createRoom(@Req() req, @Body() body: CreateRoomDto & { players: User[] }) {
     const { user } = req || {};
 
     const room = await this.roomsService.createRoom({
       userId: user.id,
       ...body,
+      players: [user],
     });
 
     return room;
