@@ -14,6 +14,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { QuestionsModule } from './questions/questions.module';
 import { Question } from './questions/question.entity';
+import { ImagesModule } from './images/images.module';
+import { Image } from './images/image.entity';
 
 @Global()
 @Module({
@@ -35,12 +37,13 @@ import { Question } from './questions/question.entity';
       username: 'root',
       password: 'jankoKriptomat9',
       database: 'sys',
-      entities: [User, Room, Question],
+      entities: [User, Room, Question, Image],
       autoLoadEntities: true,
       synchronize: true,
     }),
     MailModule,
     QuestionsModule,
+    ImagesModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],
