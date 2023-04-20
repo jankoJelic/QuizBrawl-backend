@@ -62,4 +62,7 @@ export class User {
 
   @OneToMany(() => Quiz, (quiz) => quiz.user)
   quizes: Quiz[];
+
+  @Column({ default: 0 })
+  trophies: number;
 }

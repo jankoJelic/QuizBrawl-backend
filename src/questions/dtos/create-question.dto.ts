@@ -1,4 +1,5 @@
 import { CorrectAnswer } from '../types/correct-answer.type';
+import { Difficulty } from '../types/difficulty.type';
 
 export interface CreateQuestionDto {
   question: string;
@@ -7,6 +8,6 @@ export interface CreateQuestionDto {
   answer3: string;
   answer4: string;
   correctAnswer: CorrectAnswer;
-  difficulty: number;
+  difficulty: Difficulty;
   image?: string;
 }

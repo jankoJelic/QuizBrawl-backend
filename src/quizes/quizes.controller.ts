@@ -3,7 +3,9 @@ import { CreateQuizDto } from './dtos/create-quiz.dto';
 import { QuizesService } from './quizes.service';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/auth/user.entity';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('quizes')
 @Controller('quizes')
 export class QuizesController {
   constructor(private quizesService: QuizesService) {}
@@ -27,6 +29,6 @@ export class QuizesController {
 
   @Get('/my')
   async getMyQuizes(@CurrentUser() user: User) {
-    return await this.quizesService.getQuizesForUser(user.id)
+    return await this.quizesService.getQuizesForUser(user.id);
   }
 }

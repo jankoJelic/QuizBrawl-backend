@@ -12,7 +12,9 @@ export class QuestionsService {
     private questionsRepository: Repository<Question>,
   ) {}
 
-  async getQuestions(params: GetQuestionsDto) {}
+  async getQuestions(params: GetQuestionsDto) {
+    const {topic, length} = params || {}
+  }
 
   async createQuestion(createQuestionDto: CreateQuestionDto) {
     const question = this.questionsRepository.create(createQuestionDto);

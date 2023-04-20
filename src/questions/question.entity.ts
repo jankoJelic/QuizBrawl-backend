@@ -2,6 +2,7 @@ import { IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
 import { Topic } from 'src/rooms/types/Topic';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { CorrectAnswer } from './types/correct-answer.type';
+import { Difficulty } from './types/difficulty.type';
 
 @Entity()
 export class Question {
@@ -31,11 +32,8 @@ export class Question {
   @Column()
   topic: Topic;
 
-  @IsNumber()
-  @Max(10)
-  @Min(1)
   @Column()
-  difficulty: number;
+  difficulty: Difficulty;
 
   @Column({ default: '' })
   image: string;

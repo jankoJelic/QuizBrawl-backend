@@ -13,7 +13,9 @@ import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dtos/create-room.dto';
 import { User } from 'src/auth/user.entity';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('rooms')
 @Controller('rooms')
 export class RoomsController {
   constructor(private roomsService: RoomsService) {}
