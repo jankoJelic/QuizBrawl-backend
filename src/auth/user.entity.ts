@@ -5,8 +5,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
+import { Quiz } from 'src/quizes/quiz.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -54,4 +56,10 @@ export class User {
   @ApiHideProperty()
   @Column()
   registrationOtpCode: string;
+
+  @Column({ default: false })
+  isPremium: boolean;
+
+  @OneToMany(() => Quiz, (quiz) => quiz.user)
+  quizes: Quiz[];
 }

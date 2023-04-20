@@ -17,6 +17,8 @@ import { Question } from './questions/question.entity';
 import { ImagesModule } from './images/images.module';
 import { Image } from './images/image.entity';
 import { configuration } from '../config/configuration';
+import { QuizesModule } from './quizes/quizes.module';
+import { Quiz } from './quizes/quiz.entity';
 
 @Global()
 @Module({
@@ -47,13 +49,14 @@ import { configuration } from '../config/configuration';
       username: 'root',
       password: 'jankoKriptomat9',
       database: 'sys',
-      entities: [User, Room, Question, Image],
+      entities: [User, Room, Question, Image, Quiz],
       autoLoadEntities: true,
       synchronize: true,
     }),
     MailModule,
     QuestionsModule,
     ImagesModule,
+    QuizesModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],

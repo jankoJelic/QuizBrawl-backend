@@ -7,12 +7,12 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dtos/create-room.dto';
 import { User } from 'src/auth/user.entity';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Controller('rooms')
 export class RoomsController {
@@ -24,9 +24,10 @@ export class RoomsController {
   }
 
   @Post('/create')
-  async createRoom(@Req() req, @Body() body: CreateRoomDto & { players: User[] }) {
-    const { user } = req || {};
-
+  async createRoom(
+    @CurrentUser() user: User,
+    @Body() body: CreateRoomDto & { players: User[] },
+  ) {
     const room = await this.roomsService.createRoom({
       userId: user.id,
       ...body,
@@ -37,8 +38,7 @@ export class RoomsController {
   }
 
   @Delete('/delete')
-  async deleteRoom(@Req() req, @Query() roomId: number) {
-    const { user } = req || {};
+  async deleteRoom(@CurrentUser() user: User, @Query() roomId: number) {
     const room = await this.roomsService.getRoomById(roomId);
 
     if (!room) throw new NotFoundException();

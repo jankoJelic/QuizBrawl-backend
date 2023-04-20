@@ -8,7 +8,6 @@ import {
   HttpStatus,
   Post,
   Query,
-  Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -25,6 +24,7 @@ import { GetRefreshToken } from './decorators/get-refresh-token.decorator';
 import { AdminGuard } from './guards/admin.guard';
 import { MailService } from 'src/mail/mail.service';
 import { ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from './decorators/current-user.decorator';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -95,8 +95,10 @@ export class AuthController {
   }
 
   @Get('/refreshToken')
-  async refreshToken(@Req() req: any, @GetRefreshToken() refreshToken: string) {
-    const { user } = req || {};
+  async refreshToken(
+    @CurrentUser() user: User,
+    @GetRefreshToken() refreshToken: string,
+  ) {
     await this.authService.updateRefreshToken(refreshToken, user.email);
   }
 
@@ -108,8 +110,7 @@ export class AuthController {
   }
 
   @Post('/confirmEmail')
-  async confirmEmail(@Body() otpCode: string, @Req() req) {
-    const { user } = req || {};
+  async confirmEmail(@Body() otpCode: string, @CurrentUser() user: User) {
     this.usersService.confirmEmail(otpCode, user.id);
 
     return 'email confirmed';

@@ -41,4 +41,7 @@ export class Room {
 
   @Column()
   type: GameType;
+
+  @Column({ default: '' })
+  password: string;
 }

@@ -39,4 +39,16 @@ export class Question {
 
   @Column({ default: '' })
   image: string;
+
+  @Column({ default: 0 })
+  answer1Count: number;
+
+  @Column({ default: 0 })
+  answer2Count: number;
+
+  @Column({ default: 0 })
+  answer3Count: number;
+
+  @Column({ default: 0 })
+  answer4Count: number;
 }
