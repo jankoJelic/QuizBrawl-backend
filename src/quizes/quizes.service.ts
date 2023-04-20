@@ -33,6 +33,8 @@ export class QuizesService {
   }
 
   async getQuizesForUser(userId: number) {
-    return await this.quizesRepository.find({ where: { user } });
+    return await this.quizesRepository.find({
+      where: { user: { id: userId } },
+    });
   }
 }
