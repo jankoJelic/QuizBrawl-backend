@@ -1,6 +1,7 @@
 import { IsString, MaxLength } from 'class-validator';
 import { User } from 'src/auth/user.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { GameType } from './types/GameType';
 
 @Entity()
 export class Room {
@@ -8,10 +9,13 @@ export class Room {
   id: number;
 
   @Column()
-  createdBy: number;
+  userId: number;
+
+  @Column()
+  hostName: string;
 
   @IsString()
-  @MaxLength(20)
+  @MaxLength(24)
   @Column()
   name: string;
 
@@ -32,9 +36,9 @@ export class Room {
   @Column({ default: 'general' })
   topic: string;
 
-  @Column()
+  @Column({ default: 15 })
   answerTime: number;
 
   @Column()
-  type: 'brawl' | 'classic';
+  type: GameType;
 }

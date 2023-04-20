@@ -94,8 +94,8 @@ export class AuthController {
 
   @Get('/refreshToken')
   async refreshToken(@Req() req: any, @GetRefreshToken() refreshToken: string) {
-    const { email } = req || {};
-    await this.authService.updateRefreshToken(refreshToken, email);
+    const { user } = req || {};
+    await this.authService.updateRefreshToken(refreshToken, user.email);
   }
 
   @UseGuards(AdminGuard)
@@ -107,8 +107,8 @@ export class AuthController {
 
   @Post('/confirmEmail')
   async confirmEmail(@Body() otpCode: string, @Req() req) {
-    const { userId } = req || {};
-    this.usersService.confirmEmail(otpCode, userId);
+    const { user } = req || {};
+    this.usersService.confirmEmail(otpCode, user.id);
 
     return 'email confirmed';
   }

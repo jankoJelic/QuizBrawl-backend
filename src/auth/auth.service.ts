@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { entryMatchesHash, hashAndSalt } from './util/hashAndSalt';
 import { MailService } from 'src/mail/mail.service';
 import { createOtpCode } from './util/createOtpCode';
+import { User } from './user.entity';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,7 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword,
       refreshToken: hashedRefreshToken,
-      registrationOtpCode
+      registrationOtpCode,
     });
 
     const accessToken = await this.jwtService.signAsync({
@@ -65,11 +66,7 @@ export class AuthService {
 
     if (!passwordIsCorrect) throw new BadRequestException('bad password');
 
-    const { accessToken } = await this.createNewTokens({
-      email,
-      id: user.id,
-      isAdmin: user.isAdmin,
-    });
+    const { accessToken } = await this.createNewTokens(user);
 
     return accessToken;
   }
@@ -84,32 +81,27 @@ export class AuthService {
 
     if (!refreshTokenMatchesHash) throw new UnauthorizedException();
 
-    const { accessToken } = await this.createNewTokens({
-      email: user.email,
-      id: user.id,
-      isAdmin: user.isAdmin,
-    });
+    const { accessToken } = await this.createNewTokens(user);
 
     return accessToken;
   }
 
-  async createNewTokens({ email, id, isAdmin }) {
+  async createNewTokens(user: User) {
+    const securedUserObject = {
+      ...user,
+      refreshToken: 'SECURED',
+      password: 'SECURED',
+    };
     const refreshToken = await this.jwtService.signAsync({
-      email,
-      id,
-      refresh: true,
-      isAdmin,
+      user: securedUserObject,
     });
     const accessToken = await this.jwtService.signAsync({
-      email,
-      id,
-      refreshToken,
-      isAdmin,
+      user: securedUserObject,
     });
 
     const hashedRefreshToken = await hashAndSalt(refreshToken);
 
-    this.usersService.updateRefreshToken(id, hashedRefreshToken);
+    this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
 
     return { refreshToken, accessToken };
   }

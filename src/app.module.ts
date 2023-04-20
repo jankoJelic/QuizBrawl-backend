@@ -9,6 +9,9 @@ import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { RoomsModule } from './rooms/rooms.module';
 import * as Joi from 'joi';
+import { Room } from './rooms/room.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guards/auth.guard';
 
 @Global()
 @Module({
@@ -29,7 +32,7 @@ import * as Joi from 'joi';
       username: 'root',
       password: 'jankoKriptomat9',
       database: 'sys',
-      entities: [User],
+      entities: [User, Room],
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -37,7 +40,7 @@ import * as Joi from 'joi';
     RoomsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
