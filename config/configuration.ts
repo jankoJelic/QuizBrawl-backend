@@ -1,0 +1,29 @@
+export const configuration = () => {
+  const {
+    NODE_ENV,
+    APP_PORT,
+    JWT_SECRET,
+    JWT_EXP,
+    JWT_REFRESH_SECRET,
+    JWT_REFRESH_EXP,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    GOOGLE_REFRESH_TOKEN,
+    EMAIL,
+    EMAIL_CONFIRMATION_URL,
+  } = process.env || {};
+  
+  return {
+    NODE_ENV,
+    APP_PORT,
+    JWT_SECRET,
+    JWT_EXP,
+    JWT_REFRESH_SECRET,
+    JWT_REFRESH_EXP,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    GOOGLE_REFRESH_TOKEN,
+    EMAIL,
+    EMAIL_CONFIRMATION_URL,
+  };
+};

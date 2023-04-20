@@ -16,6 +16,7 @@ import { QuestionsModule } from './questions/questions.module';
 import { Question } from './questions/question.entity';
 import { ImagesModule } from './images/images.module';
 import { Image } from './images/image.entity';
+import { configuration } from '../config/configuration';
 
 @Global()
 @Module({
@@ -23,11 +24,20 @@ import { Image } from './images/image.entity';
     AuthModule,
     RoomsModule,
     ConfigModule.forRoot({
+      envFilePath: `${process.cwd()}/config/env/${process.env.NODE_ENV}.env`,
+      load: [configuration],
+      isGlobal: true,
       validationSchema: Joi.object({
+        NODE_ENV: Joi.string().valid('dev', 'prod'),
         JWT_SECRET: Joi.string().required(),
         JWT_EXP: Joi.string().required(),
         JWT_REFRESH_SECRET: Joi.string().required(),
         JWT_REFRESH_EXP: Joi.string().required(),
+        GOOGLE_CLIENT_ID: Joi.string().required(),
+        GOOGLE_CLIENT_SECRET: Joi.string().required(),
+        GOOGLE_REFRESH_TOKEN: Joi.string().required(),
+        EMAIL: Joi.string().required(),
+        EMAIL_CONFIRMATION_URL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({

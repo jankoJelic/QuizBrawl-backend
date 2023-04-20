@@ -24,9 +24,6 @@ const jwtFactory = {
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env.dev',
-    }),
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync(jwtFactory),
     MailModule,
