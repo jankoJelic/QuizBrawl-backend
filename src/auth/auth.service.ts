@@ -87,11 +87,12 @@ export class AuthService {
   }
 
   async createNewTokens(user: User) {
-    const securedUserObject = {
-      ...user,
-      refreshToken: 'SECURED',
-      password: 'SECURED',
-    };
+    let securedUserObject = user;
+    delete securedUserObject.refreshToken;
+    delete securedUserObject.password;
+    delete securedUserObject.registrationOtpCode;
+    delete securedUserObject.updatedAt;
+
     const refreshToken = await this.jwtService.signAsync({
       user: securedUserObject,
     });

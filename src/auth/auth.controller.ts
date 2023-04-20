@@ -24,6 +24,8 @@ import { Public } from './decorators/public.decorator';
 import { GetRefreshToken } from './decorators/get-refresh-token.decorator';
 import { AdminGuard } from './guards/admin.guard';
 import { MailService } from 'src/mail/mail.service';
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
