@@ -1,7 +1,8 @@
 export type Topic =
-  | 'general'
-  | 'sport'
-  | 'music'
-  | 'history'
-  | 'geography'
-  | 'showbiz';
+  | 'GENERAL'
+  | 'SPORTS'
+  | 'MUSIC'
+  | 'HISTORY'
+  | 'GEOGRAPHY'
+  | 'SHOWBIZ'
+  | 'ART';

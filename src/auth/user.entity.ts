@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Quiz } from 'src/quizes/quiz.entity';
+import { Topic } from 'src/rooms/types/Topic';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -65,4 +66,15 @@ export class User {
 
   @Column({ default: 0 })
   trophies: number;
+
+  @Column({ default: '' })
+  avatar: string;
+
+  @Column({ default: 1 })
+  level: number;
+
+  @Column({
+    type: 'json',
+  })
+  trophiesByTopic: Record<Topic, number>;
 }

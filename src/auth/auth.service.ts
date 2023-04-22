@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { scrypt as _scrypt } from 'crypto';
+import { scrypt as _scrypt, createHash } from 'crypto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -13,6 +13,8 @@ import { entryMatchesHash, hashAndSalt } from './util/hashAndSalt';
 import { MailService } from 'src/mail/mail.service';
 import { createOtpCode } from './util/createOtpCode';
 import { User } from './user.entity';
+import { PinDto } from './dtos/pin.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -20,12 +22,13 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private configService: ConfigService,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
     const { email, password, firstName } = createUserDto;
     const user = await this.usersService.findByEmail(email);
-
+    console.log(user);
     if (user) throw new BadRequestException('Email in use');
 
     const hashedPassword = await hashAndSalt(password);
@@ -53,7 +56,7 @@ export class AuthService {
 
     this.mailService.sendUserConfirmation(createUserDto, registrationOtpCode);
 
-    return accessToken;
+    return { accessToken, refreshToken };
   }
 
   async login(signInDto: SignInDto) {
@@ -66,24 +69,24 @@ export class AuthService {
 
     if (!passwordIsCorrect) throw new BadRequestException('bad password');
 
-    const { accessToken } = await this.createNewTokens(user);
+    const { accessToken, refreshToken } = await this.createNewTokens(user);
 
-    return accessToken;
+    return { accessToken, refreshToken };
   }
 
-  async updateRefreshToken(refreshToken: string, email: string) {
+  async updateRefreshToken(sentRefreshToken: string, email: string) {
     const user = await this.usersService.findByEmail(email);
 
     const refreshTokenMatchesHash = await entryMatchesHash(
-      refreshToken,
+      sentRefreshToken,
       user.refreshToken,
     );
 
     if (!refreshTokenMatchesHash) throw new UnauthorizedException();
 
-    const { accessToken } = await this.createNewTokens(user);
+    const { accessToken, refreshToken } = await this.createNewTokens(user);
 
-    return accessToken;
+    return { accessToken, refreshToken };
   }
 
   async createNewTokens(user: User) {
@@ -105,5 +108,11 @@ export class AuthService {
     this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
 
     return { refreshToken, accessToken };
+  }
+
+  async getPinEncryptionKey(dto: PinDto) {
+    const pinKey = this.configService.get<string>('APP_PIN_KEY');
+    const salt = `${dto.pin}-${pinKey}-${dto.deviceId}`;
+    return createHash('sha256').update(salt, 'utf8').digest().toString('hex');
   }
 }

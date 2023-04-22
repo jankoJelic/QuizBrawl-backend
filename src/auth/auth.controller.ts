@@ -6,6 +6,7 @@ import {
   Headers,
   HttpException,
   HttpStatus,
+  Patch,
   Post,
   Query,
   UnauthorizedException,
@@ -25,6 +26,7 @@ import { AdminGuard } from './guards/admin.guard';
 import { MailService } from 'src/mail/mail.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { PinDto } from './dtos/pin.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -94,12 +96,13 @@ export class AuthController {
     return { ...user, password: 'SECURED', refreshToken: 'SECURED' };
   }
 
+  @Public()
   @Get('/refreshToken')
   async refreshToken(
     @CurrentUser() user: User,
     @GetRefreshToken() refreshToken: string,
   ) {
-    await this.authService.updateRefreshToken(refreshToken, user.email);
+    return await this.authService.updateRefreshToken(refreshToken, user.email);
   }
 
   @UseGuards(AdminGuard)
@@ -123,5 +126,16 @@ export class AuthController {
       { email: 'janko.jelic99@gmail.com', firstName: 'Janko' } as CreateUserDto,
       '123321',
     );
+  }
+
+  @Patch('/updateUser')
+  async updateUser(@CurrentUser() user: User, @Body() body: Partial<User>) {
+    this.usersService.updateUser(user.id, body);
+  }
+
+  @Public()
+  @Post('/pin')
+  async setPinCode(@Body() body: PinDto) {
+    return await this.authService.getPinEncryptionKey(body);
   }
 }
