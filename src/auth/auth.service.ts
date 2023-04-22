@@ -28,7 +28,7 @@ export class AuthService {
   async register(createUserDto: CreateUserDto) {
     const { email, password, firstName } = createUserDto;
     const user = await this.usersService.findByEmail(email);
-    console.log(user);
+
     if (user) throw new BadRequestException('Email in use');
 
     const hashedPassword = await hashAndSalt(password);

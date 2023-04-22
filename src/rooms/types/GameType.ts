@@ -1,1 +1,1 @@
-export type GameType = 'brawl' | 'classic';
+export type GameType = 'Arena' | 'Solo' | '1v1';

@@ -1,5 +1,4 @@
 import { Room } from 'src/rooms/room.entity';
-import { Topic } from 'src/rooms/types/Topic';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -7,15 +6,15 @@ export class Lobby {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ default: 0 })
   playersCount: number;
 
-  @Column()
+  @Column({ default: 0 })
   availableRoomsCount: number;
-
-  @Column()
-  topic: Topic;
 
   @OneToMany(() => Room, (room) => room.lobby)
   rooms: Room[];
+
+  @Column()
+  name: 'Arena' | '1v1' | 'Solo';
 }
