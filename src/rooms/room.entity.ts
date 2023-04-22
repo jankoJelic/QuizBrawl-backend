@@ -1,7 +1,8 @@
 import { IsString, MaxLength } from 'class-validator';
 import { User } from 'src/auth/user.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { GameType } from './types/GameType';
+import { Lobby } from 'src/lobbies/lobby.entity';
 
 @Entity()
 export class Room {
@@ -44,4 +45,7 @@ export class Room {
 
   @Column({ default: '' })
   password: string;
+
+  @ManyToOne(() => Lobby, (lobby) => lobby.rooms)
+  lobby: Lobby;
 }

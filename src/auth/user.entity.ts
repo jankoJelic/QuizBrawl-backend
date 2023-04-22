@@ -77,4 +77,7 @@ export class User {
     type: 'json',
   })
   trophiesByTopic: Record<Topic, number>;
+
+  @Column({ default: 0 })
+  winPercentage: number;
 }
