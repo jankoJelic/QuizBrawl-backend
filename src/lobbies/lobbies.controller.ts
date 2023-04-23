@@ -31,12 +31,12 @@ export class LobbiesController {
 
   @UseGuards(AdminGuard)
   @Patch('/updateLobby')
-  async updateLobby(@Param() id: string, @Body() body: Partial<Lobby>) {
+  async updateLobby(@Param('id') id: string, @Body() body: Partial<Lobby>) {
     return await this.lobbiesService.updateLobby(Number(id), body);
   }
 
   @Delete('/deleteLobby')
-  async deleteLobby(@Param() id: number) {
+  async deleteLobby(@Param('id') id: number) {
     return await this.lobbiesService.deleteLobby(id);
   }
 }

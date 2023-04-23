@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   NotFoundException,
+  Param,
   Patch,
   Post,
   Query,
@@ -14,6 +15,7 @@ import { CreateRoomDto } from './dtos/create-room.dto';
 import { User } from 'src/auth/user.entity';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { Topic } from './types/Topic';
 
 @ApiTags('rooms')
 @Controller('rooms')
@@ -21,8 +23,11 @@ export class RoomsController {
   constructor(private roomsService: RoomsService) {}
 
   @Get('/')
-  async getAllRooms() {
-    return this.roomsService.getAll();
+  async getAllRooms(
+    @Param('lobbyId') lobbyId: number,
+    @Param('topic') topic: Topic,
+  ) {
+    return this.roomsService.getAll(lobbyId, topic);
   }
 
   @Post('/create')

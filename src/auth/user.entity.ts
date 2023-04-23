@@ -70,6 +70,12 @@ export class User {
   @Column({ default: '' })
   avatar: string;
 
+  @Column({ type: 'json' })
+  avatars: string[];
+
+  @Column({ default: '#ECECEC' })
+  color: string;
+
   @Column({ default: 1 })
   level: number;
 
@@ -80,4 +86,13 @@ export class User {
 
   @Column({ default: 0 })
   winPercentage: number;
+
+  @Column({ default: 0 })
+  rank: number;
+
+  @Column({ default: 0 })
+  money: number;
+
+  @Column({ default: 0 })
+  maxTrophies: number;
 }

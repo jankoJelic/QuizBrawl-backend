@@ -3,6 +3,7 @@ import { User } from 'src/auth/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { GameType } from './types/GameType';
 import { Lobby } from 'src/lobbies/lobby.entity';
+import { Topic } from './types/Topic';
 
 @Entity()
 export class Room {
@@ -34,8 +35,8 @@ export class Room {
   @Column({ default: 15 })
   questionsCount: number;
 
-  @Column({ default: 'general' })
-  topic: string;
+  @Column({ default: 'General' })
+  topic: Topic;
 
   @Column({ default: 15 })
   answerTime: number;

@@ -4,6 +4,7 @@ import { Room } from './room.entity';
 import { Repository } from 'typeorm';
 import { CreateRoomDto } from './dtos/create-room.dto';
 import { User } from 'src/auth/user.entity';
+import { Topic } from './types/Topic';
 
 @Injectable()
 export class RoomsService {
@@ -34,7 +35,21 @@ export class RoomsService {
     return await this.roomsRepository.update(roomId, createRoomDto);
   }
 
-  async getAll() {
-    return await this.roomsRepository.find();
+  async getAll(lobbyId?: number, topic?: Topic) {
+    const allRooms = await this.roomsRepository.find();
+    let rooms = [];
+
+    if (!!lobbyId) {
+      const lobbyRooms = allRooms.filter((room) => room.lobby.id === lobbyId);
+      rooms = lobbyRooms;
+    }
+    if (topic) {
+      const topicRooms = rooms.filter((r) => r.topic === topic);
+      rooms = topicRooms;
+    }
+
+    return rooms;
   }
+
+  async getAllForTopic(topic: Topic) {}
 }
