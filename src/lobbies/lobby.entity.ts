@@ -1,5 +1,11 @@
 import { Room } from 'src/rooms/room.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Lobby {
@@ -13,6 +19,7 @@ export class Lobby {
   availableRoomsCount: number;
 
   @OneToMany(() => Room, (room) => room.lobby)
+  @JoinColumn()
   rooms: Room[];
 
   @Column()

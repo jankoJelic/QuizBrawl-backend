@@ -1,6 +1,12 @@
 import { IsString, MaxLength } from 'class-validator';
 import { User } from 'src/auth/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { GameType } from './types/GameType';
 import { Lobby } from 'src/lobbies/lobby.entity';
 import { Topic } from './types/Topic';
@@ -48,5 +54,6 @@ export class Room {
   password: string;
 
   @ManyToOne(() => Lobby, (lobby) => lobby.rooms)
+  @JoinColumn()
   lobby: Lobby;
 }

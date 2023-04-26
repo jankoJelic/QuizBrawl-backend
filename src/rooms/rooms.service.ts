@@ -14,7 +14,7 @@ export class RoomsService {
   ) {}
 
   async createRoom(
-    body: CreateRoomDto & { players: User[]; hostName: string, userId: number },
+    body: CreateRoomDto & { players: User[]; hostName: string; userId: number },
   ) {
     const room = this.roomsRepository.create(body);
 
@@ -38,18 +38,17 @@ export class RoomsService {
   }
 
   async getAll(lobbyId?: number, topic?: Topic) {
-    const allRooms = await this.roomsRepository.find();
-    let rooms = [];
+    const allRooms = await this.roomsRepository.find({ relations: ['lobby'] });
+    let rooms = allRooms;
 
     if (!!lobbyId) {
       const lobbyRooms = allRooms.filter((room) => room.lobby.id === lobbyId);
       rooms = lobbyRooms;
     }
-    if (topic) {
+    if (!!topic) {
       const topicRooms = rooms.filter((r) => r.topic === topic);
       rooms = topicRooms;
     }
-
     return rooms;
   }
 
