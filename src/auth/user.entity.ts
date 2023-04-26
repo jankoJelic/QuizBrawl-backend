@@ -6,10 +6,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Quiz } from 'src/quizes/quiz.entity';
 import { Topic } from 'src/rooms/types/Topic';
+import { Room } from 'src/rooms/room.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -70,7 +72,7 @@ export class User {
   @Column({ default: '' })
   avatar: string;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   avatars: string[];
 
   @Column({ default: '#ECECEC' })
@@ -81,6 +83,7 @@ export class User {
 
   @Column({
     type: 'json',
+    nullable: true,
   })
   trophiesByTopic: Record<Topic, number>;
 

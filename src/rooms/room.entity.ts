@@ -41,7 +41,7 @@ export class Room {
   @Column({ default: 15 })
   answerTime: number;
 
-  @Column()
+  @Column({ default: 'brawl' })
   type: GameType;
 
   @Column({ default: '' })

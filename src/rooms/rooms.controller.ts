@@ -31,13 +31,11 @@ export class RoomsController {
   }
 
   @Post('/create')
-  async createRoom(
-    @CurrentUser() user: User,
-    @Body() body: CreateRoomDto & { players: User[] },
-  ) {
+  async createRoom(@CurrentUser() user: User, @Body() body: CreateRoomDto) {
     const room = await this.roomsService.createRoom({
       userId: user.id,
       ...body,
+      hostName: user.firstName,
       players: [user],
     });
 
