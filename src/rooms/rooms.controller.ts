@@ -36,7 +36,7 @@ export class RoomsController {
       userId: user.id,
       ...body,
       hostName: user.firstName,
-      players: [user],
+      users: [user],
     });
 
     return room;

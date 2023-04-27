@@ -9,6 +9,6 @@ import { Room } from 'src/rooms/room.entity';
   imports: [TypeOrmModule.forFeature([Lobby, Room])],
   controllers: [LobbiesController],
   providers: [LobbiesService],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, LobbiesService],
 })
 export class LobbiesModule {}

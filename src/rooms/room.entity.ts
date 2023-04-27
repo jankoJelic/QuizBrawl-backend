@@ -5,6 +5,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { GameType } from './types/GameType';
@@ -27,14 +28,6 @@ export class Room {
   @Column()
   name: string;
 
-  @Column({ type: 'json' })
-  players: Partial<User>[];
-  //@IsOptional() => in DTO
-  // @ApiModelProperty({
-  //   isArray: true,
-  // })
-  // dependants: User[];
-
   @Column({ default: 4 })
   maxPlayers: number;
 
@@ -56,4 +49,7 @@ export class Room {
   @ManyToOne(() => Lobby, (lobby) => lobby.rooms)
   @JoinColumn()
   lobby: Lobby;
+
+  @OneToMany(() => User, (user) => user.room)
+  users: User[];
 }

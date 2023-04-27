@@ -9,7 +9,8 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { getUserDeviceRoom } from './rooms/room.events';
+import { LobbiesService } from 'src/lobbies/lobbies.service';
+import { UserJoinedLobbyDto } from './dtos/user-joined-lobby.dto';
 
 @WebSocketGateway({
   namespace: 'events',
@@ -21,25 +22,17 @@ import { getUserDeviceRoom } from './rooms/room.events';
 export class EventsGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
+  constructor(private readonly lobbiesService: LobbiesService) {}
+
   @WebSocketServer()
   public server: Server;
 
   afterInit(server: any) {
-    console.log('after init');
+    // console.log('after init');
   }
 
   handleConnection(@ConnectedSocket() client: any) {
     console.log('CLIENT CONNECTED');
-    // console.log(
-    //   `user ${client.user.id} with socket ${client.id} connected with device ${client.handshake?.query?.deviceId}`,
-    // );
-
-    // client.join(
-    //   getUserDeviceRoom(
-    //     client.user.id,
-    //     client.handshake.query.deviceId.toString(),
-    //   ),
-    // );
   }
 
   handleDisconnect(@ConnectedSocket() client: any) {
@@ -51,8 +44,18 @@ export class EventsGateway
     @MessageBody() data: string,
     @ConnectedSocket() client: Socket,
   ): string {
-    console.log('event arrived on BE');
+    console.log('event arrived on BE', data);
+    // console.log('client: ', client);
     // console.log(data, client);
     return data;
+  }
+
+  @SubscribeMessage('USER_JOINED_ROOM')
+  handleUserJoinedRoom(@MessageBody() data: string) {}
+
+  @SubscribeMessage('USER_JOINED_LOBBY')
+  handleUserJoinedLobby(@MessageBody() data: UserJoinedLobbyDto) {
+    this.server.emit('USER_JOINED_LOBBY', data);
+    this.lobbiesService.addUserToLobby(data);
   }
 }

@@ -1,3 +1,4 @@
+import { User } from 'src/auth/user.entity';
 import { Room } from 'src/rooms/room.entity';
 import {
   Column,
@@ -24,4 +25,7 @@ export class Lobby {
 
   @Column()
   name: 'Arena' | '1v1' | 'Solo';
+
+  @OneToMany(() => User, (user) => user.lobby)
+  users: User[];
 }

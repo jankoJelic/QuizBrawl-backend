@@ -14,7 +14,7 @@ export class RoomsService {
   ) {}
 
   async createRoom(
-    body: CreateRoomDto & { players: User[]; hostName: string; userId: number },
+    body: CreateRoomDto & { users: User[]; hostName: string; userId: number },
   ) {
     const room = this.roomsRepository.create(body);
 

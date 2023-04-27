@@ -7,11 +7,13 @@ import {
   UpdateDateColumn,
   OneToMany,
   OneToOne,
+  ManyToOne,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Quiz } from 'src/quizes/quiz.entity';
 import { Topic } from 'src/rooms/types/Topic';
 import { Room } from 'src/rooms/room.entity';
+import { Lobby } from 'src/lobbies/lobby.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -98,4 +100,10 @@ export class User {
 
   @Column({ default: 0 })
   maxTrophies: number;
+
+  @ManyToOne(() => Lobby, (lobby) => lobby.users)
+  lobby: Lobby;
+
+  @ManyToOne(() => Room, (room) => room.users)
+  room: Room;
 }
