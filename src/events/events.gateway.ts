@@ -43,16 +43,7 @@ export class EventsGateway
   }
 
   handleDisconnect(@ConnectedSocket() client: any) {
-    console.log(
-      `user ${client.user.id} with socket ${client.id} with device ${client.handshake?.query?.deviceId} DISCONNECTED`,
-    );
-
-    client.leave(
-      getUserDeviceRoom(
-        client.user.id,
-        client.handshake.query.deviceId.toString(),
-      ),
-    );
+    console.log('USER DISCONNECTED');
   }
 
   @SubscribeMessage('events')
