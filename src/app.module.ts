@@ -10,7 +10,7 @@ import { MailModule } from './mail/mail.module';
 import { RoomsModule } from './rooms/rooms.module';
 import * as Joi from 'joi';
 import { Room } from './rooms/room.entity';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { QuestionsModule } from './questions/questions.module';
 import { Question } from './questions/question.entity';
@@ -21,6 +21,9 @@ import { QuizesModule } from './quizes/quizes.module';
 import { Quiz } from './quizes/quiz.entity';
 import { LobbiesModule } from './lobbies/lobbies.module';
 import { Lobby } from './lobbies/lobby.entity';
+import { EventsGateway } from './events/events.gateway';
+import { HeaderInterceptor } from './interceptors/headers.interceptor';
+import { EventsModule } from './events/events.module';
 
 @Global()
 @Module({
@@ -60,9 +63,18 @@ import { Lobby } from './lobbies/lobby.entity';
     ImagesModule,
     QuizesModule,
     LobbiesModule,
+    EventsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: AuthGuard },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HeaderInterceptor,
+    },
+    EventsGateway,
+  ],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
