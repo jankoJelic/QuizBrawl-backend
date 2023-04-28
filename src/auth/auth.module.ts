@@ -10,6 +10,7 @@ import { JWT_EXP, JWT_SECRET } from './constants/authConstants';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { MailModule } from 'src/mail/mail.module';
+import { LobbiesModule } from 'src/lobbies/lobbies.module';
 
 const jwtFactory = {
   imports: [ConfigModule],
@@ -27,6 +28,7 @@ const jwtFactory = {
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync(jwtFactory),
     MailModule,
+    LobbiesModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -34,6 +36,6 @@ const jwtFactory = {
     AuthService,
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
-  exports: [TypeOrmModule, JwtModule],
+  exports: [TypeOrmModule, JwtModule, UsersService],
 })
 export class AuthModule {}

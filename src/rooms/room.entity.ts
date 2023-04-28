@@ -50,6 +50,7 @@ export class Room {
   @JoinColumn()
   lobby: Lobby;
 
-  @OneToMany(() => User, (user) => user.room)
+  @OneToMany(() => User, (user) => user.room, { eager: true })
+  @JoinColumn()
   users: User[];
 }

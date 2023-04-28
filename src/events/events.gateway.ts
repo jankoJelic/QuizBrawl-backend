@@ -9,8 +9,10 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { LobbiesService } from 'src/lobbies/lobbies.service';
 import { UserJoinedLobbyDto } from './dtos/user-joined-lobby.dto';
+import { UsersService } from 'src/auth/users.service';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from 'src/auth/user.entity';
 
 @WebSocketGateway({
   namespace: 'events',
@@ -22,7 +24,7 @@ import { UserJoinedLobbyDto } from './dtos/user-joined-lobby.dto';
 export class EventsGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
-  constructor(private readonly lobbiesService: LobbiesService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @WebSocketServer()
   public server: Server;
@@ -54,8 +56,8 @@ export class EventsGateway
   handleUserJoinedRoom(@MessageBody() data: string) {}
 
   @SubscribeMessage('USER_JOINED_LOBBY')
-  handleUserJoinedLobby(@MessageBody() data: UserJoinedLobbyDto) {
+  async handleUserJoinedLobby(@MessageBody() data: UserJoinedLobbyDto) {
+    await this.usersService.addUserToLobby(data);
     this.server.emit('USER_JOINED_LOBBY', data);
-    this.lobbiesService.addUserToLobby(data);
   }
 }

@@ -7,12 +7,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './user.entity';
+import { UserJoinedLobbyDto } from 'src/events/dtos/user-joined-lobby.dto';
+import { Lobby } from 'src/lobbies/lobby.entity';
+// import { LobbiesService } from 'src/lobbies/lobbies.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private usersRepository: Repository<User>, // private lobbiesService: LobbiesService,
+    @InjectRepository(Lobby)
+    private lobbiesRepository: Repository<Lobby>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -62,5 +67,13 @@ export class UsersService {
     if (otpCode !== registrationOtpCode) throw new BadRequestException();
 
     this.updateUser(id, { isEmailConfirmed: true, registrationOtpCode: '' });
+  }
+
+  async addUserToLobby({ lobbyId, user }: UserJoinedLobbyDto) {
+    const lobby = await this.lobbiesRepository.findOne({
+      where: { id: lobbyId },
+    });
+
+    return await this.usersRepository.update(user.id, { lobby });
   }
 }

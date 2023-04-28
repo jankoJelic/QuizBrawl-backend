@@ -8,6 +8,7 @@ import {
   OneToMany,
   OneToOne,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Quiz } from 'src/quizes/quiz.entity';
@@ -65,7 +66,8 @@ export class User {
   @Column({ default: false })
   isPremium: boolean;
 
-  @OneToMany(() => Quiz, (quiz) => quiz.user)
+  @OneToMany(() => Quiz, (quiz) => quiz.user, { eager: true })
+  @JoinColumn()
   quizes: Quiz[];
 
   @Column({ default: 0 })

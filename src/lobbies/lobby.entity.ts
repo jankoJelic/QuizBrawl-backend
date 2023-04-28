@@ -19,13 +19,15 @@ export class Lobby {
   @Column({ default: 0 })
   availableRoomsCount: number;
 
-  @OneToMany(() => Room, (room) => room.lobby)
+  @OneToMany(() => Room, (room) => room.lobby, { eager: true })
   @JoinColumn()
   rooms: Room[];
 
   @Column()
   name: 'Arena' | '1v1' | 'Solo';
 
-  @OneToMany(() => User, (user) => user.lobby)
+  @Column({ type: 'json' })
+  @OneToMany(() => User, (user) => user.lobby, { eager: true })
+  @JoinColumn()
   users: User[];
 }

@@ -1,14 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Lobby } from './lobby.entity';
 import { UserJoinedLobbyDto } from 'src/events/dtos/user-joined-lobby.dto';
+import { UsersService } from 'src/auth/users.service';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class LobbiesService {
   constructor(
     @InjectRepository(Lobby)
     private lobbiesRepository: Repository<Lobby>,
+    private usersService: UsersService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
 
   async getLobbies() {
@@ -27,13 +32,5 @@ export class LobbiesService {
 
   async deleteLobby(lobbyId: number) {
     return await this.lobbiesRepository.delete(lobbyId);
-  }
-
-  async addUserToLobby({ user, lobbyId }: UserJoinedLobbyDto) {
-    let lobby = await this.lobbiesRepository.findOneBy({ id: lobbyId });
-    const lobbyUsers = lobby?.users || [];
-    lobby.users = lobbyUsers.concat([user]);
-    console.log(lobby);
-    this.lobbiesRepository.save(lobby);
   }
 }
