@@ -8,11 +8,11 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { UserJoinedLobbyDto } from './dtos/user-joined-lobby.dto';
 import { UsersService } from 'src/auth/users.service';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import { User } from 'src/auth/user.entity';
+import { UserJoinedRoomDto } from './dtos/user-joined-room.dto';
+import { SOCKET_EVENTS } from './constants/events';
 
 @WebSocketGateway({
   namespace: 'events',
@@ -30,7 +30,7 @@ export class EventsGateway
   public server: Server;
 
   afterInit(server: any) {
-    // console.log('after init');
+    console.log('after init');
   }
 
   handleConnection(@ConnectedSocket() client: any) {
@@ -41,23 +41,15 @@ export class EventsGateway
     console.log('USER DISCONNECTED');
   }
 
-  @SubscribeMessage('events')
-  handleEvent(
-    @MessageBody() data: string,
-    @ConnectedSocket() client: Socket,
-  ): string {
-    console.log('event arrived on BE', data);
-    // console.log('client: ', client);
-    // console.log(data, client);
-    return data;
-  }
-
-  @SubscribeMessage('USER_JOINED_ROOM')
-  handleUserJoinedRoom(@MessageBody() data: string) {}
-
-  @SubscribeMessage('USER_JOINED_LOBBY')
+  @SubscribeMessage(SOCKET_EVENTS.USER_JOINED_LOBBY)
   async handleUserJoinedLobby(@MessageBody() data: UserJoinedLobbyDto) {
     await this.usersService.addUserToLobby(data);
-    this.server.emit('USER_JOINED_LOBBY', data);
+    this.server.emit(SOCKET_EVENTS.USER_JOINED_LOBBY, data);
   }
+
+  @SubscribeMessage(SOCKET_EVENTS.USER_LEFT_LOBBY)
+  async handleUserLeftLobby(@MessageBody() data: UserJoinedLobbyDto) {}
+
+  @SubscribeMessage(SOCKET_EVENTS.USER_JOINED_ROOM)
+  async handleUserJoinedRoom(@MessageBody() data: UserJoinedRoomDto) {}
 }

@@ -21,12 +21,12 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private mailService: MailService,
+    // private mailService: MailService,
     private configService: ConfigService,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
-    const { email, password, firstName } = createUserDto;
+    const { email, password } = createUserDto;
     const user = await this.usersService.findByEmail(email);
 
     if (user) throw new BadRequestException('Email in use');
@@ -54,7 +54,7 @@ export class AuthService {
       refreshToken,
     });
 
-    this.mailService.sendUserConfirmation(createUserDto, registrationOtpCode);
+    // this.mailService.sendUserConfirmation(createUserDto, registrationOtpCode);
 
     return { accessToken, refreshToken };
   }

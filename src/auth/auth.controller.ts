@@ -93,7 +93,10 @@ export class AuthController {
 
     const user = await this.usersService.findByEmail(email);
 
-    return { ...user, password: 'SECURED', refreshToken: 'SECURED' };
+    delete user.password;
+    delete user.refreshToken;
+
+    return user;
   }
 
   @Public()
