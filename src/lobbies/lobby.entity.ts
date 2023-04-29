@@ -22,7 +22,7 @@ export class Lobby {
 
   @OneToMany(() => User, (user) => user.lobby, {
     eager: true,
-    cascade: ['insert', 'update'],
+    // cascade: ['insert', 'update'],
   })
   users: User[];
 }

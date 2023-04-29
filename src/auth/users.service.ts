@@ -9,6 +9,9 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './user.entity';
 import { UserJoinedLobbyDto } from 'src/events/dtos/user-joined-lobby.dto';
 import { Lobby } from 'src/lobbies/lobby.entity';
+import { UserJoinedRoomDto } from 'src/events/dtos/user-joined-room.dto';
+import { Room } from 'src/rooms/room.entity';
+import { LobbiesService } from 'src/lobbies/lobbies.service';
 // import { LobbiesService } from 'src/lobbies/lobbies.service';
 
 @Injectable()
@@ -18,6 +21,9 @@ export class UsersService {
     private usersRepository: Repository<User>, // private lobbiesService: LobbiesService,
     @InjectRepository(Lobby)
     private lobbiesRepository: Repository<Lobby>,
+    @InjectRepository(Room)
+    private roomsRepository: Repository<Room>,
+    private lobbiesService: LobbiesService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -39,7 +45,10 @@ export class UsersService {
 
   async findByEmail(email: string) {
     try {
-      const users = await this.usersRepository.find({ where: { email } });
+      const users = await this.usersRepository.find({
+        where: { email },
+        relations: { lobby: true },
+      });
 
       if (!users.length) throw new NotFoundException();
 
@@ -74,6 +83,18 @@ export class UsersService {
       where: { id: lobbyId },
     });
 
-    return await this.usersRepository.update(user.id, { lobby });
+    lobby.users = lobby.users.concat([user]);
+
+    await this.usersRepository.update(user.id, { lobby });
+
+    this.lobbiesRepository.save(lobby);
+  }
+
+  async removeUserFromLobby({ lobbyId, user }: UserJoinedLobbyDto) {}
+
+  async addUserToRoom({ roomId, user }: UserJoinedRoomDto) {
+    const room = await this.roomsRepository.findOne({ where: { id: roomId } });
+
+    return await this.usersRepository.update(user.id, { room });
   }
 }

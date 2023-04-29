@@ -11,6 +11,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { MailModule } from 'src/mail/mail.module';
 import { LobbiesModule } from 'src/lobbies/lobbies.module';
+import { LobbiesService } from 'src/lobbies/lobbies.service';
+import { Lobby } from 'src/lobbies/lobby.entity';
 
 const jwtFactory = {
   imports: [ConfigModule],
@@ -25,7 +27,7 @@ const jwtFactory = {
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Lobby]),
     JwtModule.registerAsync(jwtFactory),
     MailModule,
     LobbiesModule,
@@ -35,6 +37,7 @@ const jwtFactory = {
     UsersService,
     AuthService,
     { provide: APP_GUARD, useClass: AuthGuard },
+    LobbiesService,
   ],
   exports: [TypeOrmModule, JwtModule, UsersService],
 })

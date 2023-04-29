@@ -3,13 +3,11 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpException,
   HttpStatus,
   Patch,
   Post,
   Query,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -79,20 +77,7 @@ export class AuthController {
   }
 
   @Get('/me')
-  async getMyInfo(@Headers('Authorization') authorization = '') {
-    let bearer: string = '';
-
-    if (typeof authorization != 'undefined') {
-      bearer = authorization.replace('Bearer ', '');
-    }
-    if (bearer === '') {
-      throw new UnauthorizedException('No Token provided!');
-    }
-
-    const { email } = await this.isTokenValid(bearer);
-
-    const user = await this.usersService.findByEmail(email);
-
+  async getMyInfo(@CurrentUser() user: User) {
     delete user.password;
     delete user.refreshToken;
 
