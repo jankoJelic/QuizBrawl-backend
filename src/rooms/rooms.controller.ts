@@ -44,15 +44,17 @@ export class RoomsController {
 
   @Delete('/delete')
   async deleteRoom(@CurrentUser() user: User, @Query('roomId') roomId: number) {
-    const room = await this.roomsService.getRoomById(roomId);
+    try {
+      const room = await this.roomsService.getRoomById(roomId);
 
-    if (!room) throw new NotFoundException();
+      if (!room) throw new NotFoundException();
 
-    if (room.userId === user.id || user.isAdmin) {
-      this.roomsService.deleteRoom(roomId);
-    } else {
-      throw new UnauthorizedException();
-    }
+      if (room?.admin?.id === user.id || user?.isAdmin) {
+        this.roomsService.deleteRoom(roomId);
+      } else {
+        throw new UnauthorizedException();
+      }
+    } catch (e) {}
   }
 
   @Patch('/updateRoom')

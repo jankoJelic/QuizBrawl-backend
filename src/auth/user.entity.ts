@@ -6,7 +6,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  OneToOne,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -106,6 +105,6 @@ export class User {
   @ManyToOne(() => Lobby, (lobby) => lobby.users)
   lobby: Lobby;
 
-  @ManyToOne(() => Room, (room) => room.users)
+  @ManyToOne(() => Room, (room) => room.users, { onDelete: 'CASCADE' })
   room: Room;
 }

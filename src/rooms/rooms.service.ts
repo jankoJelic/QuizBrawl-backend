@@ -20,7 +20,7 @@ export class RoomsService {
   }
 
   async deleteRoom(roomId: number) {
-    this.roomsRepository.delete(roomId);
+    return await this.roomsRepository.delete(roomId);
   }
 
   async getRoomById(roomId: number) {
