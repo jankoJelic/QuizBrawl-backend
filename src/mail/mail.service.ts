@@ -48,7 +48,7 @@ export class MailService {
 
   public async sendUserConfirmation(user: CreateUserDto, code: string) {
     await this.setTransport();
-    
+
     this.mailerService
       .sendMail({
         transporterName: 'gmail',
@@ -62,10 +62,10 @@ export class MailService {
         },
       })
       .then((success) => {
-        console.log(success);
+        // console.log(success);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   }
 }

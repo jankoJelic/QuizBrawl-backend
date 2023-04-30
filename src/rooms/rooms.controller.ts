@@ -24,8 +24,8 @@ export class RoomsController {
 
   @Get('/')
   async getAllRooms(
-    @Param('lobbyId') lobbyId: number,
-    @Param('topic') topic: Topic,
+    @Query('lobbyId') lobbyId: number,
+    @Query('topic') topic: Topic,
   ) {
     return this.roomsService.getAll(lobbyId, topic);
   }
@@ -58,7 +58,10 @@ export class RoomsController {
   }
 
   @Patch('/updateRoom')
-  async editRoom(@Body() body: Partial<CreateRoomDto> & { roomId: number }) {
-    return await this.roomsService.updateRoom(body);
+  async editRoom(
+    @Body() body: Partial<CreateRoomDto>,
+    @Query('roomId') roomId: number,
+  ) {
+    return await this.roomsService.updateRoom({ ...body, roomId });
   }
 }

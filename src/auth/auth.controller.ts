@@ -78,10 +78,11 @@ export class AuthController {
 
   @Get('/me')
   async getMyInfo(@CurrentUser() user: User) {
-    delete user.password;
-    delete user.refreshToken;
+    const fetchedUser = await this.usersService.findByEmail(user.email);
+    delete fetchedUser.password;
+    delete fetchedUser.refreshToken;
 
-    return user;
+    return fetchedUser;
   }
 
   @Public()

@@ -15,11 +15,11 @@ export class ImagesController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('photo', { dest: './uploads' }))
   uploadSingle(@UploadedFile() file) {
-    console.log(file);
+    // console.log(file);
   }
   @Post('uploads')
   @UseInterceptors(FilesInterceptor('photos[]', 10, { dest: './uploads' }))
   uploadMultiple(@UploadedFiles() files) {
-    console.log(files);
+    // console.log(files);
   }
 }

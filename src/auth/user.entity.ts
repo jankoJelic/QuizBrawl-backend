@@ -105,6 +105,6 @@ export class User {
   @ManyToOne(() => Lobby, (lobby) => lobby.users)
   lobby: Lobby;
 
-  @ManyToOne(() => Room, (room) => room.users, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Room, (room) => room.users, { onDelete: 'SET NULL' })
   room: Room;
 }

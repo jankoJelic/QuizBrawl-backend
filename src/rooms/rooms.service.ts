@@ -50,5 +50,7 @@ export class RoomsService {
     return rooms;
   }
 
-  async getAllForTopic(topic: Topic) {}
+  async getAllForUser(userId: number) {
+    return await this.roomsRepository.findOne({ where: { userId } });
+  }
 }

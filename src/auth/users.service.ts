@@ -50,7 +50,7 @@ export class UsersService {
     try {
       const users = await this.usersRepository.find({
         where: { email },
-        relations: { lobby: true },
+        relations: { lobby: true, room: true },
       });
 
       if (!users.length) throw new NotFoundException();
