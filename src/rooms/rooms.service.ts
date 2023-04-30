@@ -13,9 +13,7 @@ export class RoomsService {
     private roomsRepository: Repository<Room>,
   ) {}
 
-  async createRoom(
-    body: CreateRoomDto & { users: User[]; hostName: string; userId: number },
-  ) {
+  async createRoom(body: CreateRoomDto & { users: User[]; userId: number }) {
     const room = this.roomsRepository.create(body);
 
     return this.roomsRepository.save(room);

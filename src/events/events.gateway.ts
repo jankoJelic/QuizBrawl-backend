@@ -55,7 +55,9 @@ export class EventsGateway
   }
 
   @SubscribeMessage(SOCKET_EVENTS.USER_LEFT_LOBBY)
-  async handleUserLeftLobby(@MessageBody() data: UserJoinedLobbyDto) {}
+  async handleUserLeftLobby(@MessageBody() data: UserJoinedLobbyDto) {
+    
+  }
 
   @SubscribeMessage(SOCKET_EVENTS.USER_JOINED_ROOM)
   async handleUserJoinedRoom(@MessageBody() data: UserJoinedRoomDto) {}

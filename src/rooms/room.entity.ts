@@ -20,9 +20,6 @@ export class Room {
   @Column()
   userId: number;
 
-  @Column()
-  hostName: string;
-
   @IsString()
   @MaxLength(24)
   @Column()
@@ -53,4 +50,7 @@ export class Room {
   @OneToMany(() => User, (user) => user.room, { eager: true })
   @JoinColumn()
   users: User[];
+
+  @Column({ type: 'json' })
+  admin: User;
 }

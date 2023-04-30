@@ -35,7 +35,7 @@ export class RoomsController {
     const room = await this.roomsService.createRoom({
       userId: user.id,
       ...body,
-      hostName: user.firstName,
+      admin: user,
       users: [user],
     });
 

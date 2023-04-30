@@ -9,4 +9,5 @@ export interface CreateRoomDto {
   maxPlayers: number;
   lobby: Lobby;
   users: User[];
+  admin: User;
 }
