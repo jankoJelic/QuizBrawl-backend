@@ -36,7 +36,10 @@ export class UsersService {
   }
 
   findOne(id: number): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id });
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: { lobby: true, room: true },
+    });
   }
 
   async remove(id: number): Promise<void> {
@@ -90,11 +93,17 @@ export class UsersService {
     this.lobbiesRepository.save(lobby);
   }
 
-  async removeUserFromLobby({ lobbyId, user }: UserJoinedLobbyDto) {}
+  async removeUserFromLobby(user: User) {
+    await this.usersRepository.save({ ...user, lobby: null });
+  }
 
   async addUserToRoom({ roomId, user }: UserJoinedRoomDto) {
     const room = await this.roomsRepository.findOne({ where: { id: roomId } });
 
     return await this.usersRepository.update(user.id, { room });
+  }
+
+  async removeUserFromRoom(user: User) {
+    await this.usersRepository.save({ ...user, room: null });
   }
 }

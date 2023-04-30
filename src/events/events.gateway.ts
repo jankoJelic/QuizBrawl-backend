@@ -29,16 +29,23 @@ export class EventsGateway
   @WebSocketServer()
   public server: Server;
 
-  afterInit(server: any) {
-    console.log('after init');
-  }
+  afterInit(server: any) {}
 
-  handleConnection(@ConnectedSocket() client: any) {
-    console.log('CLIENT CONNECTED');
-  }
+  handleConnection(@ConnectedSocket() client: any) {}
 
-  handleDisconnect(@ConnectedSocket() client: any) {
-    console.log('USER DISCONNECTED');
+  async handleDisconnect(@ConnectedSocket() client: any) {
+    const { userId } = client.handshake.query || {};
+    const user = await this.usersService.findOne(userId);
+
+    if (!!user?.lobby?.id) {
+      this.server.emit(SOCKET_EVENTS.USER_LEFT_LOBBY);
+      this.usersService.removeUserFromLobby(user);
+    }
+
+    if (!!user?.room?.id) {
+      this.server.emit(SOCKET_EVENTS.USER_LEFT_ROOM);
+      this.usersService.removeUserFromRoom(user);
+    }
   }
 
   @SubscribeMessage(SOCKET_EVENTS.USER_JOINED_LOBBY)
