@@ -24,7 +24,7 @@ export class RoomsService {
   }
 
   async getRoomById(roomId: number) {
-    return await this.roomsRepository.findOneBy({ id: roomId });
+    return await this.roomsRepository.findOne({ where: { id: roomId } });
   }
 
   async updateRoom(createRoomDto: Partial<CreateRoomDto> & { roomId: number }) {
