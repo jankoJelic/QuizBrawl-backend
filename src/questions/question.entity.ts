@@ -1,8 +1,19 @@
 import { IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
 import { Topic } from 'src/rooms/types/Topic';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { CorrectAnswer } from './types/correct-answer.type';
 import { Difficulty } from './types/difficulty.type';
+import { Image } from 'src/images/image.entity';
+import { User } from 'src/auth/user.entity';
 
 @Entity()
 export class Question {
@@ -32,11 +43,8 @@ export class Question {
   @Column()
   topic: Topic;
 
-  @Column()
+  @Column({ default: 'EASY' })
   difficulty: Difficulty;
-
-  @Column({ default: '' })
-  image: string;
 
   @Column({ default: 0 })
   answer1Count: number;
@@ -49,4 +57,10 @@ export class Question {
 
   @Column({ default: 0 })
   answer4Count: number;
+
+  @OneToOne(() => Image, (image) => image.question)
+  image: Image;
+
+  @ManyToOne(() => User, (user) => user.questions)
+  user: User;
 }

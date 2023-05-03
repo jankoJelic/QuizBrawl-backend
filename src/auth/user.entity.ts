@@ -14,6 +14,7 @@ import { Quiz } from 'src/quizes/quiz.entity';
 import { Topic } from 'src/rooms/types/Topic';
 import { Room } from 'src/rooms/room.entity';
 import { Lobby } from 'src/lobbies/lobby.entity';
+import { Question } from 'src/questions/question.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -107,4 +108,7 @@ export class User {
 
   @ManyToOne(() => Room, (room) => room.users, { onDelete: 'SET NULL' })
   room: Room;
+
+  @OneToMany(() => Question, (question) => question.user)
+  questions: Question[];
 }

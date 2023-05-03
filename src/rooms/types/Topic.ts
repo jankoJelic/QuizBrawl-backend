@@ -5,4 +5,5 @@ export type Topic =
   | 'History'
   | 'Geography'
   | 'Showbiz'
-  | 'Art';
+  | 'Art'
+  | 'Science';

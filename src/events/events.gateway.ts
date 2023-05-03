@@ -23,6 +23,7 @@ const {
   USER_JOINED_ROOM,
   USER_LEFT_LOBBY,
   USER_LEFT_ROOM,
+  USER_DISCONNECTED, // we will see if this one is needed
 } = SOCKET_EVENTS;
 
 @WebSocketGateway({
@@ -55,6 +56,10 @@ export class EventsGateway
       await this.roomsService.deleteRoom(usersRoom.id);
       this.server.emit(ROOM_DELETED, usersRoom);
     }
+
+    const user = await this.usersService.findOne(userId);
+
+    // this.server.emit(USER_DISCONNECTED, user);
   }
 
   @SubscribeMessage(USER_JOINED_LOBBY)

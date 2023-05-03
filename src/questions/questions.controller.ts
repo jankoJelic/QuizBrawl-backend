@@ -11,9 +11,12 @@ import {
 import { QuestionsService } from './questions.service';
 import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { ApiTags } from '@nestjs/swagger';
-import { Topic } from 'src/rooms/types/Topic';
 import { GetQuestionsDto } from './dtos/get-questions.dto';
 import { CreateQuestionDto } from './dtos/create-question.dto';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from 'src/auth/user.entity';
+import { Topic } from 'src/rooms/types/Topic';
+import { Difficulty } from './types/difficulty.type';
 
 @ApiTags('questions')
 @UseGuards(AdminGuard)
@@ -22,21 +25,31 @@ export class QuestionsController {
   constructor(private questionsService: QuestionsService) {}
 
   @Post('/create')
-  async createQuestion(@Body() createQuestionDto: CreateQuestionDto) {
-    return this.questionsService.createQuestion(createQuestionDto);
+  async createQuestion(
+    @Body() createQuestionDto: CreateQuestionDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.questionsService.createQuestion(createQuestionDto, user);
   }
 
-  @Patch('/editQuestion')
-  async editQuestion() {}
+  @Patch('/edit')
+  async editQuestion(@Query('id') id: number) {}
 
-  @Delete('/deleteQuestion')
-  async deleteQuestion() {}
+  @Delete('/delete')
+  async deleteQuestion(@Query('id') id: number) {
+    this.questionsService.deleteQuestion(id);
+  }
 
   @Get('/')
   async getQuestions(
-    @Query()
-    params: GetQuestionsDto,
+    @Query('topic') topic: Topic,
+    @Query('difficulty') difficulty: Difficulty,
+    @Query('text') text: string,
   ) {
-    return await this.questionsService.getQuestions(params);
+    return await this.questionsService.getQuestions({
+      topic,
+      difficulty,
+      text,
+    });
   }
 }
