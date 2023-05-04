@@ -16,14 +16,15 @@ export class QuestionsService {
   async getQuestions(params: GetQuestionsDto) {
     const { topic, text, difficulty } = params || {};
 
-    return await this.questionsRepository.find({ relations: { user: true } });
-    // const builder = this.questionsRepository.createQueryBuilder('questions');
-
-    // return builder.getMany();
+    const builder = this.questionsRepository.createQueryBuilder('questions');
+    builder.leftJoinAndSelect('questions.user', 'user');
+    if (topic !== 'General') {
+      builder.where('questions.topic LIKE :topic', { topic });
+    }
+    return builder.getMany();
   }
 
   async createQuestion(createQuestionDto: CreateQuestionDto, user: User) {
-    console.log(user);
     const question = this.questionsRepository.create({
       ...createQuestionDto,
       user,
@@ -36,5 +37,10 @@ export class QuestionsService {
 
   async deleteQuestion(questionId: number) {
     return await this.questionsRepository.delete(questionId);
+  }
+
+  async getQuestionById(id: number) {
+    const q = await this.questionsRepository.findOneBy({ id });
+    return q;
   }
 }

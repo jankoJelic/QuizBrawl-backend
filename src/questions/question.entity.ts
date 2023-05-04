@@ -1,14 +1,13 @@
-import { IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
 import { Topic } from 'src/rooms/types/Topic';
 import {
   Column,
+  CreateDateColumn,
   Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { CorrectAnswer } from './types/correct-answer.type';
 import { Difficulty } from './types/difficulty.type';
@@ -63,4 +62,20 @@ export class Question {
 
   @ManyToOne(() => User, (user) => user.questions)
   user: User;
+
+  @Column({ type: 'json', nullable: true })
+  editedBy: User[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  createdAt: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+  updatedAt: Date;
 }
