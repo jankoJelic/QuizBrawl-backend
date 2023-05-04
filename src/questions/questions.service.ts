@@ -5,6 +5,7 @@ import { CreateQuestionDto } from './dtos/create-question.dto';
 import { Repository } from 'typeorm';
 import { Question } from './question.entity';
 import { User } from 'src/auth/user.entity';
+import { UpdateQuestionDto } from './dtos/update-question.dto';
 
 @Injectable()
 export class QuestionsService {
@@ -33,7 +34,15 @@ export class QuestionsService {
     return await this.questionsRepository.save(question);
   }
 
-  async updateQuestion(dto: Partial<CreateQuestionDto>) {}
+  async updateQuestion({ dto, id, user }: UpdateQuestionDto) {
+    const question = await this.questionsRepository.findOne({ where: { id } });
+    const isEdited = !!question.editedBy;
+    const updatedEditors = isEdited ? question.editedBy.concat([user]) : [user];
+    return await this.questionsRepository.update(id, {
+      ...dto,
+      editedBy: updatedEditors,
+    });
+  }
 
   async deleteQuestion(questionId: number) {
     return await this.questionsRepository.delete(questionId);

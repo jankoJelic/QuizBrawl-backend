@@ -33,7 +33,13 @@ export class QuestionsController {
   }
 
   @Patch('/edit')
-  async editQuestion(@Query('id') id: number) {}
+  async editQuestion(
+    @Query('id') id: number,
+    @Body() body: CreateQuestionDto,
+    @CurrentUser() user: User,
+  ) {
+    return await this.questionsService.updateQuestion({ id, dto: body, user });
+  }
 
   @Delete('/delete')
   async deleteQuestion(@Query('id') id: number) {
