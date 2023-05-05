@@ -41,9 +41,9 @@ export class QuestionsController {
     return await this.questionsService.updateQuestion({ id, dto: body, user });
   }
 
-  @Delete('/delete')
+  @Delete('/')
   async deleteQuestion(@Query('id') id: number) {
-    this.questionsService.deleteQuestion(id);
+    return await this.questionsService.deleteQuestion(id);
   }
 
   @Get('/')
