@@ -5,13 +5,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { CorrectAnswer } from './types/correct-answer.type';
 import { Difficulty } from './types/difficulty.type';
-import { Image } from 'src/images/image.entity';
 import { User } from 'src/auth/user.entity';
 
 @Entity()
@@ -57,8 +55,8 @@ export class Question {
   @Column({ default: 0 })
   answer4Count: number;
 
-  @OneToOne(() => Image, (image) => image.question)
-  image: Image;
+  @Column({ default: null })
+  image?: string;
 
   @ManyToOne(() => User, (user) => user.questions)
   user: User;

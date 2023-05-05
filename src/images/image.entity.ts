@@ -24,7 +24,4 @@ export class Image {
 
   @Column()
   questionId: number;
-
-  @OneToOne(() => Question, (question) => question.image)
-  question: Question;
 }
