@@ -61,7 +61,6 @@ export class QuestionsController {
 
   @Get('/question')
   async getQuestion(@Query('id') id: string) {
-    console.log(id);
     return await this.questionsService.getQuestionById(Number(id));
   }
 }
