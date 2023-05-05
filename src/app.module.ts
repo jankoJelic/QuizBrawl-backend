@@ -14,8 +14,6 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { QuestionsModule } from './questions/questions.module';
 import { Question } from './questions/question.entity';
-import { ImagesModule } from './images/images.module';
-import { Image } from './images/image.entity';
 import { configuration } from '../config/configuration';
 import { QuizesModule } from './quizes/quizes.module';
 import { Quiz } from './quizes/quiz.entity';
@@ -54,13 +52,12 @@ import { EventsModule } from './events/events.module';
       username: 'root',
       password: 'jankoKriptomat9',
       database: 'sys',
-      entities: [User, Room, Question, Image, Quiz, Lobby],
+      entities: [User, Room, Question, Quiz, Lobby],
       autoLoadEntities: true,
       synchronize: true,
     }),
     MailModule,
     QuestionsModule,
-    ImagesModule,
     QuizesModule,
     LobbiesModule,
     EventsModule,
