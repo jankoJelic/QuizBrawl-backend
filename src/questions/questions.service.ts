@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { GetQuestionsDto } from './dtos/get-questions.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateQuestionDto } from './dtos/create-question.dto';
@@ -36,6 +36,9 @@ export class QuestionsService {
 
   async updateQuestion({ dto, id, user }: UpdateQuestionDto) {
     const question = await this.questionsRepository.findOne({ where: { id } });
+
+    if (!question) throw new NotFoundException();
+
     const isEdited = !!question.editedBy;
     const updatedEditors = isEdited ? question.editedBy.concat([user]) : [user];
     return await this.questionsRepository.update(id, {
