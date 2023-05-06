@@ -28,16 +28,11 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async findAll(name?: string, isAdmin?: string): Promise<User[]> {
+  async findAll(name?: string, isAdmin?: boolean): Promise<User[]> {
     const builder = this.usersRepository.createQueryBuilder('user');
-
-    if (!!name) {
-      builder.where('user.email like :name', { name });
-    }
-
-    if (isAdmin === 'true') {
-      builder.where('user.isAdmin LIKE :true', { true: true });
-    }
+    builder
+      .where('user.email LIKE :name', { name: `%${name}%` })
+      .andWhere('user.isAdmin LIKE :isAdmin', { isAdmin });
 
     return await builder.getMany();
   }

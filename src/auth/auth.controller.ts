@@ -76,7 +76,8 @@ export class AuthController {
     @Query('isAdmin') isAdmin: string,
     @Query('name') name: string,
   ) {
-    return await this.usersService.findAll(name, isAdmin);
+    const isAdminBoolean = isAdmin === 'true';
+    return await this.usersService.findAll(name, isAdminBoolean);
   }
 
   @Get('/me')

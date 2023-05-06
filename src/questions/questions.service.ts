@@ -17,11 +17,15 @@ export class QuestionsService {
   async getQuestions(params: GetQuestionsDto) {
     const { topic, text, difficulty } = params || {};
 
-    const builder = this.questionsRepository.createQueryBuilder('questions');
+    let builder = this.questionsRepository.createQueryBuilder('questions');
     builder.leftJoinAndSelect('questions.user', 'user');
+
+    builder.where('questions.question LIKE :text', { text: `%${text}%` });
+
     if (topic !== 'General') {
-      builder.where('questions.topic LIKE :topic', { topic });
+      builder = builder.andWhere('questions.topic LIKE :topic', { topic });
     }
+
     return builder.getMany();
   }
 
