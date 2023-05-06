@@ -15,7 +15,7 @@ export class QuestionsService {
   ) {}
 
   async getQuestions(params: GetQuestionsDto) {
-    const { topic, text, difficulty, count } = params || {};
+    const { topic, text, count } = params || {};
 
     let builder = this.questionsRepository
       .createQueryBuilder('questions')
