@@ -11,19 +11,16 @@ import { UserJoinedLobbyDto } from 'src/events/dtos/user-joined-lobby.dto';
 import { Lobby } from 'src/lobbies/lobby.entity';
 import { UserJoinedRoomDto } from 'src/events/dtos/user-joined-room.dto';
 import { Room } from 'src/rooms/room.entity';
-import { LobbiesService } from 'src/lobbies/lobbies.service';
-// import { LobbiesService } from 'src/lobbies/lobbies.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>, // private lobbiesService: LobbiesService,
+    private usersRepository: Repository<User>,
     @InjectRepository(Lobby)
     private lobbiesRepository: Repository<Lobby>,
     @InjectRepository(Room)
     private roomsRepository: Repository<Room>,
-    private lobbiesService: LobbiesService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -31,8 +28,18 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  async findAll(name?: string, isAdmin?: string): Promise<User[]> {
+    const builder = this.usersRepository.createQueryBuilder('user');
+
+    if (!!name) {
+      builder.where('user.email like :name', { name });
+    }
+
+    if (isAdmin === 'true') {
+      builder.where('user.isAdmin LIKE :true', { true: true });
+    }
+
+    return await builder.getMany();
   }
 
   findOne(id: number): Promise<User | null> {

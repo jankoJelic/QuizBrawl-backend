@@ -72,8 +72,11 @@ export class AuthController {
   }
 
   @Get('/users')
-  async getAllUsers() {
-    return await this.usersService.findAll();
+  async getAllUsers(
+    @Query('isAdmin') isAdmin: string,
+    @Query('name') name: string,
+  ) {
+    return await this.usersService.findAll(name, isAdmin);
   }
 
   @Get('/me')
@@ -95,7 +98,7 @@ export class AuthController {
   }
 
   @UseGuards(AdminGuard)
-  @Delete('')
+  @Delete('/')
   deleteUser(@Query('id') id: string) {
     this.usersService.deleteUser(id);
     return `deleted user ${id}`;
