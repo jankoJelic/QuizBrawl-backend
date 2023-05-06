@@ -15,15 +15,22 @@ export class QuestionsService {
   ) {}
 
   async getQuestions(params: GetQuestionsDto) {
-    const { topic, text, difficulty } = params || {};
+    const { topic, text, difficulty, count } = params || {};
 
-    let builder = this.questionsRepository.createQueryBuilder('questions');
+    let builder = this.questionsRepository
+      .createQueryBuilder('questions')
+      .orderBy('RAND()');
+
     builder.leftJoinAndSelect('questions.user', 'user');
 
     builder.where('questions.question LIKE :text', { text: `%${text}%` });
 
     if (topic !== 'General') {
       builder = builder.andWhere('questions.topic LIKE :topic', { topic });
+    }
+
+    if (!!count) {
+      builder = builder.take(count);
     }
 
     return builder.getMany();

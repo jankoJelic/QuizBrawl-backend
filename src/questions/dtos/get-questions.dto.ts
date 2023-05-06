@@ -5,4 +5,5 @@ export interface GetQuestionsDto {
   text?: string;
   topic?: Topic;
   difficulty?: Difficulty;
+  count?: number;
 }
