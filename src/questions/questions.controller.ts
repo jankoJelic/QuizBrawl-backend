@@ -51,11 +51,14 @@ export class QuestionsController {
     @Query('topic') topic: Topic,
     @Query('difficulty') difficulty: Difficulty,
     @Query('text') text: string,
+    @Query('count') count: string,
   ) {
+    const countNumber = Number(count);
     return await this.questionsService.getQuestions({
       topic,
       difficulty,
       text,
+      count: countNumber,
     });
   }
 

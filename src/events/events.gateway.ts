@@ -8,13 +8,14 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { UserJoinedLobbyDto } from './dtos/user-joined-lobby.dto';
 import { UsersService } from 'src/auth/users.service';
 import { UserJoinedRoomDto } from './dtos/user-joined-room.dto';
 import { SOCKET_EVENTS } from './constants/events';
 import { Room } from 'src/rooms/room.entity';
 import { RoomsService } from 'src/rooms/rooms.service';
+import { QuestionsService } from 'src/questions/questions.service';
 
 const {
   ROOM_CREATED,
@@ -23,7 +24,8 @@ const {
   USER_JOINED_ROOM,
   USER_LEFT_LOBBY,
   USER_LEFT_ROOM,
-  USER_DISCONNECTED, // we will see if this one is needed
+  GAME_STARTED,
+  // USER_DISCONNECTED, // we will see if this one is needed
 } = SOCKET_EVENTS;
 
 @WebSocketGateway({
@@ -39,6 +41,7 @@ export class EventsGateway
   constructor(
     private readonly usersService: UsersService,
     private roomsService: RoomsService,
+    private questionsService: QuestionsService,
   ) {}
 
   @WebSocketServer()
@@ -79,10 +82,15 @@ export class EventsGateway
   }
 
   @SubscribeMessage(USER_JOINED_ROOM)
-  async handleUserJoinedRoom(@MessageBody() data: UserJoinedRoomDto) {
+  async handleUserJoinedRoom(
+    @MessageBody() data: UserJoinedRoomDto,
+    @ConnectedSocket() client: Socket,
+  ) {
     const room = await this.roomsService.getRoomById(data.roomId);
     this.usersService.updateUser(data.user.id, { room });
     this.server.emit(USER_JOINED_ROOM, data);
+
+    client.join(`room-${String(room.id)}`);
   }
 
   @SubscribeMessage(USER_LEFT_ROOM)
@@ -103,10 +111,22 @@ export class EventsGateway
     const { userId } = client.handshake.query || {};
     this.usersService.updateUser(userId, { room });
     this.server.emit(ROOM_CREATED, room);
+
+    client.join(`room-${String(room.id)}`);
   }
 
   @SubscribeMessage(ROOM_DELETED)
   async handleRoomDeleted(@MessageBody() room: Room) {
     this.server.emit(ROOM_DELETED, room);
+  }
+
+  @SubscribeMessage(GAME_STARTED)
+  async handleGameStarted(@MessageBody() room: Room) {
+    const questions = await this.questionsService.getQuestions({
+      count: room.questionsCount,
+      topic: room.topic,
+    });
+
+    this.server.to(`room-${String(room.id)}`).emit(GAME_STARTED, questions);
   }
 }

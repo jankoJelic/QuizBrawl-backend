@@ -19,11 +19,10 @@ export class QuestionsService {
 
     let builder = this.questionsRepository
       .createQueryBuilder('questions')
-      .orderBy('RAND()');
+      .orderBy('RAND()')
+      .leftJoinAndSelect('questions.user', 'user');
 
-    builder.leftJoinAndSelect('questions.user', 'user');
-
-    builder.where('questions.question LIKE :text', { text: `%${text}%` });
+    builder.where('questions.question LIKE :text', { text: `%${text || ''}%` });
 
     if (topic !== 'General') {
       builder = builder.andWhere('questions.topic LIKE :topic', { topic });
@@ -33,7 +32,7 @@ export class QuestionsService {
       builder = builder.take(count);
     }
 
-    return builder.getMany();
+    return await builder.getMany();
   }
 
   async createQuestion(createQuestionDto: CreateQuestionDto, user: User) {

@@ -22,6 +22,7 @@ import { Lobby } from './lobbies/lobby.entity';
 import { EventsGateway } from './events/events.gateway';
 import { HeaderInterceptor } from './interceptors/headers.interceptor';
 import { EventsModule } from './events/events.module';
+import { QuestionsService } from './questions/questions.service';
 
 @Global()
 @Module({
@@ -71,6 +72,7 @@ import { EventsModule } from './events/events.module';
       useClass: HeaderInterceptor,
     },
     EventsGateway,
+    QuestionsService,
   ],
 })
 export class AppModule {
