@@ -104,6 +104,8 @@ export class EventsGateway
     const { userId } = client.handshake.query || {};
     this.usersService.updateUser(userId, { room: null });
     this.server.emit(USER_LEFT_ROOM, room);
+
+    client.leave(`room-${room.id}`);
   }
 
   @SubscribeMessage(ROOM_CREATED)

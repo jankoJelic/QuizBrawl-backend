@@ -10,4 +10,5 @@ export interface CreateRoomDto {
   lobby: Lobby;
   users: User[];
   admin: User;
+  questionsCount?: number;
 }
