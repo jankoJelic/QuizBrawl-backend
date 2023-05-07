@@ -61,7 +61,7 @@ import { QuestionsService } from './questions/questions.service';
     QuestionsModule,
     QuizesModule,
     LobbiesModule,
-    EventsModule,
+    // EventsModule,
   ],
   controllers: [AppController],
   providers: [

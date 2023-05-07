@@ -127,11 +127,12 @@ export class EventsGateway
 
   @SubscribeMessage(GAME_STARTED)
   async handleGameStarted(@MessageBody() room: Room) {
+    console.log(room);
     const questions = await this.questionsService.getQuestions({
       count: room.questionsCount,
       topic: room.topic,
     });
-
+    console.log(questions);
     this.server.to(`room-${String(room.id)}`).emit(GAME_STARTED, questions);
   }
 

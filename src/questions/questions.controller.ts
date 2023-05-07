@@ -11,12 +11,12 @@ import {
 import { QuestionsService } from './questions.service';
 import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { ApiTags } from '@nestjs/swagger';
-import { GetQuestionsDto } from './dtos/get-questions.dto';
 import { CreateQuestionDto } from './dtos/create-question.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { Topic } from 'src/rooms/types/Topic';
 import { Difficulty } from './types/difficulty.type';
+import { UpdateQuestionStatsDto } from './dtos/update-question-stats.dto';
 
 @ApiTags('questions')
 @UseGuards(AdminGuard)
@@ -65,5 +65,11 @@ export class QuestionsController {
   @Get('/question')
   async getQuestion(@Query('id') id: string) {
     return await this.questionsService.getQuestionById(Number(id));
+  }
+
+  @Patch('/stats')
+  async updateQuestionStats(@Body() body: UpdateQuestionStatsDto) {
+    if (!body) return;
+    this.questionsService.updateQuestionStats(body);
   }
 }

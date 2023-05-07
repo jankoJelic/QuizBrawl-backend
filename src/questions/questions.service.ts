@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { Question } from './question.entity';
 import { User } from 'src/auth/user.entity';
 import { UpdateQuestionDto } from './dtos/update-question.dto';
+import { UpdateQuestionStatsDto } from './dtos/update-question-stats.dto';
+import { CorrectAnswer } from './types/correct-answer.type';
 
 @Injectable()
 export class QuestionsService {
@@ -64,5 +66,42 @@ export class QuestionsService {
   async getQuestionById(id: number) {
     const q = await this.questionsRepository.findOneBy({ id });
     return q;
+  }
+
+  async updateQuestionStats(body: UpdateQuestionStatsDto) {
+    const ids = Object.keys(body);
+
+    const updateAnswerCount = async (id: number, answer: CorrectAnswer) => {
+      const question = await this.getQuestionById(id);
+
+      switch (answer) {
+        case 'answer1':
+          this.questionsRepository.update(id, {
+            answer1Count: question.answer1Count + 1,
+          });
+          return;
+        case 'answer2':
+          this.questionsRepository.update(id, {
+            answer1Count: question.answer2Count + 1,
+          });
+          return;
+        case 'answer3':
+          this.questionsRepository.update(id, {
+            answer1Count: question.answer3Count + 1,
+          });
+          return;
+        case 'answer4':
+          this.questionsRepository.update(id, {
+            answer1Count: question.answer4Count + 1,
+          });
+          return;
+      }
+    };
+
+    ids.forEach((id) => {
+      const selectedAnswer = body[id];
+
+      updateAnswerCount(Number(id), selectedAnswer);
+    });
   }
 }
