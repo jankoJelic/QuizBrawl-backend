@@ -16,6 +16,7 @@ import { SOCKET_EVENTS } from './constants/events';
 import { Room } from 'src/rooms/room.entity';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { QuestionsService } from 'src/questions/questions.service';
+import { SelectAnswerDto } from './dtos/select-answer.dto';
 
 const {
   ROOM_CREATED,
@@ -25,6 +26,8 @@ const {
   USER_LEFT_LOBBY,
   USER_LEFT_ROOM,
   GAME_STARTED,
+  CORRECT_ANSWER_SELECTED,
+  WRONG_ANSWER_SELECTED,
   // USER_DISCONNECTED, // we will see if this one is needed
 } = SOCKET_EVENTS;
 
@@ -128,5 +131,23 @@ export class EventsGateway
     });
 
     this.server.to(`room-${String(room.id)}`).emit(GAME_STARTED, questions);
+  }
+
+  @SubscribeMessage(CORRECT_ANSWER_SELECTED)
+  async handleCorrectAnswerSelected(
+    @MessageBody() { roomId, answer, userId }: SelectAnswerDto,
+  ) {
+    this.server
+      .to(`room-${String(roomId)}`)
+      .emit(CORRECT_ANSWER_SELECTED, { answer, userId });
+  }
+
+  @SubscribeMessage(WRONG_ANSWER_SELECTED)
+  async handleWrongAnswerSelected(
+    @MessageBody() { roomId, answer, userId }: SelectAnswerDto,
+  ) {
+    this.server
+      .to(`room-${String(roomId)}`)
+      .emit(WRONG_ANSWER_SELECTED, { answer, userId });
   }
 }
