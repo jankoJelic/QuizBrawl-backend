@@ -15,6 +15,7 @@ import { Topic } from 'src/rooms/types/Topic';
 import { Room } from 'src/rooms/room.entity';
 import { Lobby } from 'src/lobbies/lobby.entity';
 import { Question } from 'src/questions/question.entity';
+import { IsNumber, Max, Min } from 'class-validator';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -70,6 +71,8 @@ export class User {
   @JoinColumn()
   quizes: Quiz[];
 
+  @IsNumber()
+  @Min(0)
   @Column({ default: 0 })
   trophies: number;
 
@@ -91,15 +94,24 @@ export class User {
   })
   trophiesByTopic: Record<Topic, number>;
 
+  @IsNumber()
+  @Min(0)
+  @Max(100)
   @Column({ default: 0 })
-  winPercentage: number;
+  accuracyPercentage: number;
 
+  @IsNumber()
+  @Min(0)
   @Column({ default: 0 })
   rank: number;
 
+  @IsNumber()
+  @Min(0)
   @Column({ default: 0 })
   money: number;
 
+  @IsNumber()
+  @Min(0)
   @Column({ default: 0 })
   maxTrophies: number;
 
@@ -111,4 +123,12 @@ export class User {
 
   @OneToMany(() => Question, (question) => question.user)
   questions: Question[];
+
+  @Column({ default: false })
+  isBanned: boolean;
+
+  @IsNumber()
+  @Min(0)
+  @Column({ default: 0 })
+  experience: number;
 }
