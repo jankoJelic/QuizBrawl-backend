@@ -14,7 +14,7 @@ import { UpdateQuestionStatsDto } from './dtos/update-question-stats.dto';
 import { CorrectAnswer } from './types/correct-answer.type';
 import axios from 'axios';
 import { OpenTDBCategory, OpenTDBQuestion } from './dtos/open-tdb.dto';
-import { transformToMyTopic } from './util/open-tdb.utils';
+import { cleanString, transformToMyTopic } from './util/open-tdb.utils';
 import { Difficulty } from './types/difficulty.type';
 
 @Injectable()
@@ -145,11 +145,16 @@ export class QuestionsService {
         difficulty,
       } = q || {};
 
-      if (['Entertainment: Video Games'].includes(type)) return;
+      if (question.includes('game') || question.includes('fast food')) return;
+      if (category.includes('Games') || category.includes('Japanese')) return;
+      if (type !== 'multiple') return;
+      if (incorrectAnswers.includes(correctAnswer)) return;
 
+      console.log(incorrectAnswers, correctAnswer);
       const alphabeticalAnswers = incorrectAnswers
         .concat([q.correct_answer])
-        .sort();
+        .sort()
+        .map((s) => cleanString(s));
 
       const correctAnswerIndex = alphabeticalAnswers.indexOf(correctAnswer);
 
@@ -165,7 +170,7 @@ export class QuestionsService {
             };
           case 1:
             return {
-              answer1: alphabeticalAnswers[1],
+              answer1: alphabeticalAnswers[0],
               correctAnswer: 'answer2' as CorrectAnswer,
               answer3: alphabeticalAnswers[3],
               answer2: correctAnswer,
@@ -173,7 +178,7 @@ export class QuestionsService {
             };
           case 2:
             return {
-              answer1: alphabeticalAnswers[1],
+              answer1: alphabeticalAnswers[0],
               correctAnswer: 'answer3' as CorrectAnswer,
               answer3: correctAnswer,
               answer2: alphabeticalAnswers[2],
@@ -181,21 +186,21 @@ export class QuestionsService {
             };
           case 3:
             return {
-              answer1: alphabeticalAnswers[2],
+              answer1: alphabeticalAnswers[1],
               correctAnswer: 'answer4' as CorrectAnswer,
-              answer3: alphabeticalAnswers[1],
-              answer2: alphabeticalAnswers[3],
+              answer3: alphabeticalAnswers[2],
+              answer2: alphabeticalAnswers[0],
               answer4: correctAnswer,
             };
         }
       };
 
-      const cleanQuestion = question.replaceAll('&quot;', '');
+      const cleanQuestion = cleanString(question);
 
       console.log(cleanQuestion, category);
 
       const transformedQuestion: CreateQuestionDto = {
-        question: cleanQuestion,
+        question: cleanString(question),
         ...answersObject(),
         topic: transformToMyTopic(category),
         difficulty: difficulty.toUpperCase() as Difficulty,

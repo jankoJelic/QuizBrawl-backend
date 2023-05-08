@@ -6,7 +6,11 @@ export const transformToMyTopic = (category: OpenTDBCategory) => {
     case 'Entertainment: Books':
       return 'Art';
 
+    case 'Sports':
+      return 'Sports';
+
     case 'History':
+    case 'Politics':
       return 'History';
 
     case 'Animals':
@@ -17,6 +21,7 @@ export const transformToMyTopic = (category: OpenTDBCategory) => {
 
     case 'Entertainment: Television':
     case 'Entertainment: Film':
+    case 'Celebrities':
       return 'Showbiz';
 
     case 'Geography':
@@ -33,3 +38,9 @@ export const transformToMyTopic = (category: OpenTDBCategory) => {
       return 'General';
   }
 };
+
+export const cleanString = (string: string) =>
+  string
+    .replaceAll('&quot;', '')
+    .replaceAll('&#039;', "'")
+    .replaceAll('&#039;?', '');

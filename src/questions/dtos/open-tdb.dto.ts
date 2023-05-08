@@ -13,6 +13,7 @@ export type OpenTDBCategory =
   | 'Animals' // Science
   | 'Entertainment: Comics'
   | 'Entertainment: Video Games'
+  | 'Entertainment: Board Games'
   | 'Entertainment: Television' // showbiz
   | 'Entertainment: Film' // showbiz
   | 'Entertainment: Books' // Art
@@ -22,4 +23,7 @@ export type OpenTDBCategory =
   | 'Science: Computers' // Science
   | 'Science & Nature' // Science
   | 'General Knowledge' // General
+  | 'Sports' // Sports
+  | 'Politics' // History
+  | 'Celebrities' // Showbiz
   | 'Vehicles'; // General
