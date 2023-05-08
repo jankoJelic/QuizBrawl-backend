@@ -23,6 +23,9 @@ import { EventsGateway } from './events/events.gateway';
 import { HeaderInterceptor } from './interceptors/headers.interceptor';
 import { EventsModule } from './events/events.module';
 import { QuestionsService } from './questions/questions.service';
+import { TeamsController } from './teams/teams.controller';
+import { TeamsService } from './teams/teams.service';
+import { TeamsModule } from './teams/teams.module';
 
 @Global()
 @Module({
@@ -61,9 +64,9 @@ import { QuestionsService } from './questions/questions.service';
     QuestionsModule,
     QuizesModule,
     LobbiesModule,
-    // EventsModule,
+    TeamsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, TeamsController],
   providers: [
     AppService,
     { provide: APP_GUARD, useClass: AuthGuard },
@@ -73,6 +76,7 @@ import { QuestionsService } from './questions/questions.service';
     },
     EventsGateway,
     QuestionsService,
+    TeamsService,
   ],
 })
 export class AppModule {

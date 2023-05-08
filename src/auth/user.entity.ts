@@ -16,6 +16,7 @@ import { Room } from 'src/rooms/room.entity';
 import { Lobby } from 'src/lobbies/lobby.entity';
 import { Question } from 'src/questions/question.entity';
 import { IsNumber, Max, Min } from 'class-validator';
+import { Team } from 'src/teams/team.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -131,4 +132,13 @@ export class User {
   @Min(0)
   @Column({ default: 0 })
   experience: number;
+
+  @Column()
+  country: string;
+
+  @Column({ type: 'json' })
+  friends: User[];
+
+  @ManyToOne(() => Team, (team) => team.users)
+  team: Team;
 }
