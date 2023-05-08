@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { GetQuestionsDto } from './dtos/get-questions.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateQuestionDto } from './dtos/create-question.dto';
@@ -8,6 +12,10 @@ import { User } from 'src/auth/user.entity';
 import { UpdateQuestionDto } from './dtos/update-question.dto';
 import { UpdateQuestionStatsDto } from './dtos/update-question-stats.dto';
 import { CorrectAnswer } from './types/correct-answer.type';
+import axios from 'axios';
+import { OpenTDBCategory, OpenTDBQuestion } from './dtos/open-tdb.dto';
+import { transformToMyTopic } from './util/open-tdb.utils';
+import { Difficulty } from './types/difficulty.type';
 
 @Injectable()
 export class QuestionsService {
@@ -38,6 +46,13 @@ export class QuestionsService {
   }
 
   async createQuestion(createQuestionDto: CreateQuestionDto, user: User) {
+    const questionAlreadyExists = await this.getQuestionByName(
+      createQuestionDto.question,
+    );
+
+    if (!!questionAlreadyExists)
+      throw new ConflictException('Question already exists!');
+
     const question = this.questionsRepository.create({
       ...createQuestionDto,
       user,
@@ -102,6 +117,97 @@ export class QuestionsService {
       const selectedAnswer = body[id];
 
       updateAnswerCount(Number(id), selectedAnswer);
+    });
+  }
+
+  async getQuestionByName(text: string) {
+    const question = this.questionsRepository.find({
+      where: { question: text },
+    });
+
+    return question;
+  }
+
+  async seedDatabaseFromOpenTDB(count: string, user: User) {
+    const { data } = await axios.get('https://opentdb.com/api.php', {
+      params: { amount: count },
+    });
+
+    const { results } = data || {};
+
+    const addQuestionToMyDb = (q: OpenTDBQuestion) => {
+      const {
+        type,
+        correct_answer: correctAnswer,
+        incorrect_answers: incorrectAnswers,
+        question,
+        category,
+        difficulty,
+      } = q || {};
+
+      if (['Entertainment: Video Games'].includes(type)) return;
+
+      const alphabeticalAnswers = incorrectAnswers
+        .concat([q.correct_answer])
+        .sort();
+
+      const correctAnswerIndex = alphabeticalAnswers.indexOf(correctAnswer);
+
+      const answersObject = () => {
+        switch (correctAnswerIndex) {
+          case 0:
+            return {
+              answer1: correctAnswer,
+              correctAnswer: 'answer1' as CorrectAnswer,
+              answer3: alphabeticalAnswers[3],
+              answer2: alphabeticalAnswers[1],
+              answer4: alphabeticalAnswers[2],
+            };
+          case 1:
+            return {
+              answer1: alphabeticalAnswers[1],
+              correctAnswer: 'answer2' as CorrectAnswer,
+              answer3: alphabeticalAnswers[3],
+              answer2: correctAnswer,
+              answer4: alphabeticalAnswers[2],
+            };
+          case 2:
+            return {
+              answer1: alphabeticalAnswers[1],
+              correctAnswer: 'answer3' as CorrectAnswer,
+              answer3: correctAnswer,
+              answer2: alphabeticalAnswers[2],
+              answer4: alphabeticalAnswers[3],
+            };
+          case 3:
+            return {
+              answer1: alphabeticalAnswers[2],
+              correctAnswer: 'answer4' as CorrectAnswer,
+              answer3: alphabeticalAnswers[1],
+              answer2: alphabeticalAnswers[3],
+              answer4: correctAnswer,
+            };
+        }
+      };
+
+      const cleanQuestion = question.replaceAll('&quot;', '');
+
+      console.log(cleanQuestion, category);
+
+      const transformedQuestion: CreateQuestionDto = {
+        question: cleanQuestion,
+        ...answersObject(),
+        topic: transformToMyTopic(category),
+        difficulty: difficulty.toUpperCase() as Difficulty,
+        user,
+      };
+
+      this.questionsRepository.create(transformedQuestion);
+      this.questionsRepository.save(transformedQuestion);
+    };
+
+    results.forEach((q: OpenTDBQuestion) => {
+      addQuestionToMyDb(q);
     });
   }
 }

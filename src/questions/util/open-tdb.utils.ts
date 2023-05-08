@@ -1,0 +1,35 @@
+import { OpenTDBCategory } from '../dtos/open-tdb.dto';
+
+export const transformToMyTopic = (category: OpenTDBCategory) => {
+  switch (category) {
+    case 'Mythology':
+    case 'Entertainment: Books':
+      return 'Art';
+
+    case 'History':
+      return 'History';
+
+    case 'Animals':
+    case 'Science: Computers':
+    case 'Science & Nature':
+    case 'Science: Mathematics':
+      return 'Science';
+
+    case 'Entertainment: Television':
+    case 'Entertainment: Film':
+      return 'Showbiz';
+
+    case 'Geography':
+      return 'Geography';
+
+    case 'General Knowledge':
+    case 'Vehicles':
+      return 'General';
+
+    case 'Entertainment: Music':
+      return 'Music';
+
+    default:
+      return 'General';
+  }
+};

@@ -72,4 +72,11 @@ export class QuestionsController {
     if (!body) return;
     this.questionsService.updateQuestionStats(body);
   }
+
+  @UseGuards(AdminGuard)
+  @Get('/opentdb')
+  async seedDatabaseFromOpenDb(@Query('count') count: string, @CurrentUser() user:User) {
+    
+    return await this.questionsService.seedDatabaseFromOpenTDB(count, user)
+  }
 }
