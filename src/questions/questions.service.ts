@@ -13,9 +13,10 @@ import { UpdateQuestionDto } from './dtos/update-question.dto';
 import { UpdateQuestionStatsDto } from './dtos/update-question-stats.dto';
 import { CorrectAnswer } from './types/correct-answer.type';
 import axios from 'axios';
-import { OpenTDBCategory, OpenTDBQuestion } from './dtos/open-tdb.dto';
-import { cleanString, transformToMyTopic } from './util/open-tdb.utils';
+import { OpenTDBQuestion } from './dtos/open-tdb.dto';
+import { transformToMyTopic } from './util/open-tdb.utils';
 import { Difficulty } from './types/difficulty.type';
+import { decodeHtmlEntities } from 'src/util/decodeHtmlEntities';
 
 @Injectable()
 export class QuestionsService {
@@ -50,8 +51,7 @@ export class QuestionsService {
       createQuestionDto.question,
     );
 
-    if (!!questionAlreadyExists)
-      throw new ConflictException('Question already exists!');
+    if (!!questionAlreadyExists.length) return;
 
     const question = this.questionsRepository.create({
       ...createQuestionDto,
@@ -146,69 +146,72 @@ export class QuestionsService {
       } = q || {};
 
       if (question.includes('game') || question.includes('fast food')) return;
-      if (category.includes('Games') || category.includes('Japanese')) return;
+      if (
+        category.includes('Games') ||
+        category.includes('Japanese') ||
+        category.includes('Comics')
+      )
+        return;
       if (type !== 'multiple') return;
       if (incorrectAnswers.includes(correctAnswer)) return;
 
-      console.log(incorrectAnswers, correctAnswer);
       const alphabeticalAnswers = incorrectAnswers
         .concat([q.correct_answer])
         .sort()
-        .map((s) => cleanString(s));
+        .map((s) => decodeHtmlEntities(s));
 
-      const correctAnswerIndex = alphabeticalAnswers.indexOf(correctAnswer);
+      const correctAnswerIndex = alphabeticalAnswers.indexOf(
+        decodeHtmlEntities(correctAnswer),
+      );
 
       const answersObject = () => {
         switch (correctAnswerIndex) {
           case 0:
             return {
-              answer1: correctAnswer,
+              answer1: decodeHtmlEntities(correctAnswer),
               correctAnswer: 'answer1' as CorrectAnswer,
-              answer3: alphabeticalAnswers[3],
-              answer2: alphabeticalAnswers[1],
-              answer4: alphabeticalAnswers[2],
+              answer3: decodeHtmlEntities(alphabeticalAnswers[3]),
+              answer2: decodeHtmlEntities(alphabeticalAnswers[1]),
+              answer4: decodeHtmlEntities(alphabeticalAnswers[2]),
             };
           case 1:
             return {
-              answer1: alphabeticalAnswers[0],
+              answer1: decodeHtmlEntities(alphabeticalAnswers[0]),
+              answer2: decodeHtmlEntities(correctAnswer),
               correctAnswer: 'answer2' as CorrectAnswer,
-              answer3: alphabeticalAnswers[3],
-              answer2: correctAnswer,
-              answer4: alphabeticalAnswers[2],
+              answer3: decodeHtmlEntities(alphabeticalAnswers[3]),
+              answer4: decodeHtmlEntities(alphabeticalAnswers[2]),
             };
           case 2:
             return {
-              answer1: alphabeticalAnswers[0],
+              answer1: decodeHtmlEntities(alphabeticalAnswers[0]),
+              answer2: decodeHtmlEntities(alphabeticalAnswers[3]),
+              answer3: decodeHtmlEntities(correctAnswer),
               correctAnswer: 'answer3' as CorrectAnswer,
-              answer3: correctAnswer,
-              answer2: alphabeticalAnswers[2],
-              answer4: alphabeticalAnswers[3],
+              answer4: decodeHtmlEntities(alphabeticalAnswers[1]),
             };
           case 3:
             return {
-              answer1: alphabeticalAnswers[1],
+              answer1: decodeHtmlEntities(alphabeticalAnswers[1]),
+              answer3: decodeHtmlEntities(alphabeticalAnswers[2]),
+              answer2: decodeHtmlEntities(alphabeticalAnswers[0]),
+              answer4: decodeHtmlEntities(correctAnswer),
               correctAnswer: 'answer4' as CorrectAnswer,
-              answer3: alphabeticalAnswers[2],
-              answer2: alphabeticalAnswers[0],
-              answer4: correctAnswer,
             };
         }
       };
 
-      const cleanQuestion = cleanString(question);
-
-      console.log(cleanQuestion, category);
+      const cleanQuestion = decodeHtmlEntities(question);
 
       const transformedQuestion: CreateQuestionDto = {
-        question: cleanString(question),
+        question: decodeHtmlEntities(cleanQuestion),
         ...answersObject(),
         topic: transformToMyTopic(category),
         difficulty: difficulty.toUpperCase() as Difficulty,
         user,
       };
 
-      this.questionsRepository.create(transformedQuestion);
-      this.questionsRepository.save(transformedQuestion);
+      this.createQuestion(transformedQuestion, user);
     };
 
     results.forEach((q: OpenTDBQuestion) => {

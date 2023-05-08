@@ -43,4 +43,5 @@ export const cleanString = (string: string) =>
   string
     .replaceAll('&quot;', '')
     .replaceAll('&#039;', "'")
+    .replaceAll('&amp;', '&')
     .replaceAll('&#039;?', '');

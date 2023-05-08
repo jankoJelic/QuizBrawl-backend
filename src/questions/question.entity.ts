@@ -1,4 +1,4 @@
-import { IsString, MaxLength } from 'class-validator';
+import { IsNumber, IsString, MaxLength, Min } from 'class-validator';
 import { Topic } from 'src/rooms/types/Topic';
 import {
   Column,
@@ -76,4 +76,14 @@ export class Question {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt: Date;
+
+  @IsNumber()
+  @Min(0)
+  @Column({ default: 0 })
+  likes: number;
+
+  @IsNumber()
+  @Min(0)
+  @Column({ default: 0 })
+  dislikes: number;
 }
