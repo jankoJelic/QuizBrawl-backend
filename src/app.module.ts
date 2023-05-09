@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { User } from './auth/user.entity';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { RoomsModule } from './rooms/rooms.module';
 import * as Joi from 'joi';
@@ -21,11 +21,11 @@ import { LobbiesModule } from './lobbies/lobbies.module';
 import { Lobby } from './lobbies/lobby.entity';
 import { EventsGateway } from './events/events.gateway';
 import { HeaderInterceptor } from './interceptors/headers.interceptor';
-import { EventsModule } from './events/events.module';
 import { QuestionsService } from './questions/questions.service';
 import { TeamsController } from './teams/teams.controller';
 import { TeamsService } from './teams/teams.service';
 import { TeamsModule } from './teams/teams.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Global()
 @Module({
@@ -49,16 +49,28 @@ import { TeamsModule } from './teams/teams.module';
         EMAIL_CONFIRMATION_URL: Joi.string().required(),
       }),
     }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'jankoKriptomat9',
-      database: 'sys',
-      entities: [User, Room, Question, Quiz, Lobby],
-      autoLoadEntities: true,
-      synchronize: true,
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        ttl: config.get('THROTTLE_TTL'),
+        limit: config.get('THROTTLE_LIMIT'),
+      }),
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_NAME'),
+        entities: [User, Room, Question, Quiz, Lobby],
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
     }),
     MailModule,
     QuestionsModule,
@@ -70,6 +82,10 @@ import { TeamsModule } from './teams/teams.module';
   providers: [
     AppService,
     { provide: APP_GUARD, useClass: AuthGuard },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: HeaderInterceptor,

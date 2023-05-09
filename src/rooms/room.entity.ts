@@ -53,4 +53,7 @@ export class Room {
 
   @Column({ type: 'json' })
   admin: User;
+
+  @Column({ type: 'json', nullable: true,  })
+  readyUsers: string[];
 }

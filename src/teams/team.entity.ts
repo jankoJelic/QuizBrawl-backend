@@ -25,6 +25,9 @@ export class Team {
   @Column({ default: null })
   avatar: string;
 
+  @Column({ default: '#2C2C2C' })
+  color: string;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -46,4 +49,7 @@ export class Team {
 
   @Column({ default: 0 })
   rank: number;
+
+  @Column({ type: 'json' })
+  adminIds: string[];
 }

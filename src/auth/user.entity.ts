@@ -86,6 +86,9 @@ export class User {
   @Column({ default: '#ECECEC' })
   color: string;
 
+  @Column({ type: 'json', nullable: true })
+  teamAvatars: string[];
+
   @Column({ default: 1 })
   level: number;
 

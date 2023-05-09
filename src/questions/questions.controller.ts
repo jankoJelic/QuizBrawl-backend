@@ -17,7 +17,9 @@ import { User } from 'src/auth/user.entity';
 import { Topic } from 'src/rooms/types/Topic';
 import { Difficulty } from './types/difficulty.type';
 import { UpdateQuestionStatsDto } from './dtos/update-question-stats.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @ApiTags('questions')
 @UseGuards(AdminGuard)
 @Controller('questions')
@@ -75,8 +77,10 @@ export class QuestionsController {
 
   @UseGuards(AdminGuard)
   @Get('/opentdb')
-  async seedDatabaseFromOpenDb(@Query('count') count: string, @CurrentUser() user:User) {
-    
-    return await this.questionsService.seedDatabaseFromOpenTDB(count, user)
+  async seedDatabaseFromOpenDb(
+    @Query('count') count: string,
+    @CurrentUser() user: User,
+  ) {
+    return await this.questionsService.seedDatabaseFromOpenTDB(count, user);
   }
 }
