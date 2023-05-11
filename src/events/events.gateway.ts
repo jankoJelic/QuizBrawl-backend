@@ -17,6 +17,8 @@ import { Room } from 'src/rooms/room.entity';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { QuestionsService } from 'src/questions/questions.service';
 import { SelectAnswerDto } from './dtos/select-answer.dto';
+import { UserReadyDto } from './dtos/user-ready.dto';
+import { roomName } from './util/create-room-name';
 
 const {
   ROOM_CREATED,
@@ -25,6 +27,7 @@ const {
   USER_JOINED_ROOM,
   USER_LEFT_LOBBY,
   USER_LEFT_ROOM,
+  USER_READY,
   GAME_STARTED,
   CORRECT_ANSWER_SELECTED,
   WRONG_ANSWER_SELECTED,
@@ -93,7 +96,7 @@ export class EventsGateway
     this.usersService.updateUser(data.user.id, { room });
     this.server.emit(USER_JOINED_ROOM, data);
 
-    client.join(`room-${String(room.id)}`);
+    client.join(roomName(room.id));
   }
 
   @SubscribeMessage(USER_LEFT_ROOM)
@@ -105,7 +108,7 @@ export class EventsGateway
     this.usersService.updateUser(userId, { room: null });
     this.server.emit(USER_LEFT_ROOM, room);
 
-    client.leave(`room-${room.id}`);
+    client.leave(roomName(room.id));
   }
 
   @SubscribeMessage(ROOM_CREATED)
@@ -117,7 +120,7 @@ export class EventsGateway
     this.usersService.updateUser(userId, { room });
     this.server.emit(ROOM_CREATED, room);
 
-    client.join(`room-${String(room.id)}`);
+    client.join(roomName(room.id));
   }
 
   @SubscribeMessage(ROOM_DELETED)
@@ -132,7 +135,8 @@ export class EventsGateway
       topic: room.topic,
     });
 
-    this.server.to(`room-${String(room.id)}`).emit(GAME_STARTED, questions);
+    this.roomsService.updateRoom({ roomId: room.id, readyUsers: [] });
+    this.server.emit(GAME_STARTED, { questions, roomId: room.id });
   }
 
   @SubscribeMessage(CORRECT_ANSWER_SELECTED)
@@ -140,7 +144,7 @@ export class EventsGateway
     @MessageBody() { roomId, answer, userId }: SelectAnswerDto,
   ) {
     this.server
-      .to(`room-${String(roomId)}`)
+      .to(roomName(roomId))
       .emit(CORRECT_ANSWER_SELECTED, { answer, userId });
   }
 
@@ -149,7 +153,25 @@ export class EventsGateway
     @MessageBody() { roomId, answer, userId }: SelectAnswerDto,
   ) {
     this.server
-      .to(`room-${String(roomId)}`)
+      .to(roomName(roomId))
       .emit(WRONG_ANSWER_SELECTED, { answer, userId });
+  }
+
+  @SubscribeMessage(USER_READY)
+  async handleUserReady(
+    @MessageBody() { isReady, userId, roomId }: UserReadyDto,
+  ) {
+    if (isReady) {
+      const room = await this.roomsService.getRoomById(roomId);
+      if (!room) return;
+
+      this.roomsService.updateRoom({
+        roomId,
+        readyUsers: [...room.readyUsers, String(userId)],
+      });
+
+      this.server.emit(USER_READY, { roomId, userId });
+    } else {
+    }
   }
 }

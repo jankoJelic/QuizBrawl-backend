@@ -11,4 +11,5 @@ export interface CreateRoomDto {
   users: User[];
   admin: User;
   questionsCount?: number;
+  readyUsers?: string[]
 }
