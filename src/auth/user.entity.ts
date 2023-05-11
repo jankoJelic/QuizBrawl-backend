@@ -144,4 +144,7 @@ export class User {
 
   @ManyToOne(() => Team, (team) => team.users)
   team: Team;
+
+  @Column({ default: 'General' })
+  favouriteTopic: Topic;
 }

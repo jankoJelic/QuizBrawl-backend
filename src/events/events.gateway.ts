@@ -31,6 +31,7 @@ const {
   GAME_STARTED,
   CORRECT_ANSWER_SELECTED,
   WRONG_ANSWER_SELECTED,
+  KICK_USER_FROM_ROOM,
   // USER_DISCONNECTED, // we will see if this one is needed
 } = SOCKET_EVENTS;
 
@@ -101,14 +102,19 @@ export class EventsGateway
 
   @SubscribeMessage(USER_LEFT_ROOM)
   async handleUserLeftRoom(
-    @MessageBody() room: Room,
+    @MessageBody() { room, user },
     @ConnectedSocket() client: any,
   ) {
-    const { userId } = client.handshake.query || {};
-    this.usersService.updateUser(userId, { room: null });
-    this.server.emit(USER_LEFT_ROOM, room);
+    this.usersService.updateUser(user.id, { room: null });
+    this.server.emit(USER_LEFT_ROOM, { user, room });
 
     client.leave(roomName(room.id));
+  }
+
+  @SubscribeMessage(KICK_USER_FROM_ROOM)
+  async handleUserKickedFromRoom(@MessageBody() { user, room }) {
+    await this.usersService.updateUser(user?.id, { room: null });
+    this.server.emit(KICK_USER_FROM_ROOM, { user, room });
   }
 
   @SubscribeMessage(ROOM_CREATED)
