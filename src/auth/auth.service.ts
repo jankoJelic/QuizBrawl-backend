@@ -15,6 +15,7 @@ import { createOtpCode } from './util/createOtpCode';
 import { User } from './user.entity';
 import { PinDto } from './dtos/pin.dto';
 import { ConfigService } from '@nestjs/config';
+import { GoogleAuthDto } from './dtos/google-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -90,7 +91,7 @@ export class AuthService {
   }
 
   async createNewTokens(user: User) {
-    let securedUserObject = user;
+    let securedUserObject = user; // here we remove all properties unwanted in JWT token
     delete securedUserObject.refreshToken;
     delete securedUserObject.password;
     delete securedUserObject.registrationOtpCode;
@@ -114,5 +115,28 @@ export class AuthService {
     const pinKey = this.configService.get<string>('APP_PIN_KEY');
     const salt = `${dto.pin}-${pinKey}-${dto.deviceId}`;
     return createHash('sha256').update(salt, 'utf8').digest().toString('hex');
+  }
+
+  async handleGoogleAuth({ email, name, photo, googleAuthId }: GoogleAuthDto) {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      const user = await this.usersService.create({
+        email,
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ')[1],
+        googleAuthId,
+        password: googleAuthId,
+        ...(!!photo && { avatar: photo, avatars: [photo] }),
+      });
+
+      const { accessToken, refreshToken } = await this.createNewTokens(user);
+
+      return { accessToken, refreshToken };
+    } else {
+      const { accessToken, refreshToken } = await this.createNewTokens(user);
+
+      return { accessToken, refreshToken };
+    }
   }
 }

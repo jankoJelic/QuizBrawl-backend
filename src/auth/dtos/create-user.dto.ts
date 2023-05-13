@@ -19,4 +19,13 @@ export class CreateUserDto {
 
   @ApiHideProperty()
   registrationOtpCode?: string;
+
+  @IsString()
+  googleAuthId?: string;
+
+  @IsString()
+  appleId?: string;
+
+  @IsString()
+  avatar?: string;
 }

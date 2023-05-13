@@ -147,4 +147,13 @@ export class User {
 
   @Column({ default: 'General' })
   favouriteTopic: Topic;
+
+  @Column({ type: 'json' })
+  friendRequests: [];
+
+  @Column({ default: '' })
+  googleAuthId: string;
+
+  @Column({ default: '' })
+  appleId: string;
 }

@@ -25,6 +25,7 @@ import { MailService } from 'src/mail/mail.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { PinDto } from './dtos/pin.dto';
+import { GoogleAuthDto } from './dtos/google-auth.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -83,8 +84,11 @@ export class AuthController {
   @Get('/me')
   async getMyInfo(@CurrentUser() user: User) {
     const fetchedUser = await this.usersService.findByEmail(user.email);
+
     delete fetchedUser.password;
     delete fetchedUser.refreshToken;
+    delete fetchedUser.googleAuthId;
+    delete fetchedUser.appleId;
 
     return fetchedUser;
   }
@@ -131,4 +135,14 @@ export class AuthController {
   async setPinCode(@Body() body: PinDto) {
     return await this.authService.getPinEncryptionKey(body);
   }
+
+  @Public()
+  @Post('/google')
+  async handleGoogleAuth(@Body() body: GoogleAuthDto) {
+    return await this.authService.handleGoogleAuth(body);
+  }
+
+  @Public()
+  @Post('/apple')
+  async handleApploAuth() {}
 }
