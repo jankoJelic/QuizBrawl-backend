@@ -11,8 +11,14 @@ export const configuration = () => {
     GOOGLE_REFRESH_TOKEN,
     EMAIL,
     EMAIL_CONFIRMATION_URL,
+    BASE_IMAGES_URL,
+    DB_HOST,
+    DB_PASSWORD,
+    DB_PORT,
+    DB_NAME,
+    DB_USERNAME,
   } = process.env || {};
-  
+
   return {
     NODE_ENV,
     APP_PORT,
@@ -25,5 +31,11 @@ export const configuration = () => {
     GOOGLE_REFRESH_TOKEN,
     EMAIL,
     EMAIL_CONFIRMATION_URL,
+    BASE_IMAGES_URL,
+    DB_HOST,
+    DB_NAME,
+    DB_PASSWORD,
+    DB_PORT,
+    DB_USERNAME,
   };
 };

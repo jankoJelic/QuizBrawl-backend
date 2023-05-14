@@ -26,6 +26,14 @@ import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { PinDto } from './dtos/pin.dto';
 import { GoogleAuthDto } from './dtos/google-auth.dto';
+
+import { OAuth2Client } from 'google-auth-library';
+
+const oAuthClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.OAUTH_CLIENT_SECRET,
+);
+
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -139,10 +147,16 @@ export class AuthController {
   @Public()
   @Post('/google')
   async handleGoogleAuth(@Body() body: GoogleAuthDto) {
-    return await this.authService.handleGoogleAuth(body);
+    const ticket = await oAuthClient.verifyIdToken({
+      idToken: body.googleAuthId,
+    });
+
+    if (ticket?.getPayload()?.email === body.email)
+      return await this.authService.handleGoogleAuth(body);
+    else return { message: 'Google login failed' };
   }
 
   @Public()
   @Post('/apple')
-  async handleApploAuth() {}
+  async handleAppleAuth() {}
 }

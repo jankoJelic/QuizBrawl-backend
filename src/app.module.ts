@@ -47,6 +47,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
         GOOGLE_REFRESH_TOKEN: Joi.string().required(),
         EMAIL: Joi.string().required(),
         EMAIL_CONFIRMATION_URL: Joi.string().required(),
+        BASE_IMAGES_URL: Joi.string().required(),
       }),
     }),
     ThrottlerModule.forRootAsync({
@@ -71,6 +72,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
         autoLoadEntities: true,
         synchronize: true,
       }),
+      dataSourceFactory: async (options) => {
+        const dataSource = await new DataSource(options).initialize();
+        return dataSource;
+      },
     }),
     MailModule,
     QuestionsModule,

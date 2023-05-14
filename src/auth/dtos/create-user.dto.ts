@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsArray, IsEmail, IsString } from 'class-validator';
 import { ApiHideProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -27,5 +27,8 @@ export class CreateUserDto {
   appleId?: string;
 
   @IsString()
-  avatar?: string;
+  avatar: string;
+
+  @IsArray()
+  avatars: string[];
 }

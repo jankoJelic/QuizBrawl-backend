@@ -15,7 +15,7 @@ import { Topic } from 'src/rooms/types/Topic';
 import { Room } from 'src/rooms/room.entity';
 import { Lobby } from 'src/lobbies/lobby.entity';
 import { Question } from 'src/questions/question.entity';
-import { IsNumber, Max, Min } from 'class-validator';
+import { IsNumber, Max, MaxLength, Min } from 'class-validator';
 import { Team } from 'src/teams/team.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -62,7 +62,7 @@ export class User {
   refreshToken?: string;
 
   @ApiHideProperty()
-  @Column()
+  @Column({ default: '' })
   registrationOtpCode: string;
 
   @Column({ default: false })
@@ -136,10 +136,10 @@ export class User {
   @Column({ default: 0 })
   experience: number;
 
-  @Column()
+  @Column({ default: '' })
   country: string;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   friends: User[];
 
   @ManyToOne(() => Team, (team) => team.users)
@@ -148,7 +148,7 @@ export class User {
   @Column({ default: 'General' })
   favouriteTopic: Topic;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   friendRequests: [];
 
   @Column({ default: '' })

@@ -11,6 +11,7 @@ import { UserJoinedLobbyDto } from 'src/events/dtos/user-joined-lobby.dto';
 import { Lobby } from 'src/lobbies/lobby.entity';
 import { UserJoinedRoomDto } from 'src/events/dtos/user-joined-room.dto';
 import { Room } from 'src/rooms/room.entity';
+import { DEFAULT_AVATARS } from './dtos/default-avatars.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +25,12 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const user = this.usersRepository.create(createUserDto);
+    const user = this.usersRepository.create({
+      ...createUserDto,
+      avatars: DEFAULT_AVATARS,
+      avatar:
+        DEFAULT_AVATARS[Math.floor(Math.random() * DEFAULT_AVATARS.length)],
+    });
     return this.usersRepository.save(user);
   }
 

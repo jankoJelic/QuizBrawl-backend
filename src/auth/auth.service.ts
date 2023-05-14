@@ -117,7 +117,7 @@ export class AuthService {
     return createHash('sha256').update(salt, 'utf8').digest().toString('hex');
   }
 
-  async handleGoogleAuth({ email, name, photo, googleAuthId }: GoogleAuthDto) {
+  async handleGoogleAuth({ email, name, photo }: GoogleAuthDto) {
     const user = await this.usersService.findByEmail(email);
 
     if (!user) {
@@ -125,8 +125,7 @@ export class AuthService {
         email,
         firstName: name.split(' ')[0],
         lastName: name.split(' ')[1],
-        googleAuthId,
-        password: googleAuthId,
+        password: '19431d738be0dcdcf3a1e31298e56b3f8236a147',
         ...(!!photo && { avatar: photo, avatars: [photo] }),
       });
 
