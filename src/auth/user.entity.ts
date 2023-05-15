@@ -163,4 +163,7 @@ export class User {
 
   @Column({ default: false })
   securedWithPin: boolean;
+
+  @Column({ default: '' })
+  fcmToken: string;
 }

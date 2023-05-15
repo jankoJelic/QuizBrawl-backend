@@ -27,6 +27,7 @@ import { TeamsService } from './teams/teams.service';
 import { TeamsModule } from './teams/teams.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MessagesModule } from './messages/messages.module';
+import { MessagesService } from './messages/messages.service';
 
 @Global()
 @Module({
@@ -100,8 +101,10 @@ import { MessagesModule } from './messages/messages.module';
     EventsGateway,
     QuestionsService,
     TeamsService,
+    MessagesService,
   ],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
+  
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query } from '@nestjs/common';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { MessagesService } from './messages.service';
@@ -7,11 +7,19 @@ import { MessagesService } from './messages.service';
 export class MessagesController {
   constructor(private messagesService: MessagesService) {}
 
-  @Post('friendRequest')
-  async handleFriendRequestSent(
+  // @Post('/friendRequest')
+  // async handleFriendRequestSent(
+  //   @CurrentUser() user: User,
+  //   @Query('userId') userId: string,
+  // ) {
+  //   return await this.messagesService.sendFriendRequest(user, Number(userId));
+  // }
+
+  @Get('/fcmToken')
+  async connectToFCM(
+    @Query('fcmToken') fcmToken: string,
     @CurrentUser() user: User,
-    @Query('userId') userId: string,
   ) {
-    return await this.messagesService.sendFriendRequest(user, Number(userId));
+    return await this.messagesService.connectToFCM(fcmToken, user.id);
   }
 }
