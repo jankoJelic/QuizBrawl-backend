@@ -17,6 +17,7 @@ import { Lobby } from 'src/lobbies/lobby.entity';
 import { Question } from 'src/questions/question.entity';
 import { IsNumber, Max, MaxLength, Min } from 'class-validator';
 import { Team } from 'src/teams/team.entity';
+import { Message } from '../messages/dtos/message.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -156,4 +157,10 @@ export class User {
 
   @Column({ default: '' })
   appleId: string;
+
+  @Column({ type: 'json', nullable: true })
+  inbox: Message[];
+
+  @Column({ default: false })
+  securedWithPin: boolean;
 }

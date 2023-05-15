@@ -26,6 +26,7 @@ import { TeamsController } from './teams/teams.controller';
 import { TeamsService } from './teams/teams.service';
 import { TeamsModule } from './teams/teams.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { MessagesModule } from './messages/messages.module';
 
 @Global()
 @Module({
@@ -82,6 +83,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     QuizesModule,
     LobbiesModule,
     TeamsModule,
+    MessagesModule,
   ],
   controllers: [AppController, TeamsController],
   providers: [

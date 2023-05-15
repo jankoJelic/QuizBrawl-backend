@@ -19,6 +19,8 @@ import { QuestionsService } from 'src/questions/questions.service';
 import { SelectAnswerDto } from './dtos/select-answer.dto';
 import { UserReadyDto } from './dtos/user-ready.dto';
 import { roomName } from './util/create-room-name';
+import { User } from 'src/auth/user.entity';
+import { MessagesService } from 'src/messages/messages.service';
 
 const {
   ROOM_CREATED,
@@ -32,6 +34,7 @@ const {
   CORRECT_ANSWER_SELECTED,
   WRONG_ANSWER_SELECTED,
   KICK_USER_FROM_ROOM,
+  FRIEND_REQUEST_SENT,
   // USER_DISCONNECTED, // we will see if this one is needed
 } = SOCKET_EVENTS;
 
@@ -49,6 +52,7 @@ export class EventsGateway
     private readonly usersService: UsersService,
     private roomsService: RoomsService,
     private questionsService: QuestionsService,
+    private messagesService: MessagesService,
   ) {}
 
   @WebSocketServer()
@@ -56,7 +60,11 @@ export class EventsGateway
 
   afterInit(server: any) {}
 
-  handleConnection(@ConnectedSocket() client: any) {}
+  handleConnection(@ConnectedSocket() client: Socket) {
+    const { userId } = client.handshake.query || {};
+
+    client.join(`user-${String(userId)}`);
+  }
 
   async handleDisconnect(@ConnectedSocket() client: any) {
     const { userId } = client.handshake.query || {};
@@ -179,5 +187,21 @@ export class EventsGateway
       this.server.emit(USER_READY, { roomId, userId });
     } else {
     }
+  }
+
+  @SubscribeMessage(FRIEND_REQUEST_SENT)
+  async handleFriendRequestSent(
+    @MessageBody() body: { user: User; recipientId: number },
+  ) {
+    const friendRequest = await this.messagesService.sendFriendRequest(
+      body?.user,
+      body?.recipientId,
+    );
+
+    this.server
+      .to(`user-${String(body.recipientId)}`)
+      .emit(FRIEND_REQUEST_SENT, {
+        friendRequest,
+      });
   }
 }
