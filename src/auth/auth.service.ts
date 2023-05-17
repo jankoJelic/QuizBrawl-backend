@@ -91,11 +91,17 @@ export class AuthService {
   }
 
   async createNewTokens(user: User) {
-    let securedUserObject = user; // here we remove all properties unwanted in JWT token
-    delete securedUserObject.refreshToken;
-    delete securedUserObject.password;
-    delete securedUserObject.registrationOtpCode;
-    delete securedUserObject.updatedAt;
+    const securedUserObject: Partial<User> = {
+      email: user.email,
+      id: user.id,
+      isAdmin: user.isAdmin,
+      isBanned: user.isBanned,
+      isPremium: user.isPremium,
+      trophies: user.trophies,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      level: user.level,
+    };
 
     const refreshToken = await this.jwtService.signAsync({
       user: securedUserObject,
