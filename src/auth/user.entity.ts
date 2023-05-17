@@ -141,7 +141,7 @@ export class User {
   country: string;
 
   @Column({ type: 'json', nullable: true })
-  friends: User[];
+  friends: Partial<User>[];
 
   @ManyToOne(() => Team, (team) => team.users)
   team: Team;
@@ -166,4 +166,7 @@ export class User {
 
   @Column({ default: '' })
   fcmToken: string;
+
+  @Column()
+  isOnline: boolean;
 }

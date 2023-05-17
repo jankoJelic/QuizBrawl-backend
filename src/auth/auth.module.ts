@@ -13,6 +13,7 @@ import { MailModule } from 'src/mail/mail.module';
 import { LobbiesModule } from 'src/lobbies/lobbies.module';
 import { LobbiesService } from 'src/lobbies/lobbies.service';
 import { Lobby } from 'src/lobbies/lobby.entity';
+import { UsersController } from './users.controller';
 
 const jwtFactory = {
   imports: [ConfigModule],
@@ -32,7 +33,7 @@ const jwtFactory = {
     MailModule,
     LobbiesModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, UsersController],
   providers: [
     UsersService,
     AuthService,

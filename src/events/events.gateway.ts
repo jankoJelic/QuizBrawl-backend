@@ -21,6 +21,7 @@ import { UserReadyDto } from './dtos/user-ready.dto';
 import { roomName } from './util/create-room-name';
 import { User } from 'src/auth/user.entity';
 import { MessagesService } from 'src/messages/messages.service';
+import { shallowUser } from 'src/auth/util/shallowUser';
 
 const {
   ROOM_CREATED,
@@ -35,7 +36,9 @@ const {
   WRONG_ANSWER_SELECTED,
   KICK_USER_FROM_ROOM,
   FRIEND_REQUEST_SENT,
-  // USER_DISCONNECTED, // we will see if this one is needed
+  FRIEND_REQUEST_ACCEPTED,
+  USER_DISCONNECTED,
+  USER_CONNECTED,
 } = SOCKET_EVENTS;
 
 @WebSocketGateway({
@@ -63,21 +66,28 @@ export class EventsGateway
   handleConnection(@ConnectedSocket() client: Socket) {
     const { userId } = client.handshake.query || {};
 
+    this.usersService.updateUser(Number(userId), { isOnline: true });
+
     client.join(`user-${String(userId)}`);
+
+    this.server.emit(USER_CONNECTED, userId);
   }
 
-  async handleDisconnect(@ConnectedSocket() client: any) {
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
     const { userId } = client.handshake.query || {};
-    this.usersService.updateUser(userId, { lobby: null, room: null });
-    const usersRoom = await this.roomsService.getAllForUser(userId);
+    this.usersService.updateUser(Number(userId), {
+      lobby: null,
+      room: null,
+      isOnline: false,
+    });
+    const usersRoom = await this.roomsService.getAllForUser(Number(userId));
     if (!!usersRoom) {
       await this.roomsService.deleteRoom(usersRoom.id);
       this.server.emit(ROOM_DELETED, usersRoom);
     }
 
-    const user = await this.usersService.findOne(userId);
-
-    // this.server.emit(USER_DISCONNECTED, user);
+    this.server.emit(USER_DISCONNECTED, userId);
+    client.leave(`user-${String(userId)}`);
   }
 
   @SubscribeMessage(USER_JOINED_LOBBY)
@@ -203,5 +213,15 @@ export class EventsGateway
       .emit(FRIEND_REQUEST_SENT, {
         friendRequest,
       });
+  }
+
+  @SubscribeMessage(FRIEND_REQUEST_ACCEPTED)
+  async handleFriendRequestAccepted(
+    @MessageBody() body: { user: User; senderId: number },
+  ) {
+    this.usersService.makeFriends(body.user.id, body.senderId);
+    this.server
+      .to(`user-${String(body.senderId)}`)
+      .emit(FRIEND_REQUEST_ACCEPTED, shallowUser(body.user));
   }
 }

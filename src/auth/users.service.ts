@@ -12,6 +12,7 @@ import { Lobby } from 'src/lobbies/lobby.entity';
 import { UserJoinedRoomDto } from 'src/events/dtos/user-joined-room.dto';
 import { Room } from 'src/rooms/room.entity';
 import { DEFAULT_AVATARS } from './dtos/default-avatars.dto';
+import { shallowUser } from './util/shallowUser';
 
 @Injectable()
 export class UsersService {
@@ -113,5 +114,17 @@ export class UsersService {
 
   async removeUserFromRoom(user: User) {
     await this.usersRepository.save({ ...user, room: null });
+  }
+
+  async makeFriends(user1Id: number, user2Id: number) {
+    const userOne = await this.findOne(user1Id);
+    const userTwo = await this.findOne(user2Id);
+
+    this.updateUser(user1Id, {
+      friends: (userOne?.friends || []).concat(shallowUser(userTwo)),
+    });
+    this.updateUser(user2Id, {
+      friends: (userTwo?.friends || []).concat(shallowUser(userOne)),
+    });
   }
 }

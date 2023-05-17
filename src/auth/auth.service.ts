@@ -16,6 +16,7 @@ import { User } from './user.entity';
 import { PinDto } from './dtos/pin.dto';
 import { ConfigService } from '@nestjs/config';
 import { GoogleAuthDto } from './dtos/google-auth.dto';
+import { shallowUser } from './util/shallowUser';
 
 @Injectable()
 export class AuthService {
@@ -91,17 +92,7 @@ export class AuthService {
   }
 
   async createNewTokens(user: User) {
-    const securedUserObject: Partial<User> = {
-      email: user.email,
-      id: user.id,
-      isAdmin: user.isAdmin,
-      isBanned: user.isBanned,
-      isPremium: user.isPremium,
-      trophies: user.trophies,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      level: user.level,
-    };
+    const securedUserObject: Partial<User> = shallowUser(user);
 
     const refreshToken = await this.jwtService.signAsync({
       user: securedUserObject,

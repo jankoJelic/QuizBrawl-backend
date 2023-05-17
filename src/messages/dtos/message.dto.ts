@@ -5,6 +5,8 @@ export interface Message {
   createdAt: string;
   payload?: {};
   read: string;
+  id: string;
+  senderId: string
 }
 
 export type MessageType = 'REWARD' | 'GAME_INVITE' | 'FRIEND_REQUEST';

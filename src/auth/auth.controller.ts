@@ -80,15 +80,6 @@ export class AuthController {
     return await this.authService.login(body);
   }
 
-  @Get('/users')
-  async getAllUsers(
-    @Query('isAdmin') isAdmin: string,
-    @Query('name') name: string,
-  ) {
-    const isAdminBoolean = isAdmin === 'true';
-    return await this.usersService.findAll(name, isAdminBoolean);
-  }
-
   @Get('/me')
   async getMyInfo(@CurrentUser() user: User) {
     const fetchedUser = await this.usersService.findByEmail(user.email);
