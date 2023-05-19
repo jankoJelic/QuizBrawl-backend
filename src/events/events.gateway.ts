@@ -208,6 +208,9 @@ export class EventsGateway
       body?.recipientId,
     );
 
+    if (typeof friendRequest === 'string') return;
+    if (!friendRequest?.title) return;
+
     this.server
       .to(`user-${String(body.recipientId)}`)
       .emit(FRIEND_REQUEST_SENT, {

@@ -45,7 +45,9 @@ export class MessagesService {
   async sendFriendRequest(user: User, recipientId: number) {
     const recipient = await this.usersService.findOne(recipientId);
 
-    if (!recipient) throw new Error('User does not exist');
+    if (!recipient) return 'User does not exist';
+    if (recipient.inbox.some((mess) => mess.senderId === String(user.id)))
+      return 'Friend request already sent';
 
     const friendRequestMessage = createFriendRequest(user);
 
