@@ -13,6 +13,9 @@ import { UserJoinedRoomDto } from 'src/events/dtos/user-joined-room.dto';
 import { Room } from 'src/rooms/room.entity';
 import { DEFAULT_AVATARS } from './dtos/default-avatars.dto';
 import { shallowUser } from './util/shallowUser';
+import { getStorage } from 'firebase-admin/storage';
+import { createStorageDownloadUrl } from 'src/util/firebase/createStorageDownloadUrl';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -23,6 +26,7 @@ export class UsersService {
     private lobbiesRepository: Repository<Lobby>,
     @InjectRepository(Room)
     private roomsRepository: Repository<Room>,
+    private configService: ConfigService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -126,5 +130,22 @@ export class UsersService {
     this.updateUser(user2Id, {
       friends: (userTwo?.friends || []).concat(shallowUser(userOne)),
     });
+  }
+
+  async getUserAvatars(userId: number) {
+    const bucket = await getStorage().bucket().getFiles();
+
+    const user = await this.findOne(userId);
+
+    const allUrls = bucket[0].map((file) =>
+      createStorageDownloadUrl(
+        file.name,
+        this.configService.get('FIREBASE_TOKEN'),
+      ),
+    );
+
+    return (user.avatars || []).concat(
+      allUrls.filter((url) => url.includes('.png') && url.includes('default')),
+    );
   }
 }

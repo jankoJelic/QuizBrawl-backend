@@ -23,6 +23,7 @@ async function bootstrap() {
   admin.initializeApp({
     projectId: configService.get('FIREBASE_PROJECT_ID'),
     credential: admin.applicationDefault(),
+    storageBucket: configService.get('FIREBASE_STORAGE_BUCKET'),
   });
 
   app.enableCors();
