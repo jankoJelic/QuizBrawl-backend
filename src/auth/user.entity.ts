@@ -18,6 +18,7 @@ import { Question } from 'src/questions/question.entity';
 import { IsNumber, Max, MaxLength, Min } from 'class-validator';
 import { Team } from 'src/teams/team.entity';
 import { Message } from '../messages/dtos/message.dto';
+import { Reward } from './dtos/reward.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Entity()
@@ -169,4 +170,10 @@ export class User {
 
   @Column()
   isOnline: boolean;
+
+  @Column({ type: 'json', nullable: true })
+  achievements: Reward[];
+
+  @Column({ type: 'json', nullable: true })
+  rewards: Reward[];
 }

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Message } from 'src/messages/dtos/message.dto';
 import { User } from 'src/auth/user.entity';
 import { UsersService } from 'src/auth/users.service';
@@ -25,6 +29,19 @@ export class MessagesService {
     });
   }
 
+  async sendMessage(message: Message, recipientId: number) {
+    const recipient = await this.usersService.findOne(recipientId);
+
+    if (!recipient) throw new NotFoundException('Recipient does not exist');
+
+    if (recipient.inbox?.length > 19)
+      throw new NotAcceptableException('Inbox full');
+
+    await this.usersService.updateUser(recipientId, {
+      inbox: [message, ...(recipient?.inbox || [])],
+    });
+  }
+
   async sendFriendRequest(user: User, recipientId: number) {
     const recipient = await this.usersService.findOne(recipientId);
 
@@ -32,9 +49,7 @@ export class MessagesService {
 
     const friendRequestMessage = createFriendRequest(user);
 
-    await this.usersService.updateUser(recipientId, {
-      inbox: [friendRequestMessage as Message, ...(recipient?.inbox || [])],
-    });
+    this.sendMessage(friendRequestMessage as Message, recipientId);
 
     this.sendNotification({
       data: friendRequestMessage,
