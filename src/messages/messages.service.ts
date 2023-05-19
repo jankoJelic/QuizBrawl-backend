@@ -78,4 +78,20 @@ export class MessagesService {
 
     this.deleteMessage(user.id, message.id);
   }
+
+  async readMessage(userId: number, id: string) {
+    const user = await this.usersService.findOne(userId);
+
+    const currentMessages = user.inbox;
+    const updatedMessages = currentMessages.map((m) =>
+      m.id === id
+        ? {
+            ...m,
+            read: 'true',
+          }
+        : m,
+    );
+
+    this.usersService.updateUser(userId, { inbox: updatedMessages });
+  }
 }

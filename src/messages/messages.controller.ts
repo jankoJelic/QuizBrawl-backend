@@ -49,4 +49,9 @@ export class MessagesController {
       body.response,
     );
   }
+
+  @Patch('/message/read')
+  async readMessage(@CurrentUser() user: User, @Query('id') id: string) {
+    return await this.messagesService.readMessage(user.id, id);
+  }
 }
