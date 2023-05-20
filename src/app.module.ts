@@ -10,7 +10,7 @@ import { MailModule } from './mail/mail.module';
 import { RoomsModule } from './rooms/rooms.module';
 import * as Joi from 'joi';
 import { Room } from './rooms/room.entity';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { QuestionsModule } from './questions/questions.module';
 import { Question } from './questions/question.entity';
@@ -28,6 +28,7 @@ import { TeamsModule } from './teams/teams.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MessagesModule } from './messages/messages.module';
 import { MessagesService } from './messages/messages.service';
+import { AllExceptionsFilter } from './interceptors/htttp-exception.filter';
 
 @Global()
 @Module({
@@ -98,6 +99,10 @@ import { MessagesService } from './messages/messages.service';
       provide: APP_INTERCEPTOR,
       useClass: HeaderInterceptor,
     },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
     EventsGateway,
     QuestionsService,
     TeamsService,
@@ -106,5 +111,4 @@ import { MessagesService } from './messages/messages.service';
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
-  
 }

@@ -106,6 +106,15 @@ export class User {
   @Column({ default: 0 })
   accuracyPercentage: number;
 
+  @Column({
+    type: 'json',
+    nullable: true,
+  })
+  totalAnswers: Record<Topic, number>;
+
+  @Column({ type: 'json', nullable: true })
+  correctAnswers: Record<Topic, number>;
+
   @IsNumber()
   @Min(0)
   @Column({ default: 0 })
