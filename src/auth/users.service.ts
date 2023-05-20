@@ -120,16 +120,21 @@ export class UsersService {
     await this.usersRepository.save({ ...user, room: null });
   }
 
-  async makeFriends(user1Id: number, user2Id: number) {
-    const userOne = await this.findOne(user1Id);
-    const userTwo = await this.findOne(user2Id);
+  async makeFriends(userOneId: number, userTwoId: number) {
+    const userOne = await this.findOne(userOneId);
+    const userTwo = await this.findOne(userTwoId);
 
-    this.updateUser(user1Id, {
-      friends: (userOne?.friends || []).concat(shallowUser(userTwo)),
-    });
-    this.updateUser(user2Id, {
-      friends: (userTwo?.friends || []).concat(shallowUser(userOne)),
-    });
+    if (!(userOne?.friends || []).some((freindId) => freindId === userTwoId)) {
+      this.updateUser(userOneId, {
+        friends: (userOne?.friends || []).concat([userTwoId]),
+      });
+    }
+
+    if (!(userTwo?.friends || []).some((friendId) => friendId === userOneId)) {
+      this.updateUser(userTwoId, {
+        friends: (userTwo?.friends || []).concat([userOneId]),
+      });
+    }
   }
 
   async getUserAvatars(userId: number) {
@@ -148,4 +153,6 @@ export class UsersService {
       allUrls.filter((url) => url.includes('.png') && url.includes('default')),
     );
   }
+
+  async registerAnswer(userId: number, correct: boolean) {}
 }

@@ -8,6 +8,7 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Quiz } from 'src/quizes/quiz.entity';
@@ -150,8 +151,8 @@ export class User {
   @Column({ default: '' })
   country: string;
 
-  @Column({ type: 'json', nullable: true })
-  friends: Partial<User>[];
+  @Column({ type: 'json' })
+  friends: number[];
 
   @ManyToOne(() => Team, (team) => team.users)
   team: Team;

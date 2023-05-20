@@ -40,6 +40,9 @@ export class Room {
   @Column({ default: 'brawl' })
   type: GameType;
 
+  @Column({ default: false })
+  teams: boolean;
+
   @Column({ default: '' })
   password: string;
 
@@ -54,6 +57,9 @@ export class Room {
   @Column({ type: 'json' })
   admin: User;
 
-  @Column({ type: 'json', nullable: true,  })
+  @Column({ type: 'json', nullable: true })
   readyUsers: string[];
+
+  @Column({ default: 0 })
+  bet: number;
 }

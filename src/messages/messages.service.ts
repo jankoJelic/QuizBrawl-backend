@@ -90,10 +90,10 @@ export class MessagesService {
     if (response) {
       await this.usersService.updateUser(user.id, {
         inbox: currentUser.inbox.filter((m) => m.id !== message.id),
-        friends: (currentUser?.friends || []).concat([sender]),
+        friends: (currentUser?.friends || []).concat([sender.id]),
       });
       await this.usersService.updateUser(Number(message.senderId), {
-        friends: (sender?.friends || []).concat([currentUser]),
+        friends: (sender?.friends || []).concat([currentUser.id]),
       });
     }
 

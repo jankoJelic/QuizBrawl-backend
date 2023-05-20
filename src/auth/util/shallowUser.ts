@@ -17,5 +17,7 @@ export const shallowUser = (user: User) => {
     favouriteTopic: user.favouriteTopic,
     avatar: user.avatar,
     isOnline: user.isOnline,
+    totalAnswers: user.totalAnswers,
+    correctAnswers: user.correctAnswers,
   };
 };
