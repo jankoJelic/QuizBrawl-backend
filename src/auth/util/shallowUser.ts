@@ -1,7 +1,6 @@
 import { User } from '../user.entity';
 
 export const shallowUser = (user: User) => {
-  // only neccessary info
   return {
     email: user.email,
     id: user.id,
@@ -19,5 +18,7 @@ export const shallowUser = (user: User) => {
     isOnline: user.isOnline,
     totalAnswers: user.totalAnswers,
     correctAnswers: user.correctAnswers,
+    friends: user.friends,
+    color: user.color,
   };
 };

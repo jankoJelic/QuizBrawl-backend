@@ -1,7 +1,10 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -39,5 +42,25 @@ export class UsersController {
   @Get('/avatars')
   async getDefaultAvatars(@CurrentUser() user: User) {
     return await this.usersService.getUserAvatars(user.id);
+  }
+
+  @Post('/answer')
+  async registerAnswer(
+    @CurrentUser() user: User,
+    @Body() body: { correct: boolean },
+  ) {
+    this.usersService.registerAnswer(user.id, body.correct);
+  }
+
+  @Delete('/removeFriend')
+  async removeFriend(@CurrentUser() user: User, @Query('id') id: string) {
+    return await this.usersService.removeFriend(Number(id), user);
+  }
+
+  @Get('/friends')
+  async getFriends(@CurrentUser() user: User) {
+    if (!user.friends) return;
+    console.log(user.friends);
+    return await this.usersService.getUsers(user.friends);
   }
 }

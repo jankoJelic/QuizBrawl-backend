@@ -26,9 +26,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { PinDto } from './dtos/pin.dto';
 import { GoogleAuthDto } from './dtos/google-auth.dto';
-
 import { OAuth2Client } from 'google-auth-library';
-import { shallowUser } from './util/shallowUser';
 
 const oAuthClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -47,23 +45,19 @@ export class AuthController {
   ) {}
   async isTokenValid(bearerToken: string): Promise<User | null> {
     const verifyOptions = { secret: this.configService.get(JWT_SECRET) };
-
     try {
       const payload = await this.jwtService.verifyAsync(
         bearerToken,
         verifyOptions,
       );
       const { email } = payload;
-
       const user = await this.usersService.findByEmail(email);
-
       if (user) {
         return user;
       }
     } catch (error) {
       throw new HttpException(error, HttpStatus.UNAUTHORIZED);
     }
-
     return null;
   }
 
@@ -71,7 +65,6 @@ export class AuthController {
   @Post('/register')
   async createUser(@Body() body: CreateUserDto) {
     const user = await this.authService.register(body);
-
     return user;
   }
 
@@ -84,15 +77,12 @@ export class AuthController {
   @Get('/me')
   async getMyInfo(@CurrentUser() user: User) {
     const fetchedUser = await this.usersService.findByEmail(user.email);
-
     delete fetchedUser.password;
     delete fetchedUser.refreshToken;
     delete fetchedUser.googleAuthId;
     delete fetchedUser.appleId;
-
     const { accessToken, refreshToken } =
-      await this.authService.createNewTokens(user);
-
+      await this.authService.createNewTokens(fetchedUser);
     return { userData: fetchedUser, accessToken, refreshToken };
   }
 

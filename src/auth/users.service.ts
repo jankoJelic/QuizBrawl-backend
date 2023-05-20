@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ArrayContains, Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './user.entity';
 import { UserJoinedLobbyDto } from 'src/events/dtos/user-joined-lobby.dto';
@@ -124,17 +124,15 @@ export class UsersService {
     const userOne = await this.findOne(userOneId);
     const userTwo = await this.findOne(userTwoId);
 
-    if (!(userOne?.friends || []).some((freindId) => freindId === userTwoId)) {
-      this.updateUser(userOneId, {
-        friends: (userOne?.friends || []).concat([userTwoId]),
-      });
-    }
+    if (userOne.friends.map((fr) => Number(fr)).includes(userTwo.id)) return;
 
-    if (!(userTwo?.friends || []).some((friendId) => friendId === userOneId)) {
-      this.updateUser(userTwoId, {
-        friends: (userTwo?.friends || []).concat([userOneId]),
-      });
-    }
+    this.updateUser(userOneId, {
+      friends: (userOne?.friends || []).concat([userTwoId]),
+    });
+
+    this.updateUser(userTwoId, {
+      friends: (userTwo?.friends || []).concat([userOneId]),
+    });
   }
 
   async getUserAvatars(userId: number) {
@@ -152,6 +150,27 @@ export class UsersService {
     return (user.avatars || []).concat(
       allUrls.filter((url) => url.includes('.png') && url.includes('default')),
     );
+  }
+
+  async removeFriend(friendId: number, currentUser: User) {
+    this.usersRepository.update(currentUser.id, {
+      friends: currentUser?.friends?.filter((fr) => fr != friendId) || [],
+    });
+  }
+
+  async getUsers(userIds: number[]) {
+    let friends = [];
+
+    for (let i = 0; i < userIds.length; i++) {
+      const user = await this.usersRepository.findOne({
+        where: {
+          id: userIds[0],
+        },
+      });
+
+      friends.push(user);
+    }
+    return friends.map((fr) => shallowUser(fr));
   }
 
   async registerAnswer(userId: number, correct: boolean) {}

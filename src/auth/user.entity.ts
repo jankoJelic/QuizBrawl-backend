@@ -151,7 +151,7 @@ export class User {
   @Column({ default: '' })
   country: string;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   friends: number[];
 
   @ManyToOne(() => Team, (team) => team.users)
