@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   NotAcceptableException,
   NotFoundException,
@@ -32,10 +34,7 @@ export class MessagesService {
   async sendMessage(message: Message, recipientId: number) {
     const recipient = await this.usersService.findOne(recipientId);
 
-    if (!recipient) throw new NotFoundException('Recipient does not exist');
-
-    if (recipient.inbox?.length > 19)
-      throw new NotAcceptableException('Inbox full');
+    let currentInbox = recipient?.inbox || [];
 
     await this.usersService.updateUser(recipientId, {
       inbox: [message, ...(recipient?.inbox || [])],
@@ -46,7 +45,12 @@ export class MessagesService {
     const recipient = await this.usersService.findOne(recipientId);
 
     if (!recipient) return 'User does not exist';
-    if (recipient.inbox.some((mess) => mess.senderId === String(user.id)))
+    if (
+      recipient.inbox.some(
+        (mess) =>
+          mess.senderId === String(user.id) && mess.type === 'FRIEND_REQUEST',
+      )
+    )
       return 'Friend request already sent';
 
     const friendRequestMessage = createFriendRequest(user);
