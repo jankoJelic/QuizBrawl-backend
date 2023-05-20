@@ -28,6 +28,7 @@ import { PinDto } from './dtos/pin.dto';
 import { GoogleAuthDto } from './dtos/google-auth.dto';
 
 import { OAuth2Client } from 'google-auth-library';
+import { shallowUser } from './util/shallowUser';
 
 const oAuthClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -89,7 +90,10 @@ export class AuthController {
     delete fetchedUser.googleAuthId;
     delete fetchedUser.appleId;
 
-    return fetchedUser;
+    const { accessToken, refreshToken } =
+      await this.authService.createNewTokens(user);
+
+    return { userData: fetchedUser, accessToken, refreshToken };
   }
 
   @Public()

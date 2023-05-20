@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { LobbiesService } from './lobbies.service';
@@ -30,8 +31,8 @@ export class LobbiesController {
   }
 
   @UseGuards(AdminGuard)
-  @Patch('/updateLobby')
-  async updateLobby(@Param('id') id: string, @Body() body: Partial<Lobby>) {
+  @Patch('/lobby')
+  async updateLobby(@Query('id') id: string, @Body() body: Partial<Lobby>) {
     return await this.lobbiesService.updateLobby(Number(id), body);
   }
 

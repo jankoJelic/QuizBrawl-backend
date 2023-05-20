@@ -1,17 +1,23 @@
-import { Controller, Get, NotFoundException, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiTags } from '@nestjs/swagger';
 import { shallowUser } from './util/shallowUser';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
+import { AdminGuard } from './guards/admin.guard';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(
-    private usersService: UsersService,
-  ) {}
+  constructor(private usersService: UsersService) {}
 
+  @UseGuards(AdminGuard)
   @Get('/')
   async getAllUsers(
     @Query('isAdmin') isAdmin: string,
