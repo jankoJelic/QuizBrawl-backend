@@ -60,7 +60,6 @@ export class UsersController {
   @Get('/friends')
   async getFriends(@CurrentUser() user: User) {
     if (!user.friends) return;
-    console.log(user.friends);
     return await this.usersService.getUsers(user.friends);
   }
 }

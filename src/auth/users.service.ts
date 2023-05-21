@@ -135,6 +135,19 @@ export class UsersService {
     });
   }
 
+  async removeFriends(userOneId: number, userTwoId: number) {
+    const userOne = await this.findOne(userOneId);
+    const userTwo = await this.findOne(userTwoId);
+
+    this.updateUser(userOneId, {
+      friends: userOne.friends.filter((friendId) => friendId != userTwoId),
+    });
+
+    this.updateUser(userTwoId, {
+      friends: userTwo.friends.filter((friendId) => friendId != userOneId),
+    });
+  }
+
   async getUserAvatars(userId: number) {
     const bucket = await getStorage().bucket().getFiles();
 

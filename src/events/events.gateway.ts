@@ -22,6 +22,7 @@ import { roomName } from './util/create-room-name';
 import { User } from 'src/auth/user.entity';
 import { MessagesService } from 'src/messages/messages.service';
 import { shallowUser } from 'src/auth/util/shallowUser';
+import { emit } from 'process';
 
 const {
   ROOM_CREATED,
@@ -39,6 +40,7 @@ const {
   FRIEND_REQUEST_ACCEPTED,
   USER_DISCONNECTED,
   USER_CONNECTED,
+  FRIEND_REMOVED,
 } = SOCKET_EVENTS;
 
 @WebSocketGateway({
@@ -226,5 +228,16 @@ export class EventsGateway
     this.server
       .to(`user-${String(body.senderId)}`)
       .emit(FRIEND_REQUEST_ACCEPTED, shallowUser(body.user));
+  }
+
+  @SubscribeMessage(FRIEND_REMOVED)
+  async handleFriendRemoved(
+    @MessageBody() body: { userId: number; removedFriendId: number },
+  ) {
+    const { userId, removedFriendId } = body;
+    this.usersService.removeFriends(userId, removedFriendId);
+    this.server
+      .to(`user-${String(removedFriendId)}`)
+      .emit(FRIEND_REMOVED, userId);
   }
 }
