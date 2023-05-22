@@ -207,15 +207,12 @@ export class UsersService {
 
     let updatedCorrectAnswers = myUser.correctAnswers || this.initialAnswers();
 
-    console.log(updatedCorrectAnswers);
     if (correct)
       updatedCorrectAnswers[topic] = updatedCorrectAnswers[topic] + 1;
 
     let updatedTotalAnswers = myUser.totalAnswers || this.initialAnswers();
     updatedTotalAnswers[topic] = updatedTotalAnswers[topic] + 1;
 
-    console.log('=====');
-    console.log(updatedTotalAnswers);
     this.updateUser(user.id, {
       ...(correct && {
         correctAnswers: {
