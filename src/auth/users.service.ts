@@ -16,6 +16,7 @@ import { shallowUser } from './util/shallowUser';
 import { getStorage } from 'firebase-admin/storage';
 import { createStorageDownloadUrl } from 'src/util/firebase/createStorageDownloadUrl';
 import { ConfigService } from '@nestjs/config';
+import { Topic } from 'src/rooms/types/Topic';
 
 @Injectable()
 export class UsersService {
@@ -29,12 +30,27 @@ export class UsersService {
     private configService: ConfigService,
   ) {}
 
+  initialAnswers() {
+    return {
+      General: 0,
+      Sports: 0,
+      Music: 0,
+      History: 0,
+      Geography: 0,
+      Showbiz: 0,
+      Art: 0,
+      Science: 0,
+    };
+  }
+
   async create(createUserDto: CreateUserDto) {
     const user = this.usersRepository.create({
       ...createUserDto,
       avatars: DEFAULT_AVATARS,
       avatar:
         DEFAULT_AVATARS[Math.floor(Math.random() * DEFAULT_AVATARS.length)],
+      correctAnswers: this.initialAnswers(),
+      totalAnswers: this.initialAnswers(),
     });
     return this.usersRepository.save(user);
   }
@@ -186,5 +202,27 @@ export class UsersService {
     return friends.map((fr) => shallowUser(fr));
   }
 
-  async registerAnswer(userId: number, correct: boolean) {}
+  async registerAnswer(user: User, correct: boolean, topic: Topic) {
+    const myUser = await this.findOne(user.id);
+
+    let updatedCorrectAnswers = myUser.correctAnswers || this.initialAnswers();
+
+    console.log(updatedCorrectAnswers);
+    if (correct)
+      updatedCorrectAnswers[topic] = updatedCorrectAnswers[topic] + 1;
+
+    let updatedTotalAnswers = myUser.totalAnswers || this.initialAnswers();
+    updatedTotalAnswers[topic] = updatedTotalAnswers[topic] + 1;
+
+    console.log('=====');
+    console.log(updatedTotalAnswers);
+    this.updateUser(user.id, {
+      ...(correct && {
+        correctAnswers: {
+          ...updatedCorrectAnswers,
+        },
+      }),
+      totalAnswers: updatedTotalAnswers,
+    });
+  }
 }

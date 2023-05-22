@@ -167,20 +167,26 @@ export class EventsGateway
 
   @SubscribeMessage(CORRECT_ANSWER_SELECTED)
   async handleCorrectAnswerSelected(
-    @MessageBody() { roomId, answer, userId }: SelectAnswerDto,
+    @MessageBody() { roomId, answer, userId, topic }: SelectAnswerDto,
   ) {
     this.server
       .to(roomName(roomId))
       .emit(CORRECT_ANSWER_SELECTED, { answer, userId });
+
+    const user = await this.usersService.findOne(userId);
+    this.usersService.registerAnswer(user, true, topic);
   }
 
   @SubscribeMessage(WRONG_ANSWER_SELECTED)
   async handleWrongAnswerSelected(
-    @MessageBody() { roomId, answer, userId }: SelectAnswerDto,
+    @MessageBody() { roomId, answer, userId, topic }: SelectAnswerDto,
   ) {
     this.server
       .to(roomName(roomId))
       .emit(WRONG_ANSWER_SELECTED, { answer, userId });
+
+    const user = await this.usersService.findOne(userId);
+    this.usersService.registerAnswer(user, false, topic);
   }
 
   @SubscribeMessage(USER_READY)

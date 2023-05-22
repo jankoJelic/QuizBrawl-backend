@@ -14,6 +14,7 @@ import { shallowUser } from './util/shallowUser';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { AdminGuard } from './guards/admin.guard';
+import { Topic } from 'src/rooms/types/Topic';
 
 @ApiTags('users')
 @Controller('users')
@@ -47,9 +48,9 @@ export class UsersController {
   @Post('/answer')
   async registerAnswer(
     @CurrentUser() user: User,
-    @Body() body: { correct: boolean },
+    @Body() body: { correct: boolean; topic: Topic },
   ) {
-    this.usersService.registerAnswer(user.id, body.correct);
+    this.usersService.registerAnswer(user, body.correct, body.topic);
   }
 
   @Delete('/removeFriend')
