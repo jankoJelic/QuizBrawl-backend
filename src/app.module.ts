@@ -29,6 +29,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MessagesModule } from './messages/messages.module';
 import { MessagesService } from './messages/messages.service';
 import { AllExceptionsFilter } from './interceptors/htttp-exception.filter';
+import { RewardsModule } from './rewards/rewards.module';
 
 @Global()
 @Module({
@@ -86,6 +87,7 @@ import { AllExceptionsFilter } from './interceptors/htttp-exception.filter';
     LobbiesModule,
     TeamsModule,
     MessagesModule,
+    RewardsModule,
   ],
   controllers: [AppController, TeamsController],
   providers: [
