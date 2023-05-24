@@ -30,6 +30,7 @@ import { MessagesModule } from './messages/messages.module';
 import { MessagesService } from './messages/messages.service';
 import { AllExceptionsFilter } from './interceptors/htttp-exception.filter';
 import { RewardsModule } from './rewards/rewards.module';
+import { MarketModule } from './market/market.module';
 
 @Global()
 @Module({
@@ -88,6 +89,7 @@ import { RewardsModule } from './rewards/rewards.module';
     TeamsModule,
     MessagesModule,
     RewardsModule,
+    MarketModule,
   ],
   controllers: [AppController, TeamsController],
   providers: [
