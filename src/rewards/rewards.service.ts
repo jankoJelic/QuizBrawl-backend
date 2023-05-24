@@ -75,4 +75,22 @@ export class RewardsService {
 
     return yourReward();
   }
+
+  async sendTrophiesToUser(userId: number, amount: number) {
+    const user = await this.usersService.findOne(userId);
+    const currentTrophies = user.trophies;
+    const updatedTrophies = currentTrophies + amount;
+    const result = updatedTrophies > 0 ? updatedTrophies : 0;
+    this.usersService.updateUser(userId, {
+      trophies: result,
+    });
+  }
+
+  async sendMoneyToUser(userId: number, amount: number) {
+    const user = await this.usersService.findOne(userId);
+    const currentMoney = user.money;
+    this.usersService.updateUser(userId, {
+      money: currentMoney + amount,
+    });
+  }
 }

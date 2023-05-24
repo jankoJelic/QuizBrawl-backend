@@ -62,4 +62,7 @@ export class Room {
 
   @Column({ default: 0 })
   bet: number;
+
+  @Column({ default: false })
+  gameStarted: boolean;
 }
