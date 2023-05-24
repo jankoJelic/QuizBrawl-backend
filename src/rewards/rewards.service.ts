@@ -66,7 +66,7 @@ export class RewardsService {
     };
 
     const trophiesSum = currentTrophies + yourReward();
-    const updatedTrophies = !!trophiesSum ? trophiesSum : 0;
+    const updatedTrophies = trophiesSum > 0 ? trophiesSum : 0;
 
     this,
       this.usersService.updateUser(user.id, {
