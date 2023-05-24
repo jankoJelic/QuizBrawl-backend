@@ -80,17 +80,17 @@ export class EventsGateway
     const { userId } = client.handshake.query || {};
     const user = await this.usersService.findOne(Number(userId));
 
-    if (user?.room?.users?.length === 1) {
-      this.server.emit(ROOM_DELETED, user?.room);
-      this.roomsService.deleteRoom(user?.room?.id);
-    }
-
     if (!!user?.lobby) {
       this.server.emit(USER_LEFT_LOBBY, { user, lobbyId: user.lobby.id });
     }
 
     if (!!user?.room) {
       this.server.emit(USER_LEFT_ROOM, { room: user.room, user });
+    }
+
+    if (user?.room?.users?.length === 1) {
+      this.server.emit(ROOM_DELETED, user?.room);
+      this.roomsService.deleteRoom(user?.room?.id);
     }
 
     this.server.emit(USER_DISCONNECTED, userId);
