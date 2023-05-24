@@ -6,7 +6,6 @@ import { UsersService } from 'src/auth/users.service';
 export class RewardsService {
   constructor(private usersService: UsersService) {}
   async distributeTrophies(score: Record<number, number>, user: User) {
-    console.log('SCORE ===> ', score);
     const currentUser = await this.usersService.findOne(user.id);
     const currentTrophies = currentUser.trophies;
 
@@ -21,7 +20,6 @@ export class RewardsService {
 
     const yourPosition = playerIdsByScore.indexOf(String(user.id));
     const yourScore = score[user.id];
-    console.log(`Your position, ${user.firstName}: ${yourPosition}`);
 
     const distribution = () => {
       switch (playersCount) {
@@ -53,8 +51,6 @@ export class RewardsService {
       if (item === yourScore) duplicateScoresIndexes.push(index);
     });
 
-    console.log(`Duplicate score indexes === ${duplicateScoresIndexes}`);
-
     const yourReward = () => {
       const multipleUsersWithSameScore = duplicateScoresIndexes.length > 1;
 
@@ -69,7 +65,13 @@ export class RewardsService {
       }
     };
 
-    console.log(`Your distribution ${user.firstName} => ${yourReward()}`);
+    const trophiesSum = currentTrophies + yourReward();
+    const updatedTrophies = !!trophiesSum ? trophiesSum : 0;
+
+    this,
+      this.usersService.updateUser(user.id, {
+        trophies: updatedTrophies,
+      });
 
     return yourReward();
   }
