@@ -33,6 +33,7 @@ const {
   USER_LEFT_ROOM,
   USER_READY,
   GAME_STARTED,
+  GAME_ENDED,
   CORRECT_ANSWER_SELECTED,
   WRONG_ANSWER_SELECTED,
   KICK_USER_FROM_ROOM,
@@ -77,18 +78,27 @@ export class EventsGateway
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
     const { userId } = client.handshake.query || {};
+    const user = await this.usersService.findOne(Number(userId));
+
+    if (user?.room?.users?.length === 1) {
+      this.server.emit(ROOM_DELETED, user?.room);
+      this.roomsService.deleteRoom(user?.room?.id);
+    }
+
+    if (!!user?.lobby) {
+      this.server.emit(USER_LEFT_LOBBY, { user, lobbyId: user.lobby.id });
+    }
+
+    if (!!user?.room) {
+      this.server.emit(USER_LEFT_ROOM, { room: user.room, user });
+    }
+
+    this.server.emit(USER_DISCONNECTED, userId);
     this.usersService.updateUser(Number(userId), {
       lobby: null,
       room: null,
       isOnline: false,
     });
-    const usersRoom = await this.roomsService.getAllForUser(Number(userId));
-    if (usersRoom.users.length === 1) {
-      await this.roomsService.deleteRoom(usersRoom.id);
-      this.server.emit(ROOM_DELETED, usersRoom);
-    }
-
-    this.server.emit(USER_DISCONNECTED, userId);
     client.leave(`user-${String(userId)}`);
   }
 
@@ -166,8 +176,17 @@ export class EventsGateway
       topic: room.topic,
     });
 
-    this.roomsService.updateRoom({ roomId: room.id, readyUsers: [] });
+    this.roomsService.updateRoom({
+      roomId: room.id,
+      readyUsers: [],
+      gameStarted: true,
+    });
     this.server.emit(GAME_STARTED, { questions, roomId: room.id });
+  }
+
+  @SubscribeMessage(GAME_ENDED)
+  async handleGameEnded(@MessageBody() room: Room) {
+    this.roomsService.updateRoom({ roomId: room.id, gameStarted: false });
   }
 
   @SubscribeMessage(CORRECT_ANSWER_SELECTED)
