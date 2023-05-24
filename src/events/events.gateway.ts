@@ -23,6 +23,7 @@ import { User } from 'src/auth/user.entity';
 import { MessagesService } from 'src/messages/messages.service';
 import { shallowUser } from 'src/auth/util/shallowUser';
 import { emit } from 'process';
+import { RewardsService } from 'src/rewards/rewards.service';
 
 const {
   ROOM_CREATED,
@@ -59,6 +60,7 @@ export class EventsGateway
     private roomsService: RoomsService,
     private questionsService: QuestionsService,
     private messagesService: MessagesService,
+    private rewardsService: RewardsService,
   ) {}
 
   @WebSocketServer()
@@ -86,6 +88,12 @@ export class EventsGateway
 
     if (!!user?.room) {
       this.server.emit(USER_LEFT_ROOM, { room: user.room, user });
+      if (user.room.gameStarted) {
+        this.rewardsService.sendTrophiesToUser(
+          user.id,
+          user.room.users.length * -1,
+        );
+      }
     }
 
     if (user?.room?.users?.length === 1) {
