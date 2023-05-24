@@ -83,7 +83,7 @@ export class EventsGateway
       isOnline: false,
     });
     const usersRoom = await this.roomsService.getAllForUser(Number(userId));
-    if (!!usersRoom) {
+    if (usersRoom.users.length === 1) {
       await this.roomsService.deleteRoom(usersRoom.id);
       this.server.emit(ROOM_DELETED, usersRoom);
     }
@@ -127,6 +127,11 @@ export class EventsGateway
   ) {
     this.usersService.updateUser(user.id, { room: null });
     this.server.emit(USER_LEFT_ROOM, { user, room });
+
+    if (room.users.length === 1) {
+      this.roomsService.deleteRoom(room.id);
+      this.server.emit(ROOM_DELETED, room);
+    }
 
     client.leave(roomName(room.id));
   }
