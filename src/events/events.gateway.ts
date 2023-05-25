@@ -1,10 +1,8 @@
 import {
   ConnectedSocket,
-  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -13,17 +11,13 @@ import { UsersService } from 'src/auth/users.service';
 import { SOCKET_EVENTS } from './constants/events';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { QuestionsService } from 'src/questions/questions.service';
-import { User } from 'src/auth/user.entity';
 import { MessagesService } from 'src/messages/messages.service';
-import { shallowUser } from 'src/auth/util/shallowUser';
 import { RewardsService } from 'src/rewards/rewards.service';
 
 const {
   ROOM_DELETED,
   USER_LEFT_LOBBY,
   USER_LEFT_ROOM,
-  FRIEND_REQUEST_SENT,
-  FRIEND_REQUEST_ACCEPTED,
   USER_DISCONNECTED,
   USER_CONNECTED,
   FRIEND_REMOVED,
@@ -92,45 +86,5 @@ export class EventsGateway
       isOnline: false,
     });
     client.leave(`user-${String(userId)}`);
-  }
-
-  @SubscribeMessage(FRIEND_REQUEST_SENT)
-  async handleFriendRequestSent(
-    @MessageBody() body: { user: User; recipientId: number },
-  ) {
-    const friendRequest = await this.messagesService.sendFriendRequest(
-      body?.user,
-      body?.recipientId,
-    );
-
-    if (typeof friendRequest === 'string') return;
-    if (!friendRequest?.title) return;
-
-    this.server
-      .to(`user-${String(body.recipientId)}`)
-      .emit(FRIEND_REQUEST_SENT, {
-        friendRequest,
-      });
-  }
-
-  @SubscribeMessage(FRIEND_REQUEST_ACCEPTED)
-  async handleFriendRequestAccepted(
-    @MessageBody() body: { user: User; senderId: number },
-  ) {
-    this.usersService.makeFriends(body.user.id, body.senderId);
-    this.server
-      .to(`user-${String(body.senderId)}`)
-      .emit(FRIEND_REQUEST_ACCEPTED, shallowUser(body.user));
-  }
-
-  @SubscribeMessage(FRIEND_REMOVED)
-  async handleFriendRemoved(
-    @MessageBody() body: { userId: number; removedFriendId: number },
-  ) {
-    const { userId, removedFriendId } = body;
-    this.usersService.removeFriends(userId, removedFriendId);
-    this.server
-      .to(`user-${String(removedFriendId)}`)
-      .emit(FRIEND_REMOVED, userId);
   }
 }

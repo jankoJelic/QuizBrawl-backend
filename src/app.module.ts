@@ -34,6 +34,7 @@ import { MarketModule } from './market/market.module';
 import { RoomsGateway } from './events/gateways/rooms.gateway';
 import { LobbiesGateway } from './events/gateways/lobbies.gateway';
 import { GameGateway } from './events/gateways/game.gateway';
+import { MessagesGateway } from './events/gateways/messages.gateway';
 
 @Global()
 @Module({
@@ -114,6 +115,7 @@ import { GameGateway } from './events/gateways/game.gateway';
     RoomsGateway,
     LobbiesGateway,
     GameGateway,
+    MessagesGateway,
     QuestionsService,
     TeamsService,
     MessagesService,
