@@ -13,6 +13,8 @@ import { MessagesService } from 'src/messages/messages.service';
 import { RewardsService } from 'src/rewards/rewards.service';
 import { UserJoinedRoomDto } from '../dtos/user-joined-room.dto';
 import { roomName } from '../util/create-room-name';
+import { Room } from 'src/rooms/room.entity';
+import { UserReadyDto } from '../dtos/user-ready.dto';
 
 export class RoomsGateway extends EventsGateway {
   constructor(
@@ -63,5 +65,40 @@ export class RoomsGateway extends EventsGateway {
   async handleUserKickedFromRoom(@MessageBody() { user, room }) {
     await this.usersService.updateUser(user?.id, { room: null });
     this.server.emit(SOCKET_EVENTS.KICK_USER_FROM_ROOM, { user, room });
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.ROOM_CREATED)
+  async handleRoomCreated(
+    @MessageBody() room: Room,
+    @ConnectedSocket() client: any,
+  ) {
+    const { userId } = client.handshake.query || {};
+    this.usersService.updateUser(userId, { room });
+    this.server.emit(SOCKET_EVENTS.ROOM_CREATED, room);
+
+    client.join(roomName(room.id));
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.ROOM_DELETED)
+  async handleRoomDeleted(@MessageBody() room: Room) {
+    this.server.emit(SOCKET_EVENTS.ROOM_DELETED, room);
+  }
+
+  @SubscribeMessage(SOCKET_EVENTS.USER_READY)
+  async handleUserReady(
+    @MessageBody() { isReady, userId, roomId }: UserReadyDto,
+  ) {
+    if (isReady) {
+      const room = await this.roomsService.getRoomById(roomId);
+      if (!room) return;
+
+      this.roomsService.updateRoom({
+        roomId,
+        readyUsers: [...room.readyUsers, String(userId)],
+      });
+
+      this.server.emit(SOCKET_EVENTS.USER_READY, { roomId, userId });
+    } else {
+    }
   }
 }
