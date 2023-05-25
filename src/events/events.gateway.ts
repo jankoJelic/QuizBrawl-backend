@@ -56,11 +56,11 @@ export class EventsGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
   constructor(
-    private readonly usersService: UsersService,
-    private roomsService: RoomsService,
-    private questionsService: QuestionsService,
-    private messagesService: MessagesService,
-    private rewardsService: RewardsService,
+    public usersService: UsersService,
+    public roomsService: RoomsService,
+    public questionsService: QuestionsService,
+    public messagesService: MessagesService,
+    public rewardsService: RewardsService,
   ) {}
 
   @WebSocketServer()
@@ -124,40 +124,6 @@ export class EventsGateway
     const { userId } = client.handshake.query || {};
     this.usersService.updateUser(userId, { lobby: null });
     this.server.emit(USER_LEFT_LOBBY, data);
-  }
-
-  @SubscribeMessage(USER_JOINED_ROOM)
-  async handleUserJoinedRoom(
-    @MessageBody() data: UserJoinedRoomDto,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const room = await this.roomsService.getRoomById(data.roomId);
-    this.usersService.updateUser(data.user.id, { room });
-    this.server.emit(USER_JOINED_ROOM, data);
-
-    client.join(roomName(room.id));
-  }
-
-  @SubscribeMessage(USER_LEFT_ROOM)
-  async handleUserLeftRoom(
-    @MessageBody() { room, user },
-    @ConnectedSocket() client: any,
-  ) {
-    this.usersService.updateUser(user.id, { room: null });
-    this.server.emit(USER_LEFT_ROOM, { user, room });
-
-    if (room.users.length === 1) {
-      this.roomsService.deleteRoom(room.id);
-      this.server.emit(ROOM_DELETED, room);
-    }
-
-    client.leave(roomName(room.id));
-  }
-
-  @SubscribeMessage(KICK_USER_FROM_ROOM)
-  async handleUserKickedFromRoom(@MessageBody() { user, room }) {
-    await this.usersService.updateUser(user?.id, { room: null });
-    this.server.emit(KICK_USER_FROM_ROOM, { user, room });
   }
 
   @SubscribeMessage(ROOM_CREATED)

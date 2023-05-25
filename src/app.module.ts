@@ -31,6 +31,7 @@ import { MessagesService } from './messages/messages.service';
 import { AllExceptionsFilter } from './interceptors/htttp-exception.filter';
 import { RewardsModule } from './rewards/rewards.module';
 import { MarketModule } from './market/market.module';
+import { RoomsGateway } from './events/gateways/rooms.gateway';
 
 @Global()
 @Module({
@@ -108,6 +109,7 @@ import { MarketModule } from './market/market.module';
       useClass: AllExceptionsFilter,
     },
     EventsGateway,
+    RoomsGateway,
     QuestionsService,
     TeamsService,
     MessagesService,
