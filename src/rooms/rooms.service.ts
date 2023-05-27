@@ -16,13 +16,12 @@ export class RoomsService {
 
   async createRoom(body: CreateRoomDto & { users: User[]; userId: number }) {
     const room = this.roomsRepository.create(body);
-
     return this.roomsRepository.save(room);
   }
 
   async deleteRoom(roomId: number) {
     const room = await this.roomsRepository.findOne({ where: { id: roomId } });
-    if (room.lobby.id === LOBBY_IDS.SOLO) return;
+    if (room?.lobbyId === LOBBY_IDS.SOLO) return "can't delete solo event";
     return await this.roomsRepository.delete(roomId);
   }
 
@@ -39,7 +38,7 @@ export class RoomsService {
   }
 
   async getAll(lobbyId?: number, topic?: Topic) {
-    const allRooms = await this.roomsRepository.find({ relations: ['lobby'] });
+    const allRooms = await this.roomsRepository.find();
     let rooms = allRooms;
 
     if (!!lobbyId) {
@@ -50,6 +49,7 @@ export class RoomsService {
       const topicRooms = rooms.filter((r) => r.topic === topic);
       rooms = topicRooms;
     }
+
     return rooms;
   }
 

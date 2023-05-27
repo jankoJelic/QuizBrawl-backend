@@ -35,8 +35,8 @@ export class RoomsController {
     const room = await this.roomsService.createRoom({
       userId: user.id,
       ...body,
-      admin: user,
       users: [user],
+      hostName: user.firstName
     });
 
     return room;
@@ -49,7 +49,7 @@ export class RoomsController {
 
       if (!room) throw new NotFoundException();
 
-      if (room?.admin?.id === user.id || user?.isAdmin) {
+      if (room?.userId === user.id || user?.isAdmin) {
         this.roomsService.deleteRoom(roomId);
       } else {
         throw new UnauthorizedException();

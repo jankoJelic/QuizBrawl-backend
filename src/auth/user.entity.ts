@@ -186,4 +186,7 @@ export class User {
 
   @Column({ type: 'json', nullable: true })
   rewards: Reward[];
+
+  @Column({ type: 'json', nullable: true })
+  dailies: {};
 }

@@ -44,6 +44,9 @@ export class Room {
   teams: boolean;
 
   @Column({ default: '' })
+  hostName: string;
+
+  @Column({ default: '' })
   password: string;
 
   @ManyToOne(() => Lobby, (lobby) => lobby.rooms)
@@ -54,9 +57,6 @@ export class Room {
   @JoinColumn()
   users: User[];
 
-  @Column({ type: 'json' })
-  admin: User;
-
   @Column({ type: 'json', nullable: true })
   readyUsers: string[];
 
@@ -65,4 +65,7 @@ export class Room {
 
   @Column({ default: false })
   gameStarted: boolean;
+
+  @Column({ default: 0, nullable: true })
+  lobbyId: number;
 }

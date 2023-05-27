@@ -1,5 +1,4 @@
 import { Topic } from 'src/rooms/types/Topic';
-import { Lobby } from 'src/lobbies/lobby.entity';
 import { User } from 'src/auth/user.entity';
 
 export interface CreateRoomDto {
@@ -7,10 +6,10 @@ export interface CreateRoomDto {
   topic: Topic;
   answerTime: number;
   maxPlayers: number;
-  lobby: Lobby;
+  lobbyId: number;
   users: User[];
-  admin: User;
   questionsCount?: number;
   readyUsers?: string[];
   gameStarted?: boolean;
+  hostName: string;
 }
