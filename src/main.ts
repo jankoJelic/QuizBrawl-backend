@@ -17,6 +17,7 @@ async function bootstrap() {
     .setTitle('Quiz Brawl')
     .setDescription('QB API docs')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

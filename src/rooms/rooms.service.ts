@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateRoomDto } from './dtos/create-room.dto';
 import { User } from 'src/auth/user.entity';
 import { Topic } from './types/Topic';
+import { LOBBY_IDS } from 'src/lobbies/constants/lobby-ids';
 
 @Injectable()
 export class RoomsService {
@@ -20,6 +21,8 @@ export class RoomsService {
   }
 
   async deleteRoom(roomId: number) {
+    const room = await this.roomsRepository.findOne({ where: { id: roomId } });
+    if (room.lobby.id === LOBBY_IDS.SOLO) return;
     return await this.roomsRepository.delete(roomId);
   }
 
