@@ -21,11 +21,11 @@ import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
 @ApiTags('questions')
-@UseGuards(AdminGuard)
 @Controller('questions')
 export class QuestionsController {
   constructor(private questionsService: QuestionsService) {}
 
+  @UseGuards(AdminGuard)
   @Post('/create')
   async createQuestion(
     @Body() createQuestionDto: CreateQuestionDto,
@@ -34,6 +34,7 @@ export class QuestionsController {
     return this.questionsService.createQuestion(createQuestionDto, user);
   }
 
+  @UseGuards(AdminGuard)
   @Patch('/edit')
   async editQuestion(
     @Query('id') id: number,
@@ -43,6 +44,7 @@ export class QuestionsController {
     return await this.questionsService.updateQuestion({ id, dto: body, user });
   }
 
+  @UseGuards(AdminGuard)
   @Delete('/')
   async deleteQuestion(@Query('id') id: number) {
     return await this.questionsService.deleteQuestion(id);
@@ -64,9 +66,15 @@ export class QuestionsController {
     });
   }
 
+  @UseGuards(AdminGuard)
   @Get('/question')
   async getQuestion(@Query('id') id: string) {
     return await this.questionsService.getQuestionById(Number(id));
+  }
+
+  @Post('/question/like')
+  async likeQuestion(@Body() body: { like: boolean; id: number }) {
+    return await this.questionsService.likeQuestion(Number(body.id), body.like);
   }
 
   @Patch('/stats')

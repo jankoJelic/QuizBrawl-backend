@@ -29,10 +29,7 @@ export class GameGateway extends EventsGateway {
 
   @SubscribeMessage(SOCKET_EVENTS.GAME_STARTED)
   async handleGameStarted(@MessageBody() room: Room) {
-    const questions = await this.questionsService.getQuestions({
-      count: room.questionsCount,
-      topic: room.topic,
-    });
+    const questions = await this.questionsService.getQuestionsForRoom(room);
 
     this.roomsService.updateRoom({
       roomId: room.id,

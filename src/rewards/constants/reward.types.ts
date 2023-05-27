@@ -1,0 +1,5 @@
+export const REWARD_TYPES = {
+  AVATAR: 'AVATAR',
+  ACHIEVEMENT: 'ACHIEVEMENT',
+  MEDAL: 'MEDAL',
+};

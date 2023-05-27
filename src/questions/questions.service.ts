@@ -17,6 +17,7 @@ import { OpenTDBQuestion } from './dtos/open-tdb.dto';
 import { transformToMyTopic } from './util/open-tdb.utils';
 import { Difficulty } from './types/difficulty.type';
 import { decodeHtmlEntities } from 'src/util/decodeHtmlEntities';
+import { Room } from 'src/rooms/room.entity';
 
 @Injectable()
 export class QuestionsService {
@@ -217,5 +218,19 @@ export class QuestionsService {
     results.forEach((q: OpenTDBQuestion) => {
       addQuestionToMyDb(q);
     });
+  }
+
+  async getQuestionsForRoom(room: Room) {
+    return await this.getQuestions({
+      count: room.questionsCount,
+      topic: room.topic,
+    });
+  }
+
+  async likeQuestion(questionId: number, like: boolean) {
+    const question = await this.getQuestionById(questionId);
+    const questionLikes = question.likes;
+    const updatedLikes = like ? questionLikes + 1 : questionLikes - 1;
+    this.questionsRepository.update(questionId, { likes: updatedLikes });
   }
 }

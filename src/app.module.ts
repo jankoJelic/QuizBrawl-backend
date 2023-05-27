@@ -35,6 +35,7 @@ import { RoomsGateway } from './events/gateways/rooms.gateway';
 import { LobbiesGateway } from './events/gateways/lobbies.gateway';
 import { GameGateway } from './events/gateways/game.gateway';
 import { MessagesGateway } from './events/gateways/messages.gateway';
+import { GameModule } from './game/game.module';
 
 @Global()
 @Module({
@@ -94,6 +95,7 @@ import { MessagesGateway } from './events/gateways/messages.gateway';
     MessagesModule,
     RewardsModule,
     MarketModule,
+    GameModule,
   ],
   controllers: [AppController, TeamsController],
   providers: [

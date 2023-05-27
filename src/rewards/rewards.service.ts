@@ -1,10 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { UsersService } from 'src/auth/users.service';
+import { RoomsService } from 'src/rooms/rooms.service';
+import { getStorage } from 'firebase-admin/storage';
+import { createStorageDownloadUrl } from 'src/util/firebase/createStorageDownloadUrl';
+import { ConfigService } from '@nestjs/config';
+import { shuffleArray } from 'src/util/arrays/shuffleArray';
+import { REWARD_TYPES } from './constants/reward.types';
 
 @Injectable()
 export class RewardsService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private roomsService: RoomsService,
+    private configService: ConfigService,
+  ) {}
   async distributeTrophies(score: Record<number, number>, user: User) {
     const currentUser = await this.usersService.findOne(user.id);
     const currentTrophies = currentUser.trophies;
@@ -92,5 +102,61 @@ export class RewardsService {
     this.usersService.updateUser(userId, {
       money: currentMoney + amount,
     });
+  }
+
+  async registerDailyEventScore(
+    userId: number,
+    dailyId: number,
+    score: number,
+  ) {
+    const user = await this.usersService.findOne(userId);
+    let userDailies = user.dailies ? user.dailies : {};
+    userDailies[dailyId] = score;
+    this.usersService.updateUser(userId, {
+      dailies: userDailies,
+    });
+    const perfectScore = score === 10;
+    const moneyWon = perfectScore ? 20 : score;
+    this.sendMoneyToUser(userId, moneyWon);
+
+    let payload = { money: moneyWon };
+
+    if (perfectScore) {
+      const reward = await this.rewardUserPerfectDaily(user, dailyId);
+      payload['reward'] = reward;
+    }
+
+    return payload;
+  }
+
+  async rewardUserPerfectDaily(user: User, dailyId: number) {
+    const dailyRoom = await this.roomsService.getRoomById(dailyId);
+    const { topic } = dailyRoom || {};
+    const topicAvatars = await this.getFirebaseStorageFiles(
+      `avatars/topics/${topic.toLowerCase()}`,
+    );
+    const fullUser = await this.usersService.findOne(user.id);
+    const currentUserAvatars = fullUser.avatars;
+    const avatarToReward = shuffleArray(topicAvatars).find(
+      (a) => !fullUser.avatars.includes(a),
+    );
+    this.usersService.updateUser(user.id, {
+      avatars: currentUserAvatars.concat([avatarToReward]),
+    });
+
+    return { payload: avatarToReward, type: REWARD_TYPES.AVATAR };
+  }
+
+  async getFirebaseStorageFiles(prefix = '') {
+    const bucket = await getStorage().bucket().getFiles({ prefix });
+
+    const avatarUrls = bucket[0].map((avatar) =>
+      createStorageDownloadUrl(
+        avatar.name,
+        this.configService.get('FIREBASE_TOKEN'),
+      ),
+    );
+
+    return avatarUrls;
   }
 }

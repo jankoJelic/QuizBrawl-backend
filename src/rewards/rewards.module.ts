@@ -6,10 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
 import { LobbiesService } from 'src/lobbies/lobbies.service';
 import { LobbiesModule } from 'src/lobbies/lobbies.module';
+import { RoomsService } from 'src/rooms/rooms.service';
 
 @Module({
   controllers: [RewardsController],
-  providers: [RewardsService, UsersService, LobbiesService],
+  providers: [RewardsService, UsersService, LobbiesService, RoomsService],
   imports: [TypeOrmModule.forFeature([User]), LobbiesModule],
   exports: [TypeOrmModule, RewardsService],
 })

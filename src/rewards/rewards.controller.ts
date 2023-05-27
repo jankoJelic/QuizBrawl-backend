@@ -13,4 +13,16 @@ export class RewardsController {
   ) {
     return await this.rewardsService.distributeTrophies(body, user);
   }
+
+  @Post('/solo/daily')
+  async registerDailyEventScore(
+    @CurrentUser() user: User,
+    @Body() body: { dailyId: number; score: number },
+  ) {
+    return await this.rewardsService.registerDailyEventScore(
+      user.id,
+      body.dailyId,
+      body.score,
+    );
+  }
 }

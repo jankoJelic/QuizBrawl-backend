@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArrayContains, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './user.entity';
 import { UserJoinedLobbyDto } from 'src/events/dtos/user-joined-lobby.dto';
@@ -166,7 +166,6 @@ export class UsersService {
 
   async getUserAvatars(userId: number) {
     const bucket = await getStorage().bucket().getFiles();
-
     const user = await this.findOne(userId);
 
     const allUrls = bucket[0].map((file) =>
