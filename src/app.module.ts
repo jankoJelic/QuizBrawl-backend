@@ -36,6 +36,7 @@ import { LobbiesGateway } from './events/gateways/lobbies.gateway';
 import { GameGateway } from './events/gateways/game.gateway';
 import { MessagesGateway } from './events/gateways/messages.gateway';
 import { GameModule } from './game/game.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Global()
 @Module({
@@ -60,6 +61,7 @@ import { GameModule } from './game/game.module';
         BASE_IMAGES_URL: Joi.string().required(),
       }),
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

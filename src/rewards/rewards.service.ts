@@ -7,6 +7,9 @@ import { createStorageDownloadUrl } from 'src/util/firebase/createStorageDownloa
 import { ConfigService } from '@nestjs/config';
 import { shuffleArray } from 'src/util/arrays/shuffleArray';
 import { REWARD_TYPES } from './constants/reward.types';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class RewardsService {
@@ -14,6 +17,8 @@ export class RewardsService {
     private usersService: UsersService,
     private roomsService: RoomsService,
     private configService: ConfigService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
   async distributeTrophies(score: Record<number, number>, user: User) {
     const currentUser = await this.usersService.findOne(user.id);
@@ -97,11 +102,20 @@ export class RewardsService {
   }
 
   async sendMoneyToUser(userId: number, amount: number) {
-    const user = await this.usersService.findOne(userId);
-    const currentMoney = user.money;
-    this.usersService.updateUser(userId, {
-      money: currentMoney + amount,
-    });
+    const builder = this.usersRepository
+      .createQueryBuilder('user')
+      .update(User)
+      .set({
+        money: () => `money + ${String(amount)}`,
+      })
+      .where('id = :id', { id: userId })
+      .execute(); // treba istestirati
+
+    // const user = await this.usersService.findOne(userId);
+    // const currentMoney = user.money;
+    // this.usersService.updateUser(userId, {
+    //   money: currentMoney + amount,
+    // });
   }
 
   async registerDailyEventScore(
@@ -158,5 +172,16 @@ export class RewardsService {
     );
 
     return avatarUrls;
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  resetDailyEvents() {
+    this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({
+        dailies: {},
+      })
+      .execute();
   }
 }
