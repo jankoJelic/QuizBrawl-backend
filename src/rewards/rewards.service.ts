@@ -102,20 +102,14 @@ export class RewardsService {
   }
 
   async sendMoneyToUser(userId: number, amount: number) {
-    const builder = this.usersRepository
+    this.usersRepository
       .createQueryBuilder('user')
       .update(User)
       .set({
         money: () => `money + ${String(amount)}`,
       })
       .where('id = :id', { id: userId })
-      .execute(); // treba istestirati
-
-    // const user = await this.usersService.findOne(userId);
-    // const currentMoney = user.money;
-    // this.usersService.updateUser(userId, {
-    //   money: currentMoney + amount,
-    // });
+      .execute();
   }
 
   async registerDailyEventScore(
@@ -150,9 +144,9 @@ export class RewardsService {
       `avatars/topics/${topic.toLowerCase()}`,
     );
     const fullUser = await this.usersService.findOne(user.id);
-    const currentUserAvatars = fullUser.avatars;
+    const currentUserAvatars = fullUser.avatars ? fullUser.avatars : [];
     const avatarToReward = shuffleArray(topicAvatars).find(
-      (a) => !fullUser.avatars.includes(a),
+      (a) => !currentUserAvatars.includes(a),
     );
     this.usersService.updateUser(user.id, {
       avatars: currentUserAvatars.concat([avatarToReward]),

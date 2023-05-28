@@ -61,11 +61,7 @@ export class MailService {
           name: user.firstName,
         },
       })
-      .then((success) => {
-        // console.log(success);
-      })
-      .catch((err) => {
-        // console.log(err);
-      });
+      .then((success) => {})
+      .catch((err) => {});
   }
 }
