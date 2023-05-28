@@ -13,7 +13,7 @@ export class QuizesService {
   ) {}
   async createQuiz(user: User, createQuizDto: CreateQuizDto) {
     const quiz = this.quizesRepository.create(createQuizDto);
-    quiz.user = user;
+    quiz.userId = user.id;
 
     return await this.quizesRepository.save(quiz);
   }

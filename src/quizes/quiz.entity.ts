@@ -18,4 +18,7 @@ export class Quiz {
 
   @ManyToOne(() => User, (user) => user.quizes)
   user: User;
+
+  @Column({ nullable: true })
+  userId: number;
 }
