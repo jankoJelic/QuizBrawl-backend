@@ -20,10 +20,7 @@ export class RewardsService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
-  async distributeTrophies(score: Record<number, number>, user: User) {
-    const currentUser = await this.usersService.findOne(user.id);
-    const currentTrophies = currentUser.trophies;
-
+  processMultiPlayerScore(score: Record<number, number>, user: User) {
     const playerIds = Object.keys(score);
     const playersCount = playerIds?.length;
     const playerIdsByScore = playerIds.sort((a, b) =>
@@ -35,6 +32,58 @@ export class RewardsService {
 
     const yourPosition = playerIdsByScore.indexOf(String(user.id));
     const yourScore = score[user.id];
+
+    return { playersCount, scoresLargestFirst, yourPosition, yourScore };
+  }
+
+  async distributeCashGamePrizes(
+    score: Record<number, number>,
+    user: User,
+    roomId: number,
+  ) {
+    const room = await this.roomsService.getRoomById(roomId);
+    const { bet, maxPlayers } = room || {};
+    if (!bet) return;
+
+    const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
+      this.processMultiPlayerScore(score, user);
+
+    const totalReward = bet * playersCount;
+
+    let firstPlaceUsers = 1;
+    for (let i = 1; i < playersCount; i++) {
+      if (scoresLargestFirst[i] === scoresLargestFirst[0])
+        firstPlaceUsers = firstPlaceUsers + 1;
+      else break;
+    }
+
+    const distributedReward = Math.floor(totalReward / firstPlaceUsers);
+
+    let winPayload = { money: distributedReward };
+
+    if (yourPosition <= firstPlaceUsers - 1) {
+      if (maxPlayers > 3) {
+        const maxScore = maxPlayers * 3;
+        const yuorAccuracy = yourScore / maxScore;
+        if (yuorAccuracy > 0.8) {
+          const reward = await this.rewardUserPerfectDaily(user, roomId);
+          winPayload['reward'] = reward;
+        }
+      }
+      await this.sendMoneyToUser(user.id, distributedReward);
+      return winPayload;
+    } else {
+      await this.sendMoneyToUser(user.id, -bet);
+      return { money: -bet };
+    }
+  }
+
+  async distributeTrophies(score: Record<number, number>, user: User) {
+    const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
+      this.processMultiPlayerScore(score, user);
+
+    const currentUser = await this.usersService.findOne(user.id);
+    const currentTrophies = currentUser.trophies;
 
     const distribution = () => {
       switch (playersCount) {
