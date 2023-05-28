@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { RewardsService } from './rewards.service';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/auth/user.entity';
+import { RegisterDailyEventScore } from './dtos/register-daily-score.dto';
 
 @Controller('rewards')
 export class RewardsController {
@@ -17,7 +18,7 @@ export class RewardsController {
   @Post('/solo/daily')
   async registerDailyEventScore(
     @CurrentUser() user: User,
-    @Body() body: { dailyId: number; score: number },
+    @Body() body: RegisterDailyEventScore,
   ) {
     return await this.rewardsService.registerDailyEventScore(
       user.id,
