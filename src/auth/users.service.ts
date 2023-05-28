@@ -165,9 +165,10 @@ export class UsersService {
   }
 
   async getUserAvatars(userId: number) {
-    const bucket = await getStorage().bucket().getFiles();
+    const bucket = await getStorage()
+      .bucket()
+      .getFiles({ prefix: 'avatars/default' });
     const user = await this.findOne(userId);
-
     const allUrls = bucket[0].map((file) =>
       createStorageDownloadUrl(
         file.name,
@@ -175,9 +176,11 @@ export class UsersService {
       ),
     );
 
-    return (user.avatars || []).concat(
-      allUrls.filter((url) => url.includes('.png') && url.includes('default')),
+    const availableAvatars = (user.avatars || []).concat(
+      allUrls.filter((url) => url.includes('.png')),
     );
+
+    return availableAvatars;
   }
 
   async removeFriend(friendId: number, currentUser: User) {
