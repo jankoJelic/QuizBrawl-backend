@@ -42,7 +42,7 @@ export class RewardsService {
     roomId: number,
   ) {
     const room = await this.roomsService.getRoomById(roomId);
-    const { bet, maxPlayers } = room || {};
+    const { bet, maxPlayers, questionsCount } = room || {};
     if (!bet) return;
 
     const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
@@ -64,8 +64,8 @@ export class RewardsService {
     if (yourPosition <= firstPlaceUsers - 1) {
       if (maxPlayers > 3) {
         const maxScore = maxPlayers * 3;
-        const yuorAccuracy = yourScore / maxScore;
-        if (yuorAccuracy > 0.8) {
+        const yourAccuracy = yourScore / maxScore;
+        if (yourAccuracy > 0.8 && questionsCount > 9) {
           const reward = await this.rewardUserPerfectDaily(user, roomId);
           winPayload['reward'] = reward;
         }

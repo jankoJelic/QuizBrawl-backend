@@ -228,9 +228,19 @@ export class QuestionsService {
   }
 
   async likeQuestion(questionId: number, like: boolean) {
-    const question = await this.getQuestionById(questionId);
-    const questionLikes = question.likes;
-    const updatedLikes = like ? questionLikes + 1 : questionLikes - 1;
-    this.questionsRepository.update(questionId, { likes: updatedLikes });
+    const builder = this.questionsRepository
+      .createQueryBuilder()
+      .update(Question)
+      .where({ id: questionId });
+
+    if (like) {
+      builder.set({
+        likes: () => `likes + 1`,
+      });
+    } else {
+      builder.set({ dislikes: () => 'dislikes + 1' });
+    }
+
+    builder.execute();
   }
 }
