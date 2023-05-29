@@ -8,7 +8,6 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
-  ManyToMany,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Quiz } from 'src/quizes/quiz.entity';
@@ -16,7 +15,7 @@ import { Topic } from 'src/rooms/types/Topic';
 import { Room } from 'src/rooms/room.entity';
 import { Lobby } from 'src/lobbies/lobby.entity';
 import { Question } from 'src/questions/question.entity';
-import { IsNumber, Max, MaxLength, Min } from 'class-validator';
+import { IsNumber, Max, Min } from 'class-validator';
 import { Team } from 'src/teams/team.entity';
 import { Message } from '../messages/dtos/message.dto';
 import { Reward } from './dtos/reward.dto';

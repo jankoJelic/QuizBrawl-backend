@@ -57,7 +57,7 @@ export class RewardsService {
       else break;
     }
 
-    const distributedReward = Math.floor(totalReward / firstPlaceUsers);
+    const distributedReward = Math.floor(totalReward / firstPlaceUsers) - bet;
 
     let winPayload = { money: distributedReward };
 
