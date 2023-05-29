@@ -12,17 +12,15 @@ export class QuizesService {
     private quizesRepository: Repository<Quiz>,
   ) {}
   async createQuiz(user: User, createQuizDto: CreateQuizDto) {
-    const quiz = this.quizesRepository.create(createQuizDto);
+    let quiz = this.quizesRepository.create(createQuizDto);
     quiz.userId = user.id;
 
     return await this.quizesRepository.save(quiz);
   }
 
-  async updateQuiz(
-    quizId: string,
-    createQuizDto: CreateQuizDto,
-    userId: number,
-  ) {}
+  async updateQuiz(quizId: number, createQuizDto: CreateQuizDto) {
+    return await this.quizesRepository.update(quizId, createQuizDto);
+  }
 
   async getQuizById(id: number) {
     return await this.quizesRepository.findOneBy({ id });
@@ -34,7 +32,22 @@ export class QuizesService {
 
   async getQuizesForUser(userId: number) {
     return await this.quizesRepository.find({
-      where: { user: { id: userId } },
+      where: { userId },
     });
+  }
+
+  async rateQuiz(id: number, like: boolean) {
+    const builder = this.quizesRepository
+      .createQueryBuilder('quiz')
+      .update(Quiz)
+      .where('id = :id', { id });
+
+    if (like) {
+      builder.set({ likes: () => 'likes + 1' });
+      return 'quiz liked';
+    } else {
+      builder.set({ dislikes: () => 'dislikes + 1' });
+      return 'quiz disliked';
+    }
   }
 }

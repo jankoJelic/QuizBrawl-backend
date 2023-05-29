@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from 'src/auth/user.entity';
 import { Question } from 'src/questions/question.entity';
+import { Topic } from 'src/rooms/types/Topic';
 
 export class CreateQuizDto {
   @ApiProperty()
@@ -11,4 +11,7 @@ export class CreateQuizDto {
 
   @ApiProperty()
   answerTime: number;
+
+  @ApiProperty()
+  topic: Topic;
 }

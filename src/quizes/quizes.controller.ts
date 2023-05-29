@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { CreateQuizDto } from './dtos/create-quiz.dto';
 import { QuizesService } from './quizes.service';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
@@ -18,17 +18,18 @@ export class QuizesController {
     return await this.quizesService.createQuiz(user, createQuizDto);
   }
 
-  @Patch('/update')
-  async updateQuiz(
-    @CurrentUser() user: User,
-    @Query() quizId: string,
-    @Body() updateQuizDto: CreateQuizDto,
-  ) {
-    return await this.quizesService.updateQuiz(quizId, updateQuizDto, user.id);
+  @Patch('/quiz/:id')
+  async updateQuiz(@Param('id') id: string, @Body() body: CreateQuizDto) {
+    return await this.quizesService.updateQuiz(Number(id), body);
   }
 
-  @Get('/my')
+  @Get('/')
   async getMyQuizes(@CurrentUser() user: User) {
     return await this.quizesService.getQuizesForUser(user.id);
+  }
+
+  @Patch('/quiz/:id/rate')
+  async rateQuiz(@Param('id') id: string, body: { like: boolean }) {
+    return await this.quizesService.rateQuiz(Number(id), body.like);
   }
 }
