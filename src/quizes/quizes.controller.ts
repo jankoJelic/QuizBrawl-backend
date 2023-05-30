@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { CreateQuizDto } from './dtos/create-quiz.dto';
 import { QuizesService } from './quizes.service';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
@@ -20,7 +29,8 @@ export class QuizesController {
 
   @Patch('/quiz/:id')
   async updateQuiz(@Param('id') id: string, @Body() body: CreateQuizDto) {
-    return await this.quizesService.updateQuiz(Number(id), body);
+    await this.quizesService.updateQuiz(Number(id), body);
+    return { ...body, id: Number(id) };
   }
 
   @Get('/')
@@ -31,5 +41,10 @@ export class QuizesController {
   @Patch('/quiz/:id/rate')
   async rateQuiz(@Param('id') id: string, body: { like: boolean }) {
     return await this.quizesService.rateQuiz(Number(id), body.like);
+  }
+
+  @Delete('/quiz/:id')
+  async deleteQuiz(@Param('id') id: string) {
+    return await this.quizesService.deleteQuiz(Number(id));
   }
 }

@@ -19,7 +19,8 @@ export class QuizesService {
   }
 
   async updateQuiz(quizId: number, createQuizDto: CreateQuizDto) {
-    return await this.quizesRepository.update(quizId, createQuizDto);
+    await this.quizesRepository.update(quizId, createQuizDto);
+    return createQuizDto;
   }
 
   async getQuizById(id: number) {
