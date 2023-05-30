@@ -37,6 +37,7 @@ import { GameGateway } from './events/gateways/game.gateway';
 import { MessagesGateway } from './events/gateways/messages.gateway';
 import { GameModule } from './game/game.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { LeaguesModule } from './leagues/leagues.module';
 
 @Global()
 @Module({
@@ -98,6 +99,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     RewardsModule,
     MarketModule,
     GameModule,
+    LeaguesModule,
   ],
   controllers: [AppController, TeamsController],
   providers: [

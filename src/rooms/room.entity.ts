@@ -68,4 +68,7 @@ export class Room {
 
   @Column({ default: 0, nullable: true })
   lobbyId: number;
+
+  @Column({ default: 0, nullable: true })
+  leagueId: number;
 }

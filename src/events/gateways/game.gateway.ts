@@ -9,6 +9,7 @@ import { RewardsService } from 'src/rewards/rewards.service';
 import { roomName } from '../util/create-room-name';
 import { Room } from 'src/rooms/room.entity';
 import { SelectAnswerDto } from '../dtos/select-answer.dto';
+import { Question } from 'src/questions/question.entity';
 
 export class GameGateway extends EventsGateway {
   constructor(
@@ -28,8 +29,23 @@ export class GameGateway extends EventsGateway {
   }
 
   @SubscribeMessage(SOCKET_EVENTS.GAME_STARTED)
-  async handleGameStarted(@MessageBody() room: Room) {
-    const questions = await this.questionsService.getQuestionsForRoom(room);
+  async handleGameStarted(
+    @MessageBody() body: { room: Room; questions?: Question[] },
+  ) {
+    console.log(body);
+    const { room, questions } = body || {};
+    let questionsToUse = [];
+
+    if (!!questions) {
+      questionsToUse = questions;
+    } else {
+      const newQuestions = await this.questionsService.getQuestionsForRoom(
+        room,
+      );
+      questionsToUse = newQuestions;
+    }
+
+    console.log(questionsToUse.length);
 
     this.roomsService.updateRoom({
       roomId: room.id,
@@ -37,7 +53,7 @@ export class GameGateway extends EventsGateway {
       gameStarted: true,
     });
     this.server.emit(SOCKET_EVENTS.GAME_STARTED, {
-      questions,
+      questions: questionsToUse,
       roomId: room.id,
     });
   }

@@ -144,7 +144,7 @@ export class User {
 
   @IsNumber()
   @Min(0)
-  @Column({ default: 0 })
+  @Column({ default: 0 }) // this is not yet handled in any way, same as levels
   experience: number;
 
   @Column({ default: '' })
@@ -188,4 +188,7 @@ export class User {
 
   @Column({ type: 'json', nullable: true })
   dailies: {};
+
+  @Column({ type: 'json', nullable: true })
+  leagueIds: number[];
 }
