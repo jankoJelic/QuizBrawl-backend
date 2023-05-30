@@ -32,7 +32,6 @@ export class GameGateway extends EventsGateway {
   async handleGameStarted(
     @MessageBody() body: { room: Room; questions?: Question[] },
   ) {
-    console.log(body);
     const { room, questions } = body || {};
     let questionsToUse = [];
 
@@ -44,8 +43,6 @@ export class GameGateway extends EventsGateway {
       );
       questionsToUse = newQuestions;
     }
-
-    console.log(questionsToUse.length);
 
     this.roomsService.updateRoom({
       roomId: room.id,
