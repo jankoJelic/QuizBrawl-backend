@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { League } from './league.entity';
 import { RewardsService } from 'src/rewards/rewards.service';
 import { CreateLeagueDto } from './dtos/create-league.dto';
+import { ShallowUser } from 'src/auth/util/shallowUser';
 
 @Injectable()
 export class LeaguesService {
@@ -31,7 +32,13 @@ export class LeaguesService {
     return await this.rewardsService.getFirebaseStorageFiles('leagues');
   }
 
-  async createLeague(userId: number, body: CreateLeagueDto) {}
+  async createLeague(user: ShallowUser, body: CreateLeagueDto) {
+    return await this.leaguesRepository.save({
+      ...body,
+      userId: user.id,
+      users: [user],
+    });
+  }
 
   async updateLeague(id: number, body: Partial<CreateLeagueDto>) {
     return await this.leaguesRepository.update(id, body);

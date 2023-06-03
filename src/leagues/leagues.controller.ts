@@ -12,6 +12,7 @@ import { LeaguesService } from './leagues.service';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { CreateLeagueDto } from './dtos/create-league.dto';
+import { shallowUser } from 'src/auth/util/shallowUser';
 
 @ApiTags('leagues')
 @Controller('leagues')
@@ -34,15 +35,12 @@ export class LeaguesController {
   }
 
   @Post('/league')
-  async createLeague(
-    @CurrentUser() user: User,
-    @Body() body: CreateLeagueDto,
-  ) {
-    return await this.leaguesService.createLeague(user.id, body)
+  async createLeague(@CurrentUser() user: User, @Body() body: CreateLeagueDto) {
+    return await this.leaguesService.createLeague(shallowUser(user), body);
   }
 
   @Delete('/league/:id')
-  async deleteLeague(@Param('id') id: string, @CurrentUser() user:User) {
+  async deleteLeague(@Param('id') id: string, @CurrentUser() user: User) {
     return this.leaguesService.deleteLeague(Number(id), user.id);
   }
 

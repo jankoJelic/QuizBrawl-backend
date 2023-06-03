@@ -21,27 +21,27 @@ export const shallowUser = (user: User) => {
     correctAnswers: user.correctAnswers,
     friends: user.friends,
     color: user.color,
-  };
+  } as ShallowUser;
 };
 
 export interface ShallowUser {
   // data in JWT token
   email: string;
   id: number;
-  isAdmin: string;
+  isAdmin: boolean;
   isBanned: boolean;
   isPremium: boolean;
   trophies: number;
   firstName: string;
   lastName: string;
   level: number;
-  rank: string;
+  rank: number;
   accuracyPercentage: number;
   favouriteTopic: Topic;
   avatar: string;
   isOnline: boolean;
-  totalAnswers: number;
-  correctAnswers: number;
+  totalAnswers: Record<Topic, number>;
+  correctAnswers: Record<Topic, number>;
   friends: number[];
   color: string;
 }
