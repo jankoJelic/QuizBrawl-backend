@@ -38,6 +38,7 @@ import { MessagesGateway } from './events/gateways/messages.gateway';
 import { GameModule } from './game/game.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LeaguesModule } from './leagues/leagues.module';
+import { RewardsService } from './rewards/rewards.service';
 
 @Global()
 @Module({
@@ -125,6 +126,7 @@ import { LeaguesModule } from './leagues/leagues.module';
     QuestionsService,
     TeamsService,
     MessagesService,
+    RewardsService,
   ],
 })
 export class AppModule {

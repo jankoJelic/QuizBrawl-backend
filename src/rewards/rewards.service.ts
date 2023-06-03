@@ -207,14 +207,14 @@ export class RewardsService {
   async getFirebaseStorageFiles(prefix = '') {
     const bucket = await getStorage().bucket().getFiles({ prefix });
 
-    const avatarUrls = bucket[0].map((avatar) =>
+    const urls = bucket[0].map((avatar) =>
       createStorageDownloadUrl(
         avatar.name,
         this.configService.get('FIREBASE_TOKEN'),
       ),
     );
 
-    return avatarUrls;
+    return urls;
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)

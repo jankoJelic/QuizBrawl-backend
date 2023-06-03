@@ -49,4 +49,13 @@ export class League {
 
   @Column({ type: 'json', nullable: true })
   reward: Reward;
+
+  @Column({ type: 'json', nullable: true })
+  gamesPlayed: Record<number, number>;
+
+  @Column({ default: 0 })
+  bet: number;
+
+  @Column({ default: '' })
+  password: string;
 }

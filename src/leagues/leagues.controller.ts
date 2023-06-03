@@ -1,8 +1,17 @@
-import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LeaguesService } from './leagues.service';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/auth/user.entity';
+import { CreateLeagueDto } from './dtos/create-league.dto';
 
 @ApiTags('leagues')
 @Controller('leagues')
@@ -14,15 +23,32 @@ export class LeaguesController {
     return await this.leaguesService.getAll();
   }
 
+  @Get('/images')
+  async getLeagueImages() {
+    return await this.leaguesService.getLeaguesImages();
+  }
+
   @Get('/my')
-  async getMyLeagues() {}
+  async getMyLeagues(@CurrentUser() user: User) {
+    return await this.leaguesService.getMyLeagues(user.id);
+  }
 
   @Post('/league')
-  async createLeague(@CurrentUser() user: User) {}
+  async createLeague(
+    @CurrentUser() user: User,
+    @Body() body: CreateLeagueDto,
+  ) {
+    return await this.leaguesService.createLeague(user.id, body)
+  }
 
   @Delete('/league/:id')
-  async deleteLeague(@Param('id') id:string) {
-    return this.leaguesService
-
+  async deleteLeague(@Param('id') id: string, @CurrentUser() user:User) {
+    return this.leaguesService.deleteLeague(Number(id), user.id);
   }
+
+  @Patch('/league/:id/addPlayer')
+  async addPlayer() {}
+
+  @Patch('/league/:id/addQuiz')
+  async addQuiz() {}
 }
