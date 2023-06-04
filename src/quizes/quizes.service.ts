@@ -2,15 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { CreateQuizDto } from './dtos/create-quiz.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Quiz } from './quiz.entity';
+import { LeaguesService } from 'src/leagues/leagues.service';
 
 @Injectable()
 export class QuizesService {
   constructor(
     @InjectRepository(Quiz)
     private quizesRepository: Repository<Quiz>,
+    private leaguesService: LeaguesService,
   ) {}
+  async getQuizesForLeague(leagueId: number) {
+    const league = await this.leaguesService.getLeagueById(leagueId);
+
+    if (!league.quizIds) return [];
+    return await this.quizesRepository.find({
+      where: { id: In(league.quizIds) },
+    });
+  }
+
   async createQuiz(user: User, createQuizDto: CreateQuizDto) {
     let quiz = this.quizesRepository.create(createQuizDto);
     quiz.userId = user.id;

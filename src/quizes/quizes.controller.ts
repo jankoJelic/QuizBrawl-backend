@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CreateQuizDto } from './dtos/create-quiz.dto';
 import { QuizesService } from './quizes.service';
@@ -18,6 +19,11 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('quizes')
 export class QuizesController {
   constructor(private quizesService: QuizesService) {}
+
+  @Get('/league/:id')
+  async getQuizes(@Param('id') leagueId: string) {
+    return await this.quizesService.getQuizesForLeague(Number(leagueId));
+  }
 
   @Post('/create')
   async createQuiz(
@@ -33,7 +39,7 @@ export class QuizesController {
     return { ...body, id: Number(id) };
   }
 
-  @Get('/')
+  @Get('/my')
   async getMyQuizes(@CurrentUser() user: User) {
     return await this.quizesService.getQuizesForUser(user.id);
   }

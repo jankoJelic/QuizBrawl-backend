@@ -31,4 +31,7 @@ export class Quiz {
 
   @Column({ default: 0 })
   dislikes: number;
+
+  @Column({ type: 'json', nullable: true })
+  leagueIds: number[];
 }

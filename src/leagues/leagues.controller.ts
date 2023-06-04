@@ -34,10 +34,13 @@ export class LeaguesController {
     return await this.leaguesService.getMyLeagues(user.id);
   }
 
-  @Get('/league/:id/history')
-  async getLeagueHistory() {
-    
+  @Get('/league/:id')
+  async getLeague(@Param('id') id: string) {
+    return await this.leaguesService.getLeagueById(Number(id));
   }
+
+  @Get('/league/:id/history')
+  async getLeagueHistory() {}
 
   @Post('/league')
   async createLeague(@CurrentUser() user: User, @Body() body: CreateLeagueDto) {
