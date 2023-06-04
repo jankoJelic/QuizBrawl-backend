@@ -40,6 +40,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { LeaguesModule } from './leagues/leagues.module';
 import { RewardsService } from './rewards/rewards.service';
 import { LeaguesService } from './leagues/leagues.service';
+import { QuizesService } from './quizes/quizes.service';
 
 @Global()
 @Module({
@@ -129,6 +130,7 @@ import { LeaguesService } from './leagues/leagues.service';
     MessagesService,
     RewardsService,
     LeaguesService,
+    QuizesService,
   ],
 })
 export class AppModule {

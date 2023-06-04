@@ -56,10 +56,10 @@ export class QuizesService {
 
     if (like) {
       builder.set({ likes: () => 'likes + 1' });
-      return 'quiz liked';
     } else {
       builder.set({ dislikes: () => 'dislikes + 1' });
-      return 'quiz disliked';
     }
+
+    builder.execute();
   }
 }

@@ -55,6 +55,14 @@ export class LeaguesController {
   @Patch('/league/:id/addPlayer')
   async addPlayer() {}
 
-  @Patch('/league/:id/addQuiz')
-  async addQuiz() {}
+  @Patch('/:id/addQuiz/:quizId')
+  async addQuiz(
+    @Param('id') leagueId: string,
+    @Param('quizId') quizId: string,
+  ) {
+    return this.leaguesService.addQuizToLeague(
+      Number(quizId),
+      Number(leagueId),
+    );
+  }
 }

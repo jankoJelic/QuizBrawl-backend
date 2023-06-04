@@ -12,6 +12,9 @@ import { RewardsService } from 'src/rewards/rewards.service';
 import { ConfigService } from '@nestjs/config';
 import { RoomsModule } from 'src/rooms/rooms.module';
 import { Message } from 'src/messages/message.entity';
+import { QuizesService } from 'src/quizes/quizes.service';
+import { Quiz } from 'src/quizes/quiz.entity';
+import { QuizesModule } from 'src/quizes/quizes.module';
 
 @Module({
   controllers: [LeaguesController],
@@ -21,10 +24,13 @@ import { Message } from 'src/messages/message.entity';
     MessagesService,
     RewardsService,
     ConfigService,
+    QuizesService,
   ],
   imports: [
-    TypeOrmModule.forFeature([League, User, Lobby, Room, Message]),
+    TypeOrmModule.forFeature([League, User, Lobby, Room, Message, Quiz]),
     RoomsModule,
+    QuizesModule,
   ],
+  exports: [TypeOrmModule, LeaguesService],
 })
 export class LeaguesModule {}

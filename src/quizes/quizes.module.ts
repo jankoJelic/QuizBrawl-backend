@@ -22,6 +22,6 @@ import { Lobby } from 'src/lobbies/lobby.entity';
     UsersService,
     RoomsService,
   ],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, QuizesService],
 })
 export class QuizesModule {}
