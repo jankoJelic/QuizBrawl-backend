@@ -14,6 +14,10 @@ export class LeaguesService {
     private rewardsService: RewardsService,
   ) {}
 
+  async getLeagueById(id: number) {
+    return await this.leaguesRepository.findOne({ where: { id } });
+  }
+
   async getAll() {
     return await this.leaguesRepository.find();
   }

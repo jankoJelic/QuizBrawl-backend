@@ -1,12 +1,14 @@
-export interface Message {
+export class CreateMessageDto {
   type: MessageType;
   title: string;
   text?: string;
-  createdAt: string;
-  payload?: {};
-  read: string;
-  id: string;
-  senderId: string
+  payload?: any;
+  senderId: number;
+  recipientId: number;
 }
 
-export type MessageType = 'REWARD' | 'GAME_INVITE' | 'FRIEND_REQUEST';
+export type MessageType =
+  | 'REWARD'
+  | 'GAME_INVITE'
+  | 'FRIEND_REQUEST'
+  | 'JOIN_LEAGUE_REQUEST';
