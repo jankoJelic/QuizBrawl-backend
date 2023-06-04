@@ -53,6 +53,12 @@ export class League {
   @Column({ type: 'json', nullable: true })
   gamesPlayed: Record<number, number>;
 
+  @Column({ type: 'json', nullable: true })
+  correctAnswers: Record<number, number>;
+
+  @Column({ type: 'json', nullable: true })
+  totalAnswers: Record<number, number>;
+
   @Column({ default: 0 })
   bet: number;
 
