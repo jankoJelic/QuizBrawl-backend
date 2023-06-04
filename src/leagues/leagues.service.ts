@@ -33,7 +33,9 @@ export class LeaguesService {
   }
 
   async getLeaguesImages() {
-    return await this.rewardsService.getFirebaseStorageFiles('leagues');
+    let imgs = await this.rewardsService.getFirebaseStorageFiles('leagues');
+    imgs.unshift();
+    return imgs;
   }
 
   async createLeague(user: ShallowUser, body: CreateLeagueDto) {

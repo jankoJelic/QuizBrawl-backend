@@ -58,4 +58,7 @@ export class League {
 
   @Column({ default: '' })
   password: string;
+
+  @Column({ type: 'json', nullable: true })
+  quizIds: number[];
 }
