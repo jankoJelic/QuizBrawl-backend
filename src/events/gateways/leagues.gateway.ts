@@ -95,7 +95,7 @@ export class LeaguesGateway extends EventsGateway {
   async handleUserLeftoLeagueRoom(
     @MessageBody() body: { leagueId: number; userId: number },
   ) {
-    this.leaguesService.changeUserReadyStatus(
+    await this.leaguesService.changeUserReadyStatus(
       body.leagueId,
       body.userId,
       false,
