@@ -74,6 +74,8 @@ export class LeaguesService {
     this.quizesRepository.update(quizId, {
       leagueIds: currentLeagues.concat([leagueId]),
     });
+
+    return quiz;
   }
 
   async addUserToLeague(userId: number, leagueId: number) {
@@ -125,5 +127,9 @@ export class LeaguesService {
     this.leaguesRepository.update(leagueId, {
       readyUsers: updatedReadyUsers,
     });
+  }
+
+  async setNextQuiz(leagueId: number, quizId: number) {
+    this.leaguesRepository.update(leagueId, { selectedQuizId: quizId });
   }
 }

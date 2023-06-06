@@ -76,4 +76,7 @@ export class League {
 
   @Column({ type: 'json', nullable: true })
   readyUsers: number[];
+
+  @Column({ default: 0 })
+  selectedQuizId: number;
 }

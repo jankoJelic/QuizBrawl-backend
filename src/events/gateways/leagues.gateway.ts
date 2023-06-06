@@ -13,6 +13,7 @@ import { RewardsService } from 'src/rewards/rewards.service';
 import { ShallowUser } from 'src/auth/util/shallowUser';
 import { LeaguesService } from 'src/leagues/leagues.service';
 import { Socket } from 'socket.io';
+import { Quiz } from 'src/quizes/quiz.entity';
 
 export class LeaguesGateway extends EventsGateway {
   constructor(
@@ -70,7 +71,7 @@ export class LeaguesGateway extends EventsGateway {
     const league = await this.leaguesService.getLeagueById(body.leagueId);
 
     if (league?.users?.some((u) => u.id === body.user.id)) return;
-    console.log('USER JOINED LEAGUE IN BE');
+
     await this.leaguesService.addUserToLeague(body.user.id, body.leagueId);
 
     this.server
@@ -79,4 +80,27 @@ export class LeaguesGateway extends EventsGateway {
         user: body.user,
       });
   }
+
+  @SubscribeMessage(SOCKET_EVENTS.NEXT_QUIZ_SELECTED)
+  async setNextQuiz(@MessageBody() body: { quiz: Quiz; leagueId: number }) {
+    this.leaguesService.setNextQuiz(body.leagueId, body.quiz.id);
+
+    this.server
+      .to(this.leagueChannel(body.leagueId))
+      .emit(SOCKET_EVENTS.NEXT_QUIZ_SELECTED, { quiz: body.quiz });
+  }
+
+  // @SubscribeMessage(SOCKET_EVENTS.QUIZ_ADDED_TO_LEAGUE)
+  // async addQuizToLeague(
+  //   @MessageBody() body: { quizId: number; leagueId: number },
+  // ) {
+  //   const quiz = await this.leaguesService.addQuizToLeague(
+  //     body.quizId,
+  //     body.leagueId,
+  //   );
+
+  //   this.server
+  //     .to(this.leagueChannel(body.leagueId))
+  //     .emit(SOCKET_EVENTS.QUIZ_ADDED_TO_LEAGUE, quiz);
+  // }
 }
