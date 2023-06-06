@@ -14,6 +14,7 @@ import { ShallowUser } from 'src/auth/util/shallowUser';
 import { LeaguesService } from 'src/leagues/leagues.service';
 import { Socket } from 'socket.io';
 import { Quiz } from 'src/quizes/quiz.entity';
+import { Message } from 'src/messages/message.entity';
 
 export class LeaguesGateway extends EventsGateway {
   constructor(
@@ -90,17 +91,12 @@ export class LeaguesGateway extends EventsGateway {
       .emit(SOCKET_EVENTS.NEXT_QUIZ_SELECTED, { quiz: body.quiz });
   }
 
-  // @SubscribeMessage(SOCKET_EVENTS.QUIZ_ADDED_TO_LEAGUE)
-  // async addQuizToLeague(
-  //   @MessageBody() body: { quizId: number; leagueId: number },
-  // ) {
-  //   const quiz = await this.leaguesService.addQuizToLeague(
-  //     body.quizId,
-  //     body.leagueId,
-  //   );
-
-  //   this.server
-  //     .to(this.leagueChannel(body.leagueId))
-  //     .emit(SOCKET_EVENTS.QUIZ_ADDED_TO_LEAGUE, quiz);
-  // }
+  @SubscribeMessage(SOCKET_EVENTS.USER_LEFT_LEAGUE_ROOM)
+  async handleUserLeftoLeagueRoom(
+    @MessageBody() body: { leagueId: number; userId: number },
+  ) {
+    this.server
+      .to(this.leagueChannel(body.leagueId))
+      .emit(SOCKET_EVENTS.USER_LEFT_LEAGUE_ROOM, { userId: body.userId });
+  }
 }

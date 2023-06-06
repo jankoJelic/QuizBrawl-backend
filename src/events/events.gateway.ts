@@ -15,6 +15,7 @@ import { MessagesService } from 'src/messages/messages.service';
 import { RewardsService } from 'src/rewards/rewards.service';
 import { LOBBY_IDS } from 'src/lobbies/constants/lobby-ids';
 import { LeaguesService } from 'src/leagues/leagues.service';
+import { removeDuplicatesFromArray } from 'src/util/arrays/removeDuplicatesFromArray';
 
 const {
   ROOM_DELETED,
@@ -68,17 +69,18 @@ export class EventsGateway
     }
 
     if (!!user.leagueIds) {
-      user.leagueIds.forEach((leagueId) => {
+      removeDuplicatesFromArray(user.leagueIds).forEach((leagueId) => {
         this.leaguesService.changeUserReadyStatus(
           leagueId,
           Number(userId),
           false,
         );
         client.leave(`league-${leagueId}`);
-
         this.server
           .to(`league-${leagueId}`)
-          .emit(SOCKET_EVENTS.USER_LEFT_LEAGUE_ROOM, { user });
+          .emit(SOCKET_EVENTS.USER_LEFT_LEAGUE_ROOM, {
+            userId: Number(userId),
+          });
       });
     }
 
