@@ -10,6 +10,7 @@ import { roomName } from '../util/create-room-name';
 import { Room } from 'src/rooms/room.entity';
 import { SelectAnswerDto } from '../dtos/select-answer.dto';
 import { Question } from 'src/questions/question.entity';
+import { LeaguesService } from 'src/leagues/leagues.service';
 
 export class GameGateway extends EventsGateway {
   constructor(
@@ -18,6 +19,7 @@ export class GameGateway extends EventsGateway {
     questionsService: QuestionsService,
     messagesService: MessagesService,
     rewardsService: RewardsService,
+    leaguesService: LeaguesService,
   ) {
     super(
       usersService,
@@ -25,6 +27,7 @@ export class GameGateway extends EventsGateway {
       questionsService,
       messagesService,
       rewardsService,
+      leaguesService,
     );
   }
 

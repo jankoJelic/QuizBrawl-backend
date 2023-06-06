@@ -75,6 +75,12 @@ export class UsersService {
     await this.usersRepository.delete(id);
   }
 
+  async findById(userId: number) {
+    return shallowUser(
+      await this.usersRepository.findOne({ where: { id: userId } }),
+    );
+  }
+
   async findByEmail(email: string) {
     try {
       const users = await this.usersRepository.find({

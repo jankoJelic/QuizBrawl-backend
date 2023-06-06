@@ -14,6 +14,7 @@ import { QuestionsService } from 'src/questions/questions.service';
 import { MessagesService } from 'src/messages/messages.service';
 import { RewardsService } from 'src/rewards/rewards.service';
 import { LOBBY_IDS } from 'src/lobbies/constants/lobby-ids';
+import { LeaguesService } from 'src/leagues/leagues.service';
 
 const {
   ROOM_DELETED,
@@ -40,6 +41,7 @@ export class EventsGateway
     public questionsService: QuestionsService,
     public messagesService: MessagesService,
     public rewardsService: RewardsService,
+    public leaguesService: LeaguesService,
   ) {}
 
   @WebSocketServer()
@@ -49,7 +51,7 @@ export class EventsGateway
 
   handleConnection(@ConnectedSocket() client: Socket) {
     const { userId } = client.handshake.query || {};
-
+    client.setMaxListeners(20);
     this.usersService.updateUser(Number(userId), { isOnline: true });
 
     client.join(`user-${String(userId)}`);
@@ -63,6 +65,21 @@ export class EventsGateway
 
     if (!!user?.lobby) {
       this.server.emit(USER_LEFT_LOBBY, { user, lobbyId: user.lobby.id });
+    }
+
+    if (!!user.leagueIds) {
+      user.leagueIds.forEach((leagueId) => {
+        this.leaguesService.changeUserReadyStatus(
+          leagueId,
+          Number(userId),
+          false,
+        );
+        client.leave(`league-${leagueId}`);
+
+        this.server
+          .to(`league-${leagueId}`)
+          .emit(SOCKET_EVENTS.USER_LEFT_LEAGUE_ROOM, { user });
+      });
     }
 
     if (!!user?.room) {

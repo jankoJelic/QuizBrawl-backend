@@ -41,6 +41,7 @@ import { LeaguesModule } from './leagues/leagues.module';
 import { RewardsService } from './rewards/rewards.service';
 import { LeaguesService } from './leagues/leagues.service';
 import { QuizesService } from './quizes/quizes.service';
+import { LeaguesGateway } from './events/gateways/leagues.gateway';
 
 @Global()
 @Module({
@@ -125,6 +126,7 @@ import { QuizesService } from './quizes/quizes.service';
     LobbiesGateway,
     GameGateway,
     MessagesGateway,
+    LeaguesGateway,
     QuestionsService,
     TeamsService,
     MessagesService,

@@ -29,6 +29,11 @@ export class LeaguesController {
     return await this.leaguesService.getLeaguesImages();
   }
 
+  @Delete('/')
+  deleteAllLeagues() {
+    this.leaguesService.deleteAllLeagues();
+  }
+
   @Get('/my')
   async getMyLeagues(@CurrentUser() user: User) {
     return await this.leaguesService.getMyLeagues(user.id);

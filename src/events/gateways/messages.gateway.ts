@@ -8,6 +8,7 @@ import { MessagesService } from 'src/messages/messages.service';
 import { RewardsService } from 'src/rewards/rewards.service';
 import { User } from 'src/auth/user.entity';
 import { shallowUser } from 'src/auth/util/shallowUser';
+import { LeaguesService } from 'src/leagues/leagues.service';
 
 export class MessagesGateway extends EventsGateway {
   constructor(
@@ -16,6 +17,7 @@ export class MessagesGateway extends EventsGateway {
     questionsService: QuestionsService,
     messagesService: MessagesService,
     rewardsService: RewardsService,
+    leaguesService: LeaguesService,
   ) {
     super(
       usersService,
@@ -23,6 +25,7 @@ export class MessagesGateway extends EventsGateway {
       questionsService,
       messagesService,
       rewardsService,
+      leaguesService,
     );
   }
 

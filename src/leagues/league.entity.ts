@@ -67,4 +67,13 @@ export class League {
 
   @Column({ type: 'json', nullable: true })
   quizIds: number[];
+
+  @Column()
+  nextQuizUserId: number;
+
+  @Column({ type: 'json', nullable: true })
+  playedQuizIds: number[];
+
+  @Column({ type: 'json', nullable: true })
+  readyUsers: number[];
 }

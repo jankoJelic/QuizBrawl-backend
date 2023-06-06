@@ -11,6 +11,7 @@ import { QuestionsService } from 'src/questions/questions.service';
 import { MessagesService } from 'src/messages/messages.service';
 import { RewardsService } from 'src/rewards/rewards.service';
 import { UserJoinedLobbyDto } from '../dtos/user-joined-lobby.dto';
+import { LeaguesService } from 'src/leagues/leagues.service';
 
 export class LobbiesGateway extends EventsGateway {
   constructor(
@@ -19,6 +20,7 @@ export class LobbiesGateway extends EventsGateway {
     questionsService: QuestionsService,
     messagesService: MessagesService,
     rewardsService: RewardsService,
+    leaguesService: LeaguesService,
   ) {
     super(
       usersService,
@@ -26,6 +28,7 @@ export class LobbiesGateway extends EventsGateway {
       questionsService,
       messagesService,
       rewardsService,
+      leaguesService,
     );
   }
 

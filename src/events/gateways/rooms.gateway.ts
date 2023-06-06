@@ -15,6 +15,7 @@ import { UserJoinedRoomDto } from '../dtos/user-joined-room.dto';
 import { roomName } from '../util/create-room-name';
 import { Room } from 'src/rooms/room.entity';
 import { UserReadyDto } from '../dtos/user-ready.dto';
+import { LeaguesService } from 'src/leagues/leagues.service';
 
 export class RoomsGateway extends EventsGateway {
   constructor(
@@ -23,6 +24,7 @@ export class RoomsGateway extends EventsGateway {
     questionsService: QuestionsService,
     messagesService: MessagesService,
     rewardsService: RewardsService,
+    leaguesService: LeaguesService,
   ) {
     super(
       usersService,
@@ -30,6 +32,7 @@ export class RoomsGateway extends EventsGateway {
       questionsService,
       messagesService,
       rewardsService,
+      leaguesService,
     );
   }
 
