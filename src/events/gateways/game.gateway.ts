@@ -6,7 +6,7 @@ import { MessageBody, SubscribeMessage } from '@nestjs/websockets';
 import { QuestionsService } from 'src/questions/questions.service';
 import { MessagesService } from 'src/messages/messages.service';
 import { RewardsService } from 'src/rewards/rewards.service';
-import { roomName } from '../util/create-room-name';
+import { leagueName, roomName } from '../util/create-room-name';
 import { Room } from 'src/rooms/room.entity';
 import { SelectAnswerDto } from '../dtos/select-answer.dto';
 import { Question } from 'src/questions/question.entity';
@@ -65,25 +65,37 @@ export class GameGateway extends EventsGateway {
 
   @SubscribeMessage(SOCKET_EVENTS.CORRECT_ANSWER_SELECTED)
   async handleCorrectAnswerSelected(
-    @MessageBody() { roomId, answer, userId, topic }: SelectAnswerDto,
+    @MessageBody() { roomId, answer, userId, topic, leagueId }: SelectAnswerDto,
   ) {
-    this.server
-      .to(roomName(roomId))
-      .emit(SOCKET_EVENTS.CORRECT_ANSWER_SELECTED, { answer, userId });
+    if (!!leagueId) {
+      this.server
+        .to(leagueName(leagueId))
+        .emit(SOCKET_EVENTS.CORRECT_ANSWER_SELECTED, { answer, userId });
+    } else {
+      this.server
+        .to(roomName(roomId))
+        .emit(SOCKET_EVENTS.CORRECT_ANSWER_SELECTED, { answer, userId });
 
-    const user = await this.usersService.findOne(userId);
-    this.usersService.registerAnswer(user, true, topic);
+      const user = await this.usersService.findOne(userId);
+      this.usersService.registerAnswer(user, true, topic);
+    }
   }
 
   @SubscribeMessage(SOCKET_EVENTS.WRONG_ANSWER_SELECTED)
   async handleWrongAnswerSelected(
-    @MessageBody() { roomId, answer, userId, topic }: SelectAnswerDto,
+    @MessageBody() { roomId, answer, userId, topic, leagueId }: SelectAnswerDto,
   ) {
-    this.server
-      .to(roomName(roomId))
-      .emit(SOCKET_EVENTS.WRONG_ANSWER_SELECTED, { answer, userId });
+    if (!!leagueId) {
+      this.server
+        .to(leagueName(leagueId))
+        .emit(SOCKET_EVENTS.WRONG_ANSWER_SELECTED, { answer, userId });
+    } else {
+      this.server
+        .to(roomName(roomId))
+        .emit(SOCKET_EVENTS.WRONG_ANSWER_SELECTED, { answer, userId });
 
-    const user = await this.usersService.findOne(userId);
-    this.usersService.registerAnswer(user, false, topic);
+      const user = await this.usersService.findOne(userId);
+      this.usersService.registerAnswer(user, false, topic);
+    }
   }
 }

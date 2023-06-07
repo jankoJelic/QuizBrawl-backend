@@ -14,7 +14,15 @@ import { ShallowUser } from 'src/auth/util/shallowUser';
 import { LeaguesService } from 'src/leagues/leagues.service';
 import { Socket } from 'socket.io';
 import { Quiz } from 'src/quizes/quiz.entity';
-import { Message } from 'src/messages/message.entity';
+
+const {
+  USER_JOINED_LEAGUE,
+  USER_JOINED_LEAGUE_ROOM,
+  LEAGUE_GAME_ENDED,
+  LEAGUE_GAME_STARTED,
+  USER_LEFT_LEAGUE_ROOM,
+  NEXT_QUIZ_SELECTED,
+} = SOCKET_EVENTS;
 
 export class LeaguesGateway extends EventsGateway {
   constructor(
@@ -39,7 +47,7 @@ export class LeaguesGateway extends EventsGateway {
     return `league-${leagueId}`;
   }
 
-  @SubscribeMessage(SOCKET_EVENTS.USER_JOINED_LEAGUE_ROOM)
+  @SubscribeMessage(USER_JOINED_LEAGUE_ROOM)
   async handleUserJoinedLeagueRoom(
     @MessageBody() body: { leagueId: number },
     @ConnectedSocket() client: Socket,
@@ -59,10 +67,10 @@ export class LeaguesGateway extends EventsGateway {
 
     this.server
       .to(this.leagueChannel(body.leagueId))
-      .emit(SOCKET_EVENTS.USER_JOINED_LEAGUE_ROOM, user);
+      .emit(USER_JOINED_LEAGUE_ROOM, user);
   }
 
-  @SubscribeMessage(SOCKET_EVENTS.USER_JOINED_LEAGUE)
+  @SubscribeMessage(USER_JOINED_LEAGUE)
   async handleUserJoinedLeague(
     @MessageBody() body: { user: ShallowUser; leagueId: number },
     @ConnectedSocket() client: Socket,
@@ -75,23 +83,21 @@ export class LeaguesGateway extends EventsGateway {
 
     await this.leaguesService.addUserToLeague(body.user.id, body.leagueId);
 
-    this.server
-      .to(this.leagueChannel(body.leagueId))
-      .emit(SOCKET_EVENTS.USER_JOINED_LEAGUE, {
-        user: body.user,
-      });
+    this.server.to(this.leagueChannel(body.leagueId)).emit(USER_JOINED_LEAGUE, {
+      user: body.user,
+    });
   }
 
-  @SubscribeMessage(SOCKET_EVENTS.NEXT_QUIZ_SELECTED)
+  @SubscribeMessage(NEXT_QUIZ_SELECTED)
   async setNextQuiz(@MessageBody() body: { quiz: Quiz; leagueId: number }) {
     this.leaguesService.setNextQuiz(body.leagueId, body.quiz.id);
 
     this.server
       .to(this.leagueChannel(body.leagueId))
-      .emit(SOCKET_EVENTS.NEXT_QUIZ_SELECTED, { quiz: body.quiz });
+      .emit(NEXT_QUIZ_SELECTED, { quiz: body.quiz });
   }
 
-  @SubscribeMessage(SOCKET_EVENTS.USER_LEFT_LEAGUE_ROOM)
+  @SubscribeMessage(USER_LEFT_LEAGUE_ROOM)
   async handleUserLeftoLeagueRoom(
     @MessageBody() body: { leagueId: number; userId: number },
   ) {
@@ -102,6 +108,17 @@ export class LeaguesGateway extends EventsGateway {
     );
     this.server
       .to(this.leagueChannel(body.leagueId))
-      .emit(SOCKET_EVENTS.USER_LEFT_LEAGUE_ROOM, { userId: body.userId });
+      .emit(USER_LEFT_LEAGUE_ROOM, { userId: body.userId });
   }
+
+  @SubscribeMessage(LEAGUE_GAME_STARTED)
+  async startLeagueGame(@MessageBody() body: { leagueId: number; quiz: Quiz }) {
+    this.leaguesService.updateLeague(body.leagueId, { gameInProgress: true });
+    this.server
+      .to(this.leagueChannel(body.leagueId))
+      .emit(LEAGUE_GAME_STARTED, body.quiz);
+  }
+
+  @SubscribeMessage(LEAGUE_GAME_ENDED)
+  async endLeagueGame(@MessageBody() body: {}) {}
 }

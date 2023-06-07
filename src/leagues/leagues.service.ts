@@ -7,6 +7,7 @@ import { CreateLeagueDto } from './dtos/create-league.dto';
 import { ShallowUser } from 'src/auth/util/shallowUser';
 import { Quiz } from 'src/quizes/quiz.entity';
 import { UsersService } from 'src/auth/users.service';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class LeaguesService {
@@ -86,6 +87,7 @@ export class LeaguesService {
     const newUser = await this.usersService.findOne(userId);
     this.leaguesRepository.update(leagueId, {
       users: currentUsers.concat([newUser]),
+      // totalAnswers: { ...(league?.totalAnswers || {}) },
     });
     this.usersService.updateUser(newUser.id, {
       leagueIds: (newUser?.leagueIds || []).concat(leagueId),
@@ -131,5 +133,28 @@ export class LeaguesService {
 
   async setNextQuiz(leagueId: number, quizId: number) {
     this.leaguesRepository.update(leagueId, { selectedQuizId: quizId });
+  }
+
+  async registerLeagueGameScore(
+    leagueId: number,
+    score: Record<number, number>,
+    currentUser: User,
+  ) {
+    const league = await this.getLeagueById(leagueId);
+    const { userId: adminId, users, type, score: currentScore } = league || {};
+
+    delete score[adminId];
+
+    const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
+      this.rewardsService.processMultiPlayerScore(score, currentUser);
+
+    const reward = this.rewardsService.calculateMultiPlayerReward({
+      playersCount,
+      scoresLargestFirst,
+      yourPosition,
+      yourScore,
+    });
+
+    return reward;
   }
 }

@@ -6,4 +6,5 @@ export interface SelectAnswerDto {
   roomId: number;
   userId: number;
   topic: Topic;
+  leagueId?: number;
 }

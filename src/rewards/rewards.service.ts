@@ -10,6 +10,8 @@ import { REWARD_TYPES } from './constants/reward.types';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { rewardDistribution } from './constants/reward-distribution';
+import { CalculateMultiplayerRewardDto } from './dtos/calculate-multiplayer-reward.dto';
 
 @Injectable()
 export class RewardsService {
@@ -34,6 +36,36 @@ export class RewardsService {
     const yourScore = score[user.id];
 
     return { playersCount, scoresLargestFirst, yourPosition, yourScore };
+  }
+
+  calculateMultiPlayerReward({
+    scoresLargestFirst,
+    yourScore,
+    playersCount,
+    yourPosition,
+  }: CalculateMultiplayerRewardDto) {
+    let duplicateScoresIndexes = [];
+    scoresLargestFirst.forEach((item, index) => {
+      if (item === yourScore) duplicateScoresIndexes.push(index);
+    });
+
+    const yourReward = () => {
+      const multipleUsersWithSameScore = duplicateScoresIndexes.length > 1;
+
+      if (multipleUsersWithSameScore) {
+        const averageDistribution =
+          duplicateScoresIndexes.reduce(
+            (a, b) => a + rewardDistribution(playersCount)[b],
+            0,
+          ) / duplicateScoresIndexes.length;
+
+        return Math.floor(averageDistribution);
+      } else {
+        return rewardDistribution(playersCount)[yourPosition];
+      }
+    };
+
+    return yourReward();
   }
 
   async distributeCashGamePrizes(
@@ -81,63 +113,24 @@ export class RewardsService {
   async distributeTrophies(score: Record<number, number>, user: User) {
     const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
       this.processMultiPlayerScore(score, user);
-
     const currentUser = await this.usersService.findOne(user.id);
     const currentTrophies = currentUser.trophies;
-
-    const distribution = () => {
-      switch (playersCount) {
-        case 2:
-          return [2, -2];
-        case 3:
-          return [3, 0, -3];
-        case 4:
-          return [4, 2, -2, -4];
-        case 5:
-          return [5, 3, 0, -3, -5];
-        case 6:
-          return [6, 4, 2, -2, -4, -6];
-        case 7:
-          return [7, 5, 2, 0, -2, -5, -7];
-        case 8:
-          return [8, 6, 4, 2, -2, -4, -6, -8];
-        case 9:
-          return [9, 7, 5, 3, 0, -3, -5, -7, -9];
-        case 10:
-          return [10, 8, 6, 4, 2, -2, -4, -6, -8, -10];
-        default:
-          return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      }
-    };
-
     let duplicateScoresIndexes = [];
     scoresLargestFirst.forEach((item, index) => {
       if (item === yourScore) duplicateScoresIndexes.push(index);
     });
-
-    const yourReward = () => {
-      const multipleUsersWithSameScore = duplicateScoresIndexes.length > 1;
-
-      if (multipleUsersWithSameScore) {
-        const averageDistribution =
-          duplicateScoresIndexes.reduce((a, b) => a + distribution()[b], 0) /
-          duplicateScoresIndexes.length;
-
-        return Math.floor(averageDistribution);
-      } else {
-        return distribution()[yourPosition];
-      }
-    };
-
-    const trophiesSum = currentTrophies + yourReward();
+    const yourReward = this.calculateMultiPlayerReward({
+      playersCount,
+      scoresLargestFirst,
+      yourPosition,
+      yourScore,
+    });
+    const trophiesSum = currentTrophies + yourReward;
     const updatedTrophies = trophiesSum > 0 ? trophiesSum : 0;
-
-    this,
-      this.usersService.updateUser(user.id, {
-        trophies: updatedTrophies,
-      });
-
-    return yourReward();
+    this.usersService.updateUser(user.id, {
+      trophies: updatedTrophies,
+    });
+    return yourReward;
   }
 
   async sendTrophiesToUser(userId: number, amount: number) {

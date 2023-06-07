@@ -79,4 +79,13 @@ export class League {
 
   @Column({ default: 0 })
   selectedQuizId: number;
+
+  @Column({ default: false })
+  gameInProgress: boolean;
+
+  @Column({ default: 15 })
+  answerTime: number;
+
+  @Column({ default: 10 })
+  questionsCount: number;
 }

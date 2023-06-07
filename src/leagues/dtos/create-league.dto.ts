@@ -20,4 +20,7 @@ export class CreateLeagueDto {
 
   @ApiProperty()
   password?: string;
+
+  @ApiProperty()
+  gameInProgress?: boolean;
 }

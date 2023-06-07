@@ -70,4 +70,17 @@ export class LeaguesController {
       Number(leagueId),
     );
   }
+
+  @Post('/league/:id/score')
+  async registerLeagueScore(
+    @Param('id') leagueId: string,
+    @Body() body: { score: Record<number, number> },
+    @CurrentUser() user: User,
+  ) {
+    return await this.leaguesService.registerLeagueGameScore(
+      Number(leagueId),
+      body.score,
+      user,
+    );
+  }
 }
