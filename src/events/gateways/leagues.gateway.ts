@@ -14,6 +14,7 @@ import { ShallowUser } from 'src/auth/util/shallowUser';
 import { LeaguesService } from 'src/leagues/leagues.service';
 import { Socket } from 'socket.io';
 import { Quiz } from 'src/quizes/quiz.entity';
+import { League } from 'src/leagues/league.entity';
 
 const {
   USER_JOINED_LEAGUE,
@@ -120,5 +121,17 @@ export class LeaguesGateway extends EventsGateway {
   }
 
   @SubscribeMessage(LEAGUE_GAME_ENDED)
-  async endLeagueGame(@MessageBody() body: {}) {}
+  async endLeagueGame(@MessageBody() league: League) {
+    const { nextQuizUserId, users } = league || {};
+    const currentQuizUserIndex = users.findIndex(
+      (u) => u.id === nextQuizUserId,
+    );
+
+    const isLastUserInArray = currentQuizUserIndex + 1 === users.length;
+    const nextUserIndex = isLastUserInArray ? 0 : currentQuizUserIndex + 1;
+
+    this.leaguesService.updateLeague(league.id, {
+      nextQuizUserId: users[nextUserIndex].id,
+    });
+  }
 }

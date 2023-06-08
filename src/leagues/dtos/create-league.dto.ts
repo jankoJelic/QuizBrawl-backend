@@ -23,4 +23,6 @@ export class CreateLeagueDto {
 
   @ApiProperty()
   gameInProgress?: boolean;
+
+  nextQuizUserId?: number;
 }

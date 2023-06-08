@@ -46,11 +46,16 @@ export class LeaguesService {
 
   async createLeague(user: ShallowUser, body: CreateLeagueDto) {
     const myUser = await this.usersService.findOne(user.id);
+    const initialAnswers = {
+      [user.id]: 0,
+    };
     const newLeague = await this.leaguesRepository.save({
       ...body,
       userId: user.id,
       users: [user],
       nextQuizUserId: user.id,
+      correctAnswers: initialAnswers,
+      totalAnswers: initialAnswers,
     });
 
     this.usersService.updateUser(user.id, {
@@ -87,7 +92,6 @@ export class LeaguesService {
     const newUser = await this.usersService.findOne(userId);
     this.leaguesRepository.update(leagueId, {
       users: currentUsers.concat([newUser]),
-      // totalAnswers: { ...(league?.totalAnswers || {}) },
     });
     this.usersService.updateUser(newUser.id, {
       leagueIds: (newUser?.leagueIds || []).concat(leagueId),
@@ -157,4 +161,30 @@ export class LeaguesService {
 
     return reward;
   }
+
+  async registerAnswer({ userId, correct, leagueId }: RegisterAnswerParams) {
+    const league = await this.getLeagueById(leagueId);
+    const { totalAnswers, correctAnswers } = league || {};
+  }
+
+  async leaveLeague(userId: number, leagueId: number) {
+    const user = await this.usersService.findOne(userId);
+    const userLeagues = user?.leagueIds;
+    await this.usersService.updateUser(userId, {
+      leagueIds: userLeagues.filter((id) => id !== leagueId),
+    });
+    const league = await this.leaguesRepository.findOne({
+      where: { id: leagueId },
+    });
+    const currentUsers = league.users;
+    await this.leaguesRepository.update(leagueId, {
+      users: currentUsers.filter((u) => u.id !== userId),
+    });
+  }
+}
+
+interface RegisterAnswerParams {
+  userId: number;
+  correct: boolean;
+  leagueId: number;
 }

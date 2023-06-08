@@ -83,4 +83,9 @@ export class LeaguesController {
       user,
     );
   }
+
+  @Post('/league/:id/leave')
+  async leaveLeague(@Param('id') id: string, @CurrentUser() user: User) {
+    await this.leaguesService.leaveLeague(user.id, Number(id));
+  }
 }
