@@ -1,8 +1,10 @@
 import {
   ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -24,6 +26,7 @@ const {
   USER_DISCONNECTED,
   USER_CONNECTED,
   FRIEND_REMOVED,
+  LEAGUE_DELETED
 } = SOCKET_EVENTS;
 
 @WebSocketGateway({

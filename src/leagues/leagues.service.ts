@@ -35,6 +35,9 @@ export class LeaguesService {
   async deleteLeague(id: number, userId: number) {
     const league = await this.leaguesRepository.findOneBy({ id });
     if (league.userId !== userId) throw new UnauthorizedException();
+    league.users.forEach(async (user) => {
+      await this.removeUserFromLeague(user.id, league.id);
+    });
     return await this.leaguesRepository.delete(id);
   }
 
@@ -57,6 +60,7 @@ export class LeaguesService {
       correctAnswers: initialAnswers,
       totalAnswers: initialAnswers,
       gamesPlayed: { [user.id]: 0 },
+      readyUsers: [user.id],
     });
 
     this.usersService.updateUser(user.id, {
@@ -95,6 +99,7 @@ export class LeaguesService {
       users: currentUsers.concat([newUser]),
       totalAnswers: { ...league.totalAnswers, [userId]: 0 },
       correctAnswers: { ...league.correctAnswers, [userId]: 0 },
+      readyUsers: league.readyUsers.concat([userId]),
     });
     this.usersService.updateUser(newUser.id, {
       leagueIds: (newUser?.leagueIds || []).concat(leagueId),
@@ -113,6 +118,7 @@ export class LeaguesService {
       users: currentUsers.filter((u) => u.id !== userId),
       correctAnswers: league.correctAnswers,
       totalAnswers: league.totalAnswers,
+      readyUsers: league.readyUsers.filter((u) => u !== userId),
     });
     this.usersService.updateUser(newUser.id, {
       leagueIds: newUser.leagueIds.filter((id) => id !== leagueId),
@@ -131,7 +137,7 @@ export class LeaguesService {
     const league = await this.leaguesRepository.findOne({
       where: { id: leagueId },
     });
-    const currentReadyUsers = league.readyUsers ? league.readyUsers : [];
+    const currentReadyUsers = league?.readyUsers ? league.readyUsers : [];
 
     const updatedReadyUsers = status
       ? currentReadyUsers.concat([userId])
@@ -153,7 +159,7 @@ export class LeaguesService {
   ) {
     const league = await this.getLeagueById(leagueId);
     const { userId: adminId, users, type, score: currentScore } = league || {};
-
+    
     delete score[adminId];
 
     const { playersCount, scoresLargestFirst, yourPosition, yourScore } =

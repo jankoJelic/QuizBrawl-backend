@@ -23,6 +23,7 @@ const {
   USER_LEFT_LEAGUE_ROOM,
   LEAGUE_GAME_ENDED,
   LEAGUE_GAME_STARTED,
+  LEAGUE_DELETED,
   NEXT_QUIZ_SELECTED,
 } = SOCKET_EVENTS;
 
@@ -151,5 +152,10 @@ export class LeaguesGateway extends EventsGateway {
     this.server
       .to(this.leagueChannel(body.leagueId))
       .emit(USER_LEFT_LEAGUE, body.userId);
+  }
+  
+  @SubscribeMessage(LEAGUE_DELETED)
+  handleLeagueDeleted(@MessageBody() leagueId: number) {
+    this.server.to(this.leagueChannel(leagueId)).emit(LEAGUE_DELETED, leagueId);
   }
 }
