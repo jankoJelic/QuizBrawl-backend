@@ -51,6 +51,7 @@ export class UsersService {
         DEFAULT_AVATARS[Math.floor(Math.random() * DEFAULT_AVATARS.length)],
       correctAnswers: this.initialAnswers(),
       totalAnswers: this.initialAnswers(),
+      leagueIds: [-1],
     });
     return this.usersRepository.save(user);
   }
