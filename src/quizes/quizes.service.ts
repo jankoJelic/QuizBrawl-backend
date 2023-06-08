@@ -16,7 +16,7 @@ export class QuizesService {
   async getQuizesForLeague(leagueId: number) {
     const league = await this.leaguesService.getLeagueById(leagueId);
 
-    if (!league.quizIds) return [];
+    if (!league?.quizIds) return [];
     return await this.quizesRepository.find({
       where: { id: In(league.quizIds) },
     });

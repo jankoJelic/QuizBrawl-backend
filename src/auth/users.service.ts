@@ -44,11 +44,15 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
+    const defaultAvatars = await this.getDefaultAvatars();
+    const randomDefaultAvatar =
+      defaultAvatars[Math.floor(Math.random() * defaultAvatars.length)];
+    console.log(defaultAvatars);
+    console.log('============');
+
     const user = this.usersRepository.create({
       ...createUserDto,
-      avatars: DEFAULT_AVATARS,
-      avatar:
-        DEFAULT_AVATARS[Math.floor(Math.random() * DEFAULT_AVATARS.length)],
+      avatar: randomDefaultAvatar,
       correctAnswers: this.initialAnswers(),
       totalAnswers: this.initialAnswers(),
       leagueIds: [-1],
@@ -171,22 +175,25 @@ export class UsersService {
     });
   }
 
-  async getUserAvatars(userId: number) {
+  async getDefaultAvatars() {
     const bucket = await getStorage()
       .bucket()
       .getFiles({ prefix: 'avatars/default' });
-    const user = await this.findOne(userId);
     const allUrls = bucket[0].map((file) =>
       createStorageDownloadUrl(
         file.name,
         this.configService.get('FIREBASE_TOKEN'),
       ),
     );
+    return allUrls;
+  }
 
+  async getUserAvatars(userId: number) {
+    const defaultAvatars = await this.getDefaultAvatars();
+    const user = await this.findOne(userId);
     const availableAvatars = (user.avatars || []).concat(
-      allUrls.filter((url) => url.includes('.png')),
+      defaultAvatars.filter((url) => url.includes('.png')),
     );
-
     return availableAvatars;
   }
 

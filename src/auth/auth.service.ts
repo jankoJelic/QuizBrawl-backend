@@ -36,13 +36,16 @@ export class AuthService {
     const hashedPassword = await hashAndSalt(password);
 
     const refreshToken = await this.jwtService.signAsync({
-      email,
-      refresh: true,
+      user: {
+        email,
+        refresh: true,
+      },
     });
     const hashedRefreshToken = await hashAndSalt(refreshToken);
 
     const registrationOtpCode = createOtpCode();
 
+    const defaultAvatars = await this.usersService.getDefaultAvatars();
     const newUser = await this.usersService.create({
       ...createUserDto,
       password: hashedPassword,
@@ -51,9 +54,11 @@ export class AuthService {
     });
 
     const accessToken = await this.jwtService.signAsync({
-      email,
-      id: newUser.id,
-      refreshToken,
+      user: {
+        email,
+        id: newUser.id,
+        refreshToken,
+      },
     });
 
     // this.mailService.sendUserConfirmation(createUserDto, registrationOtpCode);

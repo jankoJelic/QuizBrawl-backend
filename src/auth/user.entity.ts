@@ -173,7 +173,7 @@ export class User {
   @Column({ default: '' })
   fcmToken: string;
 
-  @Column()
+  @Column({ default: true })
   isOnline: boolean;
 
   @Column({ type: 'json', nullable: true })
