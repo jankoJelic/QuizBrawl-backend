@@ -88,4 +88,17 @@ export class LeaguesController {
   async leaveLeague(@Param('id') id: string, @CurrentUser() user: User) {
     await this.leaguesService.leaveLeague(user.id, Number(id));
   }
+
+  @Post('/league/:id/answer')
+  registerAnswer(
+    @Param('id') leagueId: string,
+    @CurrentUser() user: User,
+    @Body() body: { correct: boolean },
+  ) {
+    this.leaguesService.registerAnswer({
+      userId: user.id,
+      leagueId: Number(leagueId),
+      correct: body.correct,
+    });
+  }
 }

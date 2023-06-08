@@ -18,10 +18,11 @@ import { League } from 'src/leagues/league.entity';
 
 const {
   USER_JOINED_LEAGUE,
+  USER_LEFT_LEAGUE,
   USER_JOINED_LEAGUE_ROOM,
+  USER_LEFT_LEAGUE_ROOM,
   LEAGUE_GAME_ENDED,
   LEAGUE_GAME_STARTED,
-  USER_LEFT_LEAGUE_ROOM,
   NEXT_QUIZ_SELECTED,
 } = SOCKET_EVENTS;
 
@@ -84,9 +85,9 @@ export class LeaguesGateway extends EventsGateway {
 
     await this.leaguesService.addUserToLeague(body.user.id, body.leagueId);
 
-    this.server.to(this.leagueChannel(body.leagueId)).emit(USER_JOINED_LEAGUE, {
-      user: body.user,
-    });
+    this.server
+      .to(this.leagueChannel(body.leagueId))
+      .emit(USER_JOINED_LEAGUE, body.user);
   }
 
   @SubscribeMessage(NEXT_QUIZ_SELECTED)
@@ -121,7 +122,8 @@ export class LeaguesGateway extends EventsGateway {
   }
 
   @SubscribeMessage(LEAGUE_GAME_ENDED)
-  async endLeagueGame(@MessageBody() league: League) {
+  async endLeagueGame(@MessageBody() body: { league: League; userId: number }) {
+    const { league, userId } = body;
     const { nextQuizUserId, users } = league || {};
     const currentQuizUserIndex = users.findIndex(
       (u) => u.id === nextQuizUserId,
@@ -129,9 +131,25 @@ export class LeaguesGateway extends EventsGateway {
 
     const isLastUserInArray = currentQuizUserIndex + 1 === users.length;
     const nextUserIndex = isLastUserInArray ? 0 : currentQuizUserIndex + 1;
+    const currentGamesPlayed = league.gamesPlayed;
 
     this.leaguesService.updateLeague(league.id, {
       nextQuizUserId: users[nextUserIndex].id,
+      gameInProgress: false,
+      gamesPlayed: {
+        ...currentGamesPlayed,
+        [userId]: currentGamesPlayed[userId] + 1,
+      },
     });
+  }
+
+  @SubscribeMessage(USER_LEFT_LEAGUE)
+  async removeUserFromLeague(
+    @MessageBody() body: { userId: number; leagueId: number },
+  ) {
+    this.leaguesService.removeUserFromLeague(body.userId, body.leagueId);
+    this.server
+      .to(this.leagueChannel(body.leagueId))
+      .emit(USER_LEFT_LEAGUE, body.userId);
   }
 }

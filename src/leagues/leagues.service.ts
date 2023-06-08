@@ -56,6 +56,7 @@ export class LeaguesService {
       nextQuizUserId: user.id,
       correctAnswers: initialAnswers,
       totalAnswers: initialAnswers,
+      gamesPlayed: { [user.id]: 0 },
     });
 
     this.usersService.updateUser(user.id, {
@@ -92,6 +93,8 @@ export class LeaguesService {
     const newUser = await this.usersService.findOne(userId);
     this.leaguesRepository.update(leagueId, {
       users: currentUsers.concat([newUser]),
+      totalAnswers: { ...league.totalAnswers, [userId]: 0 },
+      correctAnswers: { ...league.correctAnswers, [userId]: 0 },
     });
     this.usersService.updateUser(newUser.id, {
       leagueIds: (newUser?.leagueIds || []).concat(leagueId),
@@ -104,8 +107,12 @@ export class LeaguesService {
     });
     const currentUsers = league.users;
     const newUser = await this.usersService.findOne(userId);
+    delete league.totalAnswers[userId];
+    delete league.correctAnswers[userId];
     this.leaguesRepository.update(leagueId, {
       users: currentUsers.filter((u) => u.id !== userId),
+      correctAnswers: league.correctAnswers,
+      totalAnswers: league.totalAnswers,
     });
     this.usersService.updateUser(newUser.id, {
       leagueIds: newUser.leagueIds.filter((id) => id !== leagueId),
@@ -165,6 +172,18 @@ export class LeaguesService {
   async registerAnswer({ userId, correct, leagueId }: RegisterAnswerParams) {
     const league = await this.getLeagueById(leagueId);
     const { totalAnswers, correctAnswers } = league || {};
+    const updatedTotalAnswers = {
+      ...totalAnswers,
+      [userId]: totalAnswers[userId] + 1,
+    };
+    let updatedCorrectAnswers = correctAnswers;
+    if (correct) {
+      updatedCorrectAnswers[userId] = updatedCorrectAnswers[userId] + 1;
+    }
+    await this.leaguesRepository.update(leagueId, {
+      totalAnswers: updatedTotalAnswers,
+      correctAnswers: updatedCorrectAnswers,
+    });
   }
 
   async leaveLeague(userId: number, leagueId: number) {

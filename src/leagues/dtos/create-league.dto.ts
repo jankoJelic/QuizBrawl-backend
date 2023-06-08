@@ -25,4 +25,6 @@ export class CreateLeagueDto {
   gameInProgress?: boolean;
 
   nextQuizUserId?: number;
+
+  gamesPlayed?: Record<number, number>;
 }
