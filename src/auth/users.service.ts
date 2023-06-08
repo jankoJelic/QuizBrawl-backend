@@ -47,8 +47,6 @@ export class UsersService {
     const defaultAvatars = await this.getDefaultAvatars();
     const randomDefaultAvatar =
       defaultAvatars[Math.floor(Math.random() * defaultAvatars.length)];
-    console.log(defaultAvatars);
-    console.log('============');
 
     const user = this.usersRepository.create({
       ...createUserDto,
