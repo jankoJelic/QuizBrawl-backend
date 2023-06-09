@@ -61,6 +61,9 @@ export class LeaguesService {
       totalAnswers: initialAnswers,
       gamesPlayed: { [user.id]: 0 },
       readyUsers: [user.id],
+      score: { [user.id]: 0 },
+      quizIds: [],
+      playedQuizIds: [],
     });
 
     this.usersService.updateUser(user.id, {
@@ -100,6 +103,8 @@ export class LeaguesService {
       totalAnswers: { ...league.totalAnswers, [userId]: 0 },
       correctAnswers: { ...league.correctAnswers, [userId]: 0 },
       readyUsers: league.readyUsers.concat([userId]),
+      score: { ...league.score, [userId]: 0 },
+      gamesPlayed: { ...league.gamesPlayed, [userId]: 0 },
     });
     this.usersService.updateUser(newUser.id, {
       leagueIds: (newUser?.leagueIds || []).concat(leagueId),
@@ -159,7 +164,6 @@ export class LeaguesService {
   ) {
     const league = await this.getLeagueById(leagueId);
     const { userId: adminId, users, type, score: currentScore } = league || {};
-    
     delete score[adminId];
 
     const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
@@ -170,6 +174,13 @@ export class LeaguesService {
       scoresLargestFirst,
       yourPosition,
       yourScore,
+    });
+
+    this.leaguesRepository.update(leagueId, {
+      score: {
+        ...currentScore,
+        [currentUser.id]: currentScore[currentUser.id] + reward,
+      },
     });
 
     return reward;

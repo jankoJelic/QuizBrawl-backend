@@ -141,6 +141,7 @@ export class LeaguesGateway extends EventsGateway {
         ...currentGamesPlayed,
         [userId]: currentGamesPlayed[userId] + 1,
       },
+      selectedQuizId: 0,
     });
   }
 
@@ -153,7 +154,7 @@ export class LeaguesGateway extends EventsGateway {
       .to(this.leagueChannel(body.leagueId))
       .emit(USER_LEFT_LEAGUE, body.userId);
   }
-  
+
   @SubscribeMessage(LEAGUE_DELETED)
   handleLeagueDeleted(@MessageBody() leagueId: number) {
     this.server.to(this.leagueChannel(leagueId)).emit(LEAGUE_DELETED, leagueId);

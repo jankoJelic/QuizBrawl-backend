@@ -29,4 +29,6 @@ export class CreateLeagueDto {
   gamesPlayed?: Record<number, number>;
 
   readyUsers?: number[];
+
+  selectedQuizId?: number;
 }
