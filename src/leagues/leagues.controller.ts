@@ -74,14 +74,15 @@ export class LeaguesController {
   @Post('/league/:id/score')
   async registerLeagueScore(
     @Param('id') leagueId: string,
-    @Body() body: { score: Record<number, number> },
+    @Body() body: { score: Record<number, number>; quizId: number },
     @CurrentUser() user: User,
   ) {
-    return await this.leaguesService.registerLeagueGameScore(
-      Number(leagueId),
-      body.score,
-      user,
-    );
+    return await this.leaguesService.registerLeagueGameScore({
+      leagueId: Number(leagueId),
+      currentUser: user,
+      quizId: body.quizId,
+      score: body.score,
+    });
   }
 
   @Post('/league/:id/leave')

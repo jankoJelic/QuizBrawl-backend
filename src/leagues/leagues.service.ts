@@ -64,6 +64,7 @@ export class LeaguesService {
       score: { [user.id]: 0 },
       quizIds: [],
       playedQuizIds: [],
+      quizIdHistory: [],
     });
 
     this.usersService.updateUser(user.id, {
@@ -157,30 +158,62 @@ export class LeaguesService {
     this.leaguesRepository.update(leagueId, { selectedQuizId: quizId });
   }
 
-  async registerLeagueGameScore(
-    leagueId: number,
-    score: Record<number, number>,
-    currentUser: User,
-  ) {
-    const league = await this.getLeagueById(leagueId);
-    const { userId: adminId, users, type, score: currentScore } = league || {};
-
+  async registerLeagueGameScore({
+    leagueId,
+    score,
+    currentUser,
+    quizId,
+  }: {
+    leagueId: number;
+    score: Record<number, number>;
+    currentUser: User;
+    quizId: number;
+  }) {
     const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
       this.rewardsService.processMultiPlayerScore(score, currentUser);
 
     const reward = this.rewardsService.calculateMultiPlayerReward({
-      playersCount,
+      playersCount: playersCount - 1,
       scoresLargestFirst,
       yourPosition,
       yourScore,
     });
 
-    this.leaguesRepository.update(leagueId, {
-      score: {
-        ...currentScore,
-        [currentUser.id]: currentScore[currentUser.id] + reward,
-      },
+    const league = await this.getLeagueById(leagueId);
+    const {
+      users,
+      score: currentScore,
+      quizIdHistory,
+      gamesPlayed,
+    } = league || {};
+
+    const quiz = await this.quizesRepository.findOne({
+      where: { id: quizId },
     });
+    const quizAdminId = quiz.userId;
+
+    if (quizAdminId !== currentUser.id)
+      await this.leaguesRepository.update(leagueId, {
+        score: {
+          ...currentScore,
+          [currentUser.id]: currentScore[currentUser.id] + reward,
+        },
+        gamesPlayed: {
+          ...gamesPlayed,
+          [currentUser.id]: gamesPlayed[currentUser.id] + 1,
+        },
+      });
+
+    if (!quizIdHistory.includes(quizId)) {
+      const currentQuizUserIndex = users.findIndex((u) => u.id === quizAdminId);
+      const isLastUserInArray = currentQuizUserIndex + 1 === users.length;
+      const nextUserIndex = isLastUserInArray ? 0 : currentQuizUserIndex + 1;
+      await this.leaguesRepository.update(leagueId, {
+        nextQuizUserId: users[nextUserIndex].id,
+        gameInProgress: false,
+        selectedQuizId: 0,
+      });
+    }
 
     return reward;
   }

@@ -88,4 +88,7 @@ export class League {
 
   @Column({ default: 10 })
   questionsCount: number;
+
+  @Column({ type: 'json', nullable: true })
+  quizIdHistory: number[];
 }

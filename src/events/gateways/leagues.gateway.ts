@@ -14,14 +14,12 @@ import { ShallowUser } from 'src/auth/util/shallowUser';
 import { LeaguesService } from 'src/leagues/leagues.service';
 import { Socket } from 'socket.io';
 import { Quiz } from 'src/quizes/quiz.entity';
-import { League } from 'src/leagues/league.entity';
 
 const {
   USER_JOINED_LEAGUE,
   USER_LEFT_LEAGUE,
   USER_JOINED_LEAGUE_ROOM,
   USER_LEFT_LEAGUE_ROOM,
-  LEAGUE_GAME_ENDED,
   LEAGUE_GAME_STARTED,
   LEAGUE_DELETED,
   NEXT_QUIZ_SELECTED,
@@ -94,7 +92,6 @@ export class LeaguesGateway extends EventsGateway {
   @SubscribeMessage(NEXT_QUIZ_SELECTED)
   async setNextQuiz(@MessageBody() body: { quiz: Quiz; leagueId: number }) {
     this.leaguesService.setNextQuiz(body.leagueId, body.quiz.id);
-
     this.server
       .to(this.leagueChannel(body.leagueId))
       .emit(NEXT_QUIZ_SELECTED, { quiz: body.quiz });
@@ -116,34 +113,13 @@ export class LeaguesGateway extends EventsGateway {
 
   @SubscribeMessage(LEAGUE_GAME_STARTED)
   async startLeagueGame(@MessageBody() body: { leagueId: number; quiz: Quiz }) {
-    this.leaguesService.updateLeague(body.leagueId, { gameInProgress: true });
+    await this.leaguesService.updateLeague(body.leagueId, {
+      gameInProgress: true,
+    });
+    const league = await this.leaguesService.getLeagueById(body.leagueId);
     this.server
       .to(this.leagueChannel(body.leagueId))
-      .emit(LEAGUE_GAME_STARTED, body.quiz);
-  }
-
-  @SubscribeMessage(LEAGUE_GAME_ENDED)
-  async endLeagueGame(@MessageBody() body: { league: League; userId: number }) {
-    const { league, userId } = body;
-    const { nextQuizUserId, users } = league || {};
-    const youWereAdmin = nextQuizUserId === body.userId;
-    const currentQuizUserIndex = users.findIndex(
-      (u) => u.id === nextQuizUserId,
-    );
-
-    const isLastUserInArray = currentQuizUserIndex + 1 === users.length;
-    const nextUserIndex = isLastUserInArray ? 0 : currentQuizUserIndex + 1;
-    const currentGamesPlayed = league.gamesPlayed;
-
-    this.leaguesService.updateLeague(league.id, {
-      nextQuizUserId: users[nextUserIndex].id,
-      gameInProgress: false,
-      gamesPlayed: {
-        ...currentGamesPlayed,
-        [userId]: currentGamesPlayed[userId] + (youWereAdmin ? 0 : 1),
-      },
-      selectedQuizId: 0,
-    });
+      .emit(LEAGUE_GAME_STARTED, { quiz: body.quiz, league });
   }
 
   @SubscribeMessage(USER_LEFT_LEAGUE)
