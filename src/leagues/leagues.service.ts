@@ -212,6 +212,7 @@ export class LeaguesService {
         nextQuizUserId: users[nextUserIndex].id,
         gameInProgress: false,
         selectedQuizId: 0,
+        quizIdHistory: league.quizIdHistory.concat(quizId),
       });
     }
 
@@ -221,7 +222,6 @@ export class LeaguesService {
   async registerAnswer({ userId, correct, leagueId }: RegisterAnswerParams) {
     const league = await this.getLeagueById(leagueId);
     const { totalAnswers, correctAnswers } = league || {};
-
     await this.leaguesRepository.update(leagueId, {
       totalAnswers: {
         ...totalAnswers,
