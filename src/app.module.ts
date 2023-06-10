@@ -87,7 +87,7 @@ import { LeaguesGateway } from './events/gateways/leagues.gateway';
         database: configService.get('DB_NAME'),
         entities: [User, Room, Question, Quiz, Lobby],
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
       }),
       dataSourceFactory: async (options) => {
         const dataSource = await new DataSource(options).initialize();

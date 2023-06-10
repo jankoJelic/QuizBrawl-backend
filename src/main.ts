@@ -16,7 +16,7 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
-  
+
   const config = new DocumentBuilder()
     .setTitle('Quiz Brawl')
     .setDescription('QB API docs')
@@ -36,6 +36,6 @@ async function bootstrap() {
   });
 
   app.enableCors();
-  await app.listen(3000);
+  await app.listen(configService.get('PORT'));
 }
 bootstrap();
