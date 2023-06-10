@@ -164,7 +164,6 @@ export class LeaguesService {
   ) {
     const league = await this.getLeagueById(leagueId);
     const { userId: adminId, users, type, score: currentScore } = league || {};
-    delete score[adminId];
 
     const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
       this.rewardsService.processMultiPlayerScore(score, currentUser);
@@ -189,17 +188,16 @@ export class LeaguesService {
   async registerAnswer({ userId, correct, leagueId }: RegisterAnswerParams) {
     const league = await this.getLeagueById(leagueId);
     const { totalAnswers, correctAnswers } = league || {};
-    const updatedTotalAnswers = {
-      ...totalAnswers,
-      [userId]: totalAnswers[userId] + 1,
-    };
-    let updatedCorrectAnswers = correctAnswers;
-    if (correct) {
-      updatedCorrectAnswers[userId] = updatedCorrectAnswers[userId] + 1;
-    }
+
     await this.leaguesRepository.update(leagueId, {
-      totalAnswers: updatedTotalAnswers,
-      correctAnswers: updatedCorrectAnswers,
+      totalAnswers: {
+        ...totalAnswers,
+        [userId]: totalAnswers[userId] + 1,
+      },
+      correctAnswers: {
+        ...correctAnswers,
+        [userId]: correctAnswers[userId] + (correct ? 1 : 0),
+      },
     });
   }
 
@@ -212,6 +210,7 @@ export class LeaguesService {
     const league = await this.leaguesRepository.findOne({
       where: { id: leagueId },
     });
+    if (!league) return;
     const currentUsers = league.users;
     await this.leaguesRepository.update(leagueId, {
       users: currentUsers.filter((u) => u.id !== userId),

@@ -126,6 +126,7 @@ export class LeaguesGateway extends EventsGateway {
   async endLeagueGame(@MessageBody() body: { league: League; userId: number }) {
     const { league, userId } = body;
     const { nextQuizUserId, users } = league || {};
+    const youWereAdmin = nextQuizUserId === body.userId;
     const currentQuizUserIndex = users.findIndex(
       (u) => u.id === nextQuizUserId,
     );
@@ -139,7 +140,7 @@ export class LeaguesGateway extends EventsGateway {
       gameInProgress: false,
       gamesPlayed: {
         ...currentGamesPlayed,
-        [userId]: currentGamesPlayed[userId] + 1,
+        [userId]: currentGamesPlayed[userId] + (youWereAdmin ? 0 : 1),
       },
       selectedQuizId: 0,
     });
