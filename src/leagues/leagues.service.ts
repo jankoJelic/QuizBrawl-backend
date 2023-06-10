@@ -169,16 +169,6 @@ export class LeaguesService {
     currentUser: User;
     quizId: number;
   }) {
-    const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
-      this.rewardsService.processMultiPlayerScore(score, currentUser);
-
-    const reward = this.rewardsService.calculateMultiPlayerReward({
-      playersCount: playersCount - 1,
-      scoresLargestFirst,
-      yourPosition,
-      yourScore,
-    });
-
     const league = await this.getLeagueById(leagueId);
     const {
       users,
@@ -191,6 +181,18 @@ export class LeaguesService {
       where: { id: quizId },
     });
     const quizAdminId = quiz.userId;
+
+    delete score[quizAdminId];
+
+    const { playersCount, scoresLargestFirst, yourPosition, yourScore } =
+      this.rewardsService.processMultiPlayerScore(score, currentUser);
+
+    const reward = this.rewardsService.calculateMultiPlayerReward({
+      playersCount,
+      scoresLargestFirst,
+      yourPosition,
+      yourScore,
+    });
 
     if (quizAdminId !== currentUser.id)
       await this.leaguesRepository.update(leagueId, {
