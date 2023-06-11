@@ -85,9 +85,11 @@ import { LeaguesGateway } from './events/gateways/leagues.gateway';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Room, Question, Quiz, Lobby],
+        entities: ['dist/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: false,
+        migrations: ['src/migrations/**/*{.ts,.js}'],
+        migrationsTableName: 'custom_migration_table',
       }),
       dataSourceFactory: async (options) => {
         const dataSource = await new DataSource(options).initialize();
