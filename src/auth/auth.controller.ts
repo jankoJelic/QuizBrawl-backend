@@ -5,6 +5,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Patch,
   Post,
   Query,
@@ -79,6 +80,7 @@ export class AuthController {
   @Get('/me')
   async getMyInfo(@CurrentUser() user: User) {
     const fetchedUser = await this.usersService.findByEmail(user.email);
+    if (!fetchedUser) throw new NotFoundException('user does not exist');
     delete fetchedUser.password;
     delete fetchedUser.refreshToken;
     delete fetchedUser.googleAuthId;
