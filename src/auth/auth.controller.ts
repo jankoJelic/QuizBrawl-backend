@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  SetMetadata,
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -18,7 +19,6 @@ import { SignInDto } from './dtos/sign-in.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { JWT_SECRET } from './constants/authConstants';
-import { Public } from './decorators/public.decorator';
 import { GetRefreshToken } from './decorators/get-refresh-token.decorator';
 import { AdminGuard } from './guards/admin.guard';
 import { MailService } from 'src/mail/mail.service';
@@ -27,6 +27,8 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { PinDto } from './dtos/pin.dto';
 import { GoogleAuthDto } from './dtos/google-auth.dto';
 import { OAuth2Client } from 'google-auth-library';
+
+export const Public = () => SetMetadata('isPublic', true);
 
 const oAuthClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
