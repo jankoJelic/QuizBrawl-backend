@@ -13,7 +13,8 @@ export class HeaderInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         const res = context.switchToHttp().getResponse();
-        res.header('Access-Control-Allow-Origin', '*');
+        res.header['Access-Control-Allow-Origin'] =
+          'https://quiz-clash.herokuapp.com';
       }),
     );
   }
