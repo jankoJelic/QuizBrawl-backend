@@ -26,10 +26,10 @@ const {
   USER_DISCONNECTED,
   USER_CONNECTED,
   FRIEND_REMOVED,
-  LEAGUE_DELETED
+  LEAGUE_DELETED,
 } = SOCKET_EVENTS;
 
-@WebSocketGateway({
+@WebSocketGateway(Number(process.env.PORT) || 3000, {
   namespace: 'events',
   transports: ['websocket'],
   cors: {
