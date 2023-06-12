@@ -29,7 +29,7 @@ const {
   LEAGUE_DELETED,
 } = SOCKET_EVENTS;
 
-@WebSocketGateway(Number(process.env.PORT) || 3000, {
+@WebSocketGateway(80, {
   namespace: 'events',
   transports: ['websocket'],
   cors: {
