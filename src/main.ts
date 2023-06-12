@@ -35,7 +35,7 @@ async function bootstrap() {
     storageBucket: configService.get('FIREBASE_STORAGE_BUCKET'),
   });
 
-  app.enableCors({ origin: '*' });
+  app.enableCors();
   await app.listen(configService.get('PORT') || 3000);
 }
 bootstrap();
