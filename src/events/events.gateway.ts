@@ -71,7 +71,7 @@ export class EventsGateway
       this.server.emit(USER_LEFT_LOBBY, { user, lobbyId: user.lobby.id });
     }
 
-    if (!!user.leagueIds) {
+    if (!!user?.leagueIds) {
       removeDuplicatesFromArray(user.leagueIds).forEach((leagueId) => {
         this.leaguesService.changeUserReadyStatus(
           leagueId,
