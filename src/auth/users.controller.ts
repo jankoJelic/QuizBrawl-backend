@@ -63,4 +63,9 @@ export class UsersController {
     if (!user.friends) return;
     return await this.usersService.getUsers(user.friends);
   }
+
+  @Get('/leaderboards')
+  async getLeaderboards() {
+    return this.usersService.getLeaderboards()
+  }
 }

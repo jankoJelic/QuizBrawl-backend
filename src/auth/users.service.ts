@@ -11,7 +11,6 @@ import { UserJoinedLobbyDto } from 'src/events/dtos/user-joined-lobby.dto';
 import { Lobby } from 'src/lobbies/lobby.entity';
 import { UserJoinedRoomDto } from 'src/events/dtos/user-joined-room.dto';
 import { Room } from 'src/rooms/room.entity';
-import { DEFAULT_AVATARS } from './dtos/default-avatars.dto';
 import { shallowUser } from './util/shallowUser';
 import { getStorage } from 'firebase-admin/storage';
 import { createStorageDownloadUrl } from 'src/util/firebase/createStorageDownloadUrl';
@@ -113,9 +112,7 @@ export class UsersService {
 
   async confirmEmail(otpCode: string, id: number) {
     const { registrationOtpCode } = await this.findOne(id);
-
     if (otpCode !== registrationOtpCode) throw new BadRequestException();
-
     this.updateUser(id, { isEmailConfirmed: true, registrationOtpCode: '' });
   }
 
@@ -123,11 +120,8 @@ export class UsersService {
     const lobby = await this.lobbiesRepository.findOne({
       where: { id: lobbyId },
     });
-
     lobby.users = lobby.users.concat([user]);
-
     await this.usersRepository.update(user.id, { lobby });
-
     this.lobbiesRepository.save(lobby);
   }
 
@@ -137,7 +131,6 @@ export class UsersService {
 
   async addUserToRoom({ roomId, user }: UserJoinedRoomDto) {
     const room = await this.roomsRepository.findOne({ where: { id: roomId } });
-
     return await this.usersRepository.update(user.id, { room });
   }
 
@@ -235,5 +228,20 @@ export class UsersService {
       }),
       totalAnswers: updatedTotalAnswers,
     });
+  }
+
+  async getLeaderboards() {
+    const players = await this.usersRepository
+      .find({
+        order: {
+          trophies: {
+            direction: 'DESC',
+          },
+        },
+        take: 100,
+      })
+      .then((res) => res.map((u) => shallowUser(u)));
+
+    return players;
   }
 }
