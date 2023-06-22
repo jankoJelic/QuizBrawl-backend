@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Quiz } from './quiz.entity';
 import { LeaguesService } from 'src/leagues/leagues.service';
+import { getStorage } from 'firebase-admin/storage';
 
 @Injectable()
 export class QuizesService {
@@ -41,6 +42,19 @@ export class QuizesService {
   async deleteQuiz(id: number, userId: number) {
     const quiz = await this.getQuizById(id);
     if (quiz.userId !== userId) throw new UnauthorizedException();
+
+    const usedImages = quiz.questions
+      .map((q) => (q.image ? q.image : null))
+      .filter((img) => !!img);
+
+    if (usedImages.length) {
+      const bucket = getStorage().bucket();
+      usedImages.forEach((img) => {
+        const imgFile = bucket.file('customQuizzes/' + img);
+        imgFile.delete();
+      });
+    }
+
     this.quizesRepository.delete(id);
   }
 
