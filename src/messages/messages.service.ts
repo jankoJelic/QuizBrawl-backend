@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { UsersService } from 'src/auth/users.service';
 import admin from 'firebase-admin';
-import { createFriendRequest } from './util/create-friend-request';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './message.entity';
