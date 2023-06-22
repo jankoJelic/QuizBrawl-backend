@@ -1,7 +1,13 @@
 import { User } from 'src/auth/user.entity';
 import { Question } from 'src/questions/question.entity';
 import { Topic } from 'src/rooms/types/Topic';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Quiz {
@@ -34,4 +40,13 @@ export class Quiz {
 
   @Column({ type: 'json', nullable: true })
   leagueIds: number[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  createdAt: Date;
+
+  @Column({ default: '' })
+  lastPlayedAt: string;
 }
