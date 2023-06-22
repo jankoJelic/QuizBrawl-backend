@@ -219,6 +219,10 @@ export class LeaguesService {
       });
     }
 
+    this.quizesRepository.update(quizId, {
+      lastPlayedAt: new Date().toISOString(),
+    });
+
     return reward;
   }
 
