@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { CreateQuizDto } from './dtos/create-quiz.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -38,7 +38,9 @@ export class QuizesService {
     return await this.quizesRepository.findOneBy({ id });
   }
 
-  async deleteQuiz(id: number) {
+  async deleteQuiz(id: number, userId: number) {
+    const quiz = await this.getQuizById(id);
+    if (quiz.userId !== userId) throw new UnauthorizedException();
     this.quizesRepository.delete(id);
   }
 

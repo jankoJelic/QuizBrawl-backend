@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LeaguesService } from './leagues.service';
@@ -13,6 +14,7 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { CreateLeagueDto } from './dtos/create-league.dto';
 import { shallowUser } from 'src/auth/util/shallowUser';
+import { AdminGuard } from 'src/auth/guards/admin.guard';
 
 @ApiTags('leagues')
 @Controller('leagues')
@@ -29,6 +31,7 @@ export class LeaguesController {
     return await this.leaguesService.getLeaguesImages();
   }
 
+  @UseGuards(AdminGuard)
   @Delete('/')
   deleteAllLeagues() {
     this.leaguesService.deleteAllLeagues();

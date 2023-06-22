@@ -50,7 +50,7 @@ export class QuizesController {
   }
 
   @Delete('/quiz/:id')
-  async deleteQuiz(@Param('id') id: string) {
-    return await this.quizesService.deleteQuiz(Number(id));
+  async deleteQuiz(@Param('id') id: string, @CurrentUser() user:User) {
+    return await this.quizesService.deleteQuiz(Number(id), user.id);
   }
 }

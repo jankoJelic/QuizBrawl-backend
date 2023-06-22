@@ -36,6 +36,7 @@ export class LobbiesController {
     return await this.lobbiesService.updateLobby(Number(id), body);
   }
 
+  @UseGuards(AdminGuard)
   @Delete('/deleteLobby')
   async deleteLobby(@Param('id') id: number) {
     return await this.lobbiesService.deleteLobby(id);
