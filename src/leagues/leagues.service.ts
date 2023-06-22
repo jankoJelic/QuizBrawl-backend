@@ -175,6 +175,7 @@ export class LeaguesService {
       score: currentScore,
       quizIdHistory,
       gamesPlayed,
+      type,
     } = league || {};
 
     const quiz = await this.quizesRepository.findOne({
@@ -211,10 +212,10 @@ export class LeaguesService {
       const isLastUserInArray = currentQuizUserIndex + 1 === users.length;
       const nextUserIndex = isLastUserInArray ? 0 : currentQuizUserIndex + 1;
       await this.leaguesRepository.update(leagueId, {
-        nextQuizUserId: users[nextUserIndex].id,
         gameInProgress: false,
         selectedQuizId: 0,
         quizIdHistory: league.quizIdHistory.concat(quizId),
+        ...(type === 'ROUND' && { nextQuizUserId: users[nextUserIndex].id }),
       });
     }
 
