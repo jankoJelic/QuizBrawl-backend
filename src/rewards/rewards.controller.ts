@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { RewardsService } from './rewards.service';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'src/auth/user.entity';
@@ -40,4 +40,20 @@ export class RewardsController {
       body.roomId,
     );
   }
+
+  @Get('/market')
+  async getMarket() {
+    return await this.rewardsService.getMarket();
+  }
+
+  @Post('/market/buy/:type')
+  async buyAvatar(
+    @CurrentUser() user: User,
+    @Param('type') type: MarketProductType,
+    @Body() body: { payload: any },
+  ) {
+    return this.rewardsService.makePurchase(user, type, body.payload)
+  }
 }
+
+export type MarketProductType = 'avatar';

@@ -62,7 +62,6 @@ export class UsersService {
     builder
       .where('user.email LIKE :name', { name: `%${name}%` })
       .andWhere('user.isAdmin LIKE :isAdmin', { isAdmin });
-
     return await builder.getMany();
   }
 
@@ -241,7 +240,23 @@ export class UsersService {
         take: 100,
       })
       .then((res) => res.map((u) => shallowUser(u)));
-
     return players;
+  }
+
+  async takeMoneyFromUser(userId: number, amount: number) {
+    this.usersRepository
+      .createQueryBuilder('user')
+      .update(User)
+      .where('id = :id', { id: userId })
+      .set({ money: () => `money - ${amount}` })
+      .execute();
+  }
+
+  async giveUserAvatar(userId: number, avatarUrl: string) {
+    const user = await this.findOne(userId);
+    const currentAvatars = user.avatars;
+    this.usersRepository.update(userId, {
+      avatars: [avatarUrl].concat(currentAvatars || []),
+    });
   }
 }

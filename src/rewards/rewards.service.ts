@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { UsersService } from 'src/auth/users.service';
 import { RoomsService } from 'src/rooms/rooms.service';
@@ -12,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { rewardDistribution } from './constants/reward-distribution';
 import { CalculateMultiplayerRewardDto } from './dtos/calculate-multiplayer-reward.dto';
+import { MarketProductType } from './rewards.controller';
 
 @Injectable()
 export class RewardsService {
@@ -208,6 +209,25 @@ export class RewardsService {
     );
 
     return urls;
+  }
+
+  async getMarket() {
+    const avatars = await this.getFirebaseStorageFiles('avatar');
+    const randomAvatars = shuffleArray(avatars);
+    return { avatars: randomAvatars.slice(0, 16) };
+  }
+
+  async makePurchase(user: User, type: MarketProductType, payload: any) {
+    switch (type) {
+      case 'avatar':
+        const AVATAR_PRICE = 100;
+        if (user.money < AVATAR_PRICE) throw new UnauthorizedException();
+        await this.usersService.giveUserAvatar(user.id, payload);
+        await this.usersService.takeMoneyFromUser(user.id, AVATAR_PRICE);
+        break;
+      default:
+        return;
+    }
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
