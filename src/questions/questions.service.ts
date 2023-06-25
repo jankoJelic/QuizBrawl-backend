@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { GetQuestionsDto } from './dtos/get-questions.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateQuestionDto } from './dtos/create-question.dto';

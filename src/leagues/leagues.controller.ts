@@ -105,4 +105,12 @@ export class LeaguesController {
       correct: body.correct,
     });
   }
+
+  @Patch('/:id')
+  async updateLeague(
+    @Param('id') leagueId: string,
+    @Body() body: Partial<CreateLeagueDto>,
+  ) {
+    return await this.leaguesService.updateLeague(Number(leagueId), body);
+  }
 }
