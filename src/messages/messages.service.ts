@@ -6,10 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './message.entity';
 import { CreateMessageDto, MessageType } from './dtos/message.dto';
-import { LeaguesService } from 'src/leagues/leagues.service';
-
-const jankosToken =
-  'c8rpPv3URoO1tshuI60Sqt:APA91bHOek1ojK8oUlX5a8yk594RK2Qpf-_Eo2XEFddw9uT_bscRxak7EjKix2w8p-V4S49lJH_Hi1--aDMYS8qi9n2CLWDBtB3LA88alGSZ-H8MOfKytM57UgGo3uQq-xfA9sgevLqf';
 
 @Injectable()
 export class MessagesService {
@@ -17,15 +13,12 @@ export class MessagesService {
     private usersService: UsersService,
     @InjectRepository(Message)
     private messagesRepository: Repository<Message>,
-    private leaguesService: LeaguesService,
   ) {}
 
-  sendNotification({ data, title, text, token = jankosToken }) {
+  sendNotification({ title, text, token, data = { type: '', payload: '0' } }) {
     admin.messaging().send({
-      // token: recipient.fcmToken,
-      // hardcoded my phone for testing, needs to be equal to recipient?.fcmToken
       token,
-      // data,
+      data,
       notification: {
         title: title,
         body: text,
@@ -69,7 +62,7 @@ export class MessagesService {
     await this.sendMessage(friendRequestMessage);
 
     this.sendNotification({
-      data: 'FRIEND_REQUEST',
+      data: { type: 'FRIEND_REQUEST', payload: String(user.id) },
       text: friendRequestMessage.text,
       title: friendRequestMessage.title,
       ...(recipient?.fcmToken && { token: recipient.fcmToken }),
@@ -89,4 +82,9 @@ export class MessagesService {
   readMessage(id: number) {
     this.messagesRepository.update(id, { read: true });
   }
+}
+
+interface MessageData {
+  type: MessageType;
+  payload: string; // mostly a stringified ID (notifications don't accept numbers)
 }
