@@ -16,14 +16,21 @@ export class MessagesService {
   ) {}
 
   sendNotification({ title, text, token, data = { type: '', payload: '0' } }) {
-    admin.messaging().send({
-      token,
+    const payload = {
       data,
       notification: {
         title: title,
         body: text,
       },
-    });
+    };
+    if (typeof token === 'string') {
+      admin.messaging().send({
+        token,
+        ...payload,
+      });
+    } else {
+      admin.messaging().sendMulticast({ tokens: token as string[] });
+    }
   }
 
   async getMyMessages(userId: number) {
