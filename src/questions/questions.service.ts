@@ -18,12 +18,16 @@ import { transformToMyTopic } from './util/open-tdb.utils';
 import { Difficulty } from './types/difficulty.type';
 import { decodeHtmlEntities } from 'src/util/decodeHtmlEntities';
 import { Room } from 'src/rooms/room.entity';
+import { Topic } from 'src/rooms/types/Topic';
+import { ConfigService } from '@nestjs/config';
+import { Configuration, OpenAIApi } from 'openai';
 
 @Injectable()
 export class QuestionsService {
   constructor(
     @InjectRepository(Question)
     private questionsRepository: Repository<Question>,
+    private configService: ConfigService,
   ) {}
 
   async getQuestions(params: GetQuestionsDto) {
@@ -242,5 +246,15 @@ export class QuestionsService {
     }
 
     builder.execute();
+  }
+
+  async generateAIQuestion(topic: Topic) {
+    const configuration = new Configuration({
+      // organization: 'org-sf7BXsn2qbLqY6eJspqw9jyc',
+      apiKey: this.configService.get('OPENAI_API_KEY'),
+    });
+    const openai = new OpenAIApi(configuration);
+    const response = await openai.listEngines();
+    console.log(openai, response);
   }
 }

@@ -121,7 +121,6 @@ export class AuthService {
 
   async handleGoogleAuth({ email, name, photo }: GoogleAuthDto) {
     const user = await this.usersService.findByEmail(email);
-
     if (!user) {
       const user = await this.usersService.create({
         email,
@@ -130,9 +129,7 @@ export class AuthService {
         password: '19431d738be0dcdcf3a1e31298e56b3f8236a147',
         ...(!!photo && { avatar: photo, avatars: [photo] }),
       });
-
       const { accessToken, refreshToken } = await this.createNewTokens(user);
-
       return { accessToken, refreshToken };
     } else {
       const { accessToken, refreshToken } = await this.createNewTokens(user);

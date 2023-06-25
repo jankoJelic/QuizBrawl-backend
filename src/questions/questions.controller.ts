@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Query,
@@ -18,6 +19,7 @@ import { Topic } from 'src/rooms/types/Topic';
 import { Difficulty } from './types/difficulty.type';
 import { UpdateQuestionStatsDto } from './dtos/update-question-stats.dto';
 import { SkipThrottle } from '@nestjs/throttler';
+import { Public } from 'src/auth/auth.controller';
 
 @SkipThrottle()
 @ApiTags('questions')
@@ -90,5 +92,11 @@ export class QuestionsController {
     @CurrentUser() user: User,
   ) {
     return await this.questionsService.seedDatabaseFromOpenTDB(count, user);
+  }
+
+  @Public()
+  @Post('/openai/create')
+  async generateAIQuestion(@Body() body: { topic: Topic }) {
+    return await this.questionsService.generateAIQuestion(body.topic);
   }
 }

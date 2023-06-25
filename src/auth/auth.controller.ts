@@ -109,7 +109,6 @@ export class AuthController {
   @Post('/confirmEmail')
   async confirmEmail(@Body() otpCode: string, @CurrentUser() user: User) {
     this.usersService.confirmEmail(otpCode, user.id);
-
     return 'email confirmed';
   }
 
@@ -147,5 +146,7 @@ export class AuthController {
 
   @Public()
   @Post('/apple')
-  async handleAppleAuth() {}
+  async handleAppleAuth(@Body() body: {}) {
+
+  }
 }
