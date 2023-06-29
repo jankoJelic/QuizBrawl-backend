@@ -229,7 +229,7 @@ export class UsersService {
     });
   }
 
-  async getLeaderboards() {
+  async getUsersByTrophies(count = 100) {
     const players = await this.usersRepository
       .find({
         order: {
@@ -237,9 +237,14 @@ export class UsersService {
             direction: 'DESC',
           },
         },
-        take: 100,
+        take: count,
       })
       .then((res) => res.map((u) => shallowUser(u)));
+    return players;
+  }
+
+  async getLeaderboards() {
+    const players = await this.getUsersByTrophies(100);
     return players;
   }
 
@@ -258,5 +263,11 @@ export class UsersService {
     this.usersRepository.update(userId, {
       avatars: [avatarUrl].concat(currentAvatars || []),
     });
+  }
+
+  async getUserRank(userId: number) {
+    const players = await this.getUsersByTrophies(500);
+    const userIndex = players.findIndex((user) => user.id === userId);
+    return userIndex + 1;
   }
 }

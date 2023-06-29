@@ -69,6 +69,9 @@ export class User {
   @Column({ default: false })
   isPremium: boolean;
 
+  @Column({ default: '' })
+  premiumUntil: string;
+
   @OneToMany(() => Quiz, (quiz) => quiz.user, { eager: true })
   @JoinColumn()
   quizes: Quiz[];

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   NotFoundException,
+  Param,
   Post,
   Query,
   UseGuards,
@@ -66,6 +67,11 @@ export class UsersController {
 
   @Get('/leaderboards')
   async getLeaderboards() {
-    return this.usersService.getLeaderboards()
+    return this.usersService.getLeaderboards();
+  }
+
+  @Get('/:id/rank')
+  async getUserRank(@Param('id') id: string) {
+    return await this.usersService.getUserRank(Number(id));
   }
 }
