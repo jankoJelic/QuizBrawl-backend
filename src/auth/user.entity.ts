@@ -69,8 +69,11 @@ export class User {
   @Column({ default: false })
   isPremium: boolean;
 
-  @Column({ default: '' })
-  premiumUntil: string;
+  @Column({ type: 'datetime', nullable: true })
+  premiumUntil: Date;
+
+  @Column({ default: false })
+  premiumSubscriptionActive: boolean;
 
   @OneToMany(() => Quiz, (quiz) => quiz.user, { eager: true })
   @JoinColumn()

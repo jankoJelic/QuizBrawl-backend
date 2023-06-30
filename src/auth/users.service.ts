@@ -16,6 +16,8 @@ import { getStorage } from 'firebase-admin/storage';
 import { createStorageDownloadUrl } from 'src/util/firebase/createStorageDownloadUrl';
 import { ConfigService } from '@nestjs/config';
 import { Topic } from 'src/rooms/types/Topic';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import * as moment from 'moment';
 
 @Injectable()
 export class UsersService {
@@ -269,5 +271,24 @@ export class UsersService {
     const players = await this.getUsersByTrophies(500);
     const userIndex = players.findIndex((user) => user.id === userId);
     return userIndex + 1;
+  }
+
+  @Cron(CronExpression.EVERY_12_HOURS)
+  checkPremiumSubscriptions() {
+    const currentTimestamp = moment(new Date().getTime()).format(
+      'YYYY-MM-DD hh:mm:ss',
+    );
+    this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .where('isPremium = :isUserPremium', { isUserPremium: true })
+      .andWhere('premiumUntil < :currentTimestamp', { currentTimestamp })
+      .andWhere('premiumSubscriptionActive = :userSubscribed', {
+        userSubscribed: false,
+      })
+      .set({
+        isPremium: false,
+      })
+      .execute();
   }
 }
