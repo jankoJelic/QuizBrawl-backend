@@ -14,7 +14,6 @@ import { transformToMyTopic } from './util/open-tdb.utils';
 import { Difficulty } from './types/difficulty.type';
 import { decodeHtmlEntities } from 'src/util/decodeHtmlEntities';
 import { Room } from 'src/rooms/room.entity';
-import { Topic } from 'src/rooms/types/Topic';
 
 @Injectable()
 export class QuestionsService {
