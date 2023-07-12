@@ -14,6 +14,7 @@ import { transformToMyTopic } from './util/open-tdb.utils';
 import { Difficulty } from './types/difficulty.type';
 import { decodeHtmlEntities } from 'src/util/decodeHtmlEntities';
 import { Room } from 'src/rooms/room.entity';
+import { Topic } from 'src/rooms/types/Topic';
 
 @Injectable()
 export class QuestionsService {
@@ -125,6 +126,56 @@ export class QuestionsService {
     return question;
   }
 
+  transformAnswers(incorrectAnswers: string[], correctAnswer: string) {
+    const alphabeticalAnswers = incorrectAnswers
+      .concat([correctAnswer])
+      .sort()
+      .map((s) => decodeHtmlEntities(s));
+
+    const correctAnswerIndex = alphabeticalAnswers.indexOf(
+      decodeHtmlEntities(correctAnswer),
+    );
+
+    const answersObject = () => {
+      switch (correctAnswerIndex) {
+        case 0:
+          return {
+            answer1: decodeHtmlEntities(correctAnswer),
+            correctAnswer: 'answer1' as CorrectAnswer,
+            answer3: decodeHtmlEntities(alphabeticalAnswers[3]),
+            answer2: decodeHtmlEntities(alphabeticalAnswers[1]),
+            answer4: decodeHtmlEntities(alphabeticalAnswers[2]),
+          };
+        case 1:
+          return {
+            answer1: decodeHtmlEntities(alphabeticalAnswers[0]),
+            answer2: decodeHtmlEntities(correctAnswer),
+            correctAnswer: 'answer2' as CorrectAnswer,
+            answer3: decodeHtmlEntities(alphabeticalAnswers[3]),
+            answer4: decodeHtmlEntities(alphabeticalAnswers[2]),
+          };
+        case 2:
+          return {
+            answer1: decodeHtmlEntities(alphabeticalAnswers[0]),
+            answer2: decodeHtmlEntities(alphabeticalAnswers[3]),
+            answer3: decodeHtmlEntities(correctAnswer),
+            correctAnswer: 'answer3' as CorrectAnswer,
+            answer4: decodeHtmlEntities(alphabeticalAnswers[1]),
+          };
+        case 3:
+          return {
+            answer1: decodeHtmlEntities(alphabeticalAnswers[1]),
+            answer3: decodeHtmlEntities(alphabeticalAnswers[2]),
+            answer2: decodeHtmlEntities(alphabeticalAnswers[0]),
+            answer4: decodeHtmlEntities(correctAnswer),
+            correctAnswer: 'answer4' as CorrectAnswer,
+          };
+      }
+    };
+
+    return answersObject;
+  }
+
   async seedDatabaseFromOpenTDB(count: string, user: User) {
     const { data } = await axios.get('https://opentdb.com/api.php', {
       params: { amount: count },
@@ -152,51 +203,10 @@ export class QuestionsService {
       if (type !== 'multiple') return;
       if (incorrectAnswers.includes(correctAnswer)) return;
 
-      const alphabeticalAnswers = incorrectAnswers
-        .concat([q.correct_answer])
-        .sort()
-        .map((s) => decodeHtmlEntities(s));
-
-      const correctAnswerIndex = alphabeticalAnswers.indexOf(
-        decodeHtmlEntities(correctAnswer),
+      const answersObject = this.transformAnswers(
+        incorrectAnswers,
+        q.correct_answer,
       );
-
-      const answersObject = () => {
-        switch (correctAnswerIndex) {
-          case 0:
-            return {
-              answer1: decodeHtmlEntities(correctAnswer),
-              correctAnswer: 'answer1' as CorrectAnswer,
-              answer3: decodeHtmlEntities(alphabeticalAnswers[3]),
-              answer2: decodeHtmlEntities(alphabeticalAnswers[1]),
-              answer4: decodeHtmlEntities(alphabeticalAnswers[2]),
-            };
-          case 1:
-            return {
-              answer1: decodeHtmlEntities(alphabeticalAnswers[0]),
-              answer2: decodeHtmlEntities(correctAnswer),
-              correctAnswer: 'answer2' as CorrectAnswer,
-              answer3: decodeHtmlEntities(alphabeticalAnswers[3]),
-              answer4: decodeHtmlEntities(alphabeticalAnswers[2]),
-            };
-          case 2:
-            return {
-              answer1: decodeHtmlEntities(alphabeticalAnswers[0]),
-              answer2: decodeHtmlEntities(alphabeticalAnswers[3]),
-              answer3: decodeHtmlEntities(correctAnswer),
-              correctAnswer: 'answer3' as CorrectAnswer,
-              answer4: decodeHtmlEntities(alphabeticalAnswers[1]),
-            };
-          case 3:
-            return {
-              answer1: decodeHtmlEntities(alphabeticalAnswers[1]),
-              answer3: decodeHtmlEntities(alphabeticalAnswers[2]),
-              answer2: decodeHtmlEntities(alphabeticalAnswers[0]),
-              answer4: decodeHtmlEntities(correctAnswer),
-              correctAnswer: 'answer4' as CorrectAnswer,
-            };
-        }
-      };
 
       const cleanQuestion = decodeHtmlEntities(question);
 
@@ -239,4 +249,81 @@ export class QuestionsService {
 
     builder.execute();
   }
+
+  mapTriviaQuestionCategory(category: TriviaQuestionCategory) {
+    switch (category) {
+      case 'music':
+        return 'Music';
+      case 'food_and_drink':
+      case 'society_and_culture':
+      case 'general_knowledge':
+        return 'General';
+      case 'film_and_tv':
+        return 'Showbiz';
+      case 'geography':
+        return 'Geography';
+      case 'history':
+        return 'History';
+      case 'sport_and_leisure':
+        return 'Sports';
+      case 'science':
+        return 'Science';
+      case 'arts_and_literature':
+        return 'Art';
+    }
+  }
+
+  async seedDbFromTriviaApi(user: User) {
+    const { data } = await axios.get<TriviaApiQuestion[]>(
+      'https://the-trivia-api.com/v2/questions/',
+    );
+
+    const addTriviaQuestionToDb = (q: TriviaApiQuestion) => {
+      const answersObject = this.transformAnswers(
+        q.incorrectAnswers,
+        q.correctAnswer,
+      );
+
+      const transformedQuestion: CreateQuestionDto = {
+        difficulty: q.difficulty?.toUpperCase() as Difficulty,
+        topic: this.mapTriviaQuestionCategory(q.category),
+        ...answersObject(),
+        user,
+        question: q.question.text,
+      };
+
+      this.createQuestion(transformedQuestion, user);
+    };
+
+    data.forEach(addTriviaQuestionToDb);
+
+    return data;
+  }
+}
+
+type TriviaQuestionCategory =
+  | 'food_and_drink'
+  | 'music'
+  | 'film_and_tv'
+  | 'history'
+  | 'geography'
+  | 'sport_and_leisure'
+  | 'society_and_culture'
+  | 'general_knowledge'
+  | 'arts_and_literature'
+  | 'science';
+
+interface TriviaApiQuestion {
+  category: TriviaQuestionCategory;
+  id: string;
+  correctAnswer: string;
+  incorrectAnswers: string[];
+  question: {
+    text: string;
+  };
+  tags: string[];
+  type: 'text_choice';
+  difficulty: Difficulty;
+  regions: [];
+  isNiche: boolean;
 }

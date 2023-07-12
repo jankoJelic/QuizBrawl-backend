@@ -91,4 +91,9 @@ export class QuestionsController {
   ) {
     return await this.questionsService.seedDatabaseFromOpenTDB(count, user);
   }
+
+  @Get('/triviaapi')
+  async seedDbFromTriviaApi(@CurrentUser() user: User) {
+    return await this.questionsService.seedDbFromTriviaApi(user);
+  }
 }
