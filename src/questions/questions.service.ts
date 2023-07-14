@@ -14,6 +14,11 @@ import { transformToMyTopic } from './util/open-tdb.utils';
 import { Difficulty } from './types/difficulty.type';
 import { decodeHtmlEntities } from 'src/util/decodeHtmlEntities';
 import { Room } from 'src/rooms/room.entity';
+import {
+  TriviaApiQuestion,
+  TriviaQuestionCategory,
+} from './types/trivia-api-question.type';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class QuestionsService {
@@ -272,7 +277,7 @@ export class QuestionsService {
     }
   }
 
-  async seedDbFromTriviaApi(user: User) {
+  async seedDbFromTriviaApi(user: User): Promise<TriviaApiQuestion[]> {
     const { data } = await axios.get<TriviaApiQuestion[]>(
       'https://the-trivia-api.com/v2/questions/',
     );
@@ -298,31 +303,4 @@ export class QuestionsService {
 
     return data;
   }
-}
-
-type TriviaQuestionCategory =
-  | 'food_and_drink'
-  | 'music'
-  | 'film_and_tv'
-  | 'history'
-  | 'geography'
-  | 'sport_and_leisure'
-  | 'society_and_culture'
-  | 'general_knowledge'
-  | 'arts_and_literature'
-  | 'science';
-
-interface TriviaApiQuestion {
-  category: TriviaQuestionCategory;
-  id: string;
-  correctAnswer: string;
-  incorrectAnswers: string[];
-  question: {
-    text: string;
-  };
-  tags: string[];
-  type: 'text_choice';
-  difficulty: Difficulty;
-  regions: [];
-  isNiche: boolean;
 }
