@@ -9,16 +9,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { RoomsModule } from './rooms/rooms.module';
 import * as Joi from 'joi';
-import { Room } from './rooms/room.entity';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { QuestionsModule } from './questions/questions.module';
-import { Question } from './questions/question.entity';
 import { configuration } from '../config/configuration';
 import { QuizesModule } from './quizes/quizes.module';
-import { Quiz } from './quizes/quiz.entity';
 import { LobbiesModule } from './lobbies/lobbies.module';
-import { Lobby } from './lobbies/lobby.entity';
 import { EventsGateway } from './events/events.gateway';
 import { HeaderInterceptor } from './interceptors/headers.interceptor';
 import { QuestionsService } from './questions/questions.service';
@@ -42,6 +38,7 @@ import { RewardsService } from './rewards/rewards.service';
 import { LeaguesService } from './leagues/leagues.service';
 import { QuizesService } from './quizes/quizes.service';
 import { LeaguesGateway } from './events/gateways/leagues.gateway';
+import { PagesModule } from './pages/pages.module';
 
 @Global()
 @Module({
@@ -106,6 +103,7 @@ import { LeaguesGateway } from './events/gateways/leagues.gateway';
     MarketModule,
     GameModule,
     LeaguesModule,
+    PagesModule,
   ],
   controllers: [AppController, TeamsController],
   providers: [

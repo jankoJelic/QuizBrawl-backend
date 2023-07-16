@@ -17,7 +17,7 @@ export class Quiz {
   @Column()
   name: string;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   questions: Question[];
 
   @Column({ default: 15 })
