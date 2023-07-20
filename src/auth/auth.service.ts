@@ -10,7 +10,7 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { entryMatchesHash, hashAndSalt } from './util/hashAndSalt';
-import { MailService } from 'src/mail/mail.service';
+// import { MailService } from 'src/mail/mail.service';
 import { createOtpCode } from './util/createOtpCode';
 import { User } from './user.entity';
 import { PinDto } from './dtos/pin.dto';
@@ -45,7 +45,7 @@ export class AuthService {
 
     const registrationOtpCode = createOtpCode();
 
-    const defaultAvatars = await this.usersService.getDefaultAvatars();
+    // const defaultAvatars = await this.usersService.getDefaultAvatars();
     const newUser = await this.usersService.create({
       ...createUserDto,
       password: hashedPassword,
@@ -69,11 +69,9 @@ export class AuthService {
   async login(signInDto: SignInDto) {
     const { email, password } = signInDto;
     const user = await this.usersService.findByEmail(email);
-
     if (!user) throw new NotFoundException('user not found');
 
     const passwordIsCorrect = await entryMatchesHash(password, user.password);
-
     if (!passwordIsCorrect) throw new BadRequestException('bad password');
 
     const { accessToken, refreshToken } = await this.createNewTokens(user);
@@ -138,6 +136,17 @@ export class AuthService {
       const { accessToken, refreshToken } = await this.createNewTokens(user);
 
       return { accessToken, refreshToken };
+    }
+  }
+
+  async deleteMyAccount(email: string, password: string, userId: number) {
+    const { accessToken } = await this.login({ email, password });
+    console.log(accessToken);
+    if (accessToken) {
+      this.usersService.deleteUser(String(userId));
+      return true;
+    } else {
+      return false;
     }
   }
 }

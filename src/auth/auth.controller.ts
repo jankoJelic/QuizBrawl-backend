@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  Param,
   Patch,
   Post,
   Query,
@@ -148,4 +149,16 @@ export class AuthController {
   @Public()
   @Post('/apple')
   async handleAppleAuth() {}
+
+  @Delete('/:password')
+  async deleteMyAccount(
+    @CurrentUser() user: User,
+    @Param('password') password: string,
+  ) {
+    return await this.authService.deleteMyAccount(
+      user.email,
+      password,
+      user.id,
+    );
+  }
 }
