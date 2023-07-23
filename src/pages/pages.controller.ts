@@ -1,6 +1,7 @@
 import { Controller, Get, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { Public } from 'src/auth/auth.controller';
+import { ATTRIBUTIONS } from 'src/views/attributions';
 import { DELETE_ACCOUNT_INSTRUCTIONS } from 'src/views/delete-account-instructions';
 import { PRIVACY_POLICY } from 'src/views/privacy-policy';
 
@@ -17,5 +18,10 @@ export class PagesController {
   @Get('/delete_account_instructions')
   renderDeleteAccountInstructions(@Res() res: Response) {
     res.send(DELETE_ACCOUNT_INSTRUCTIONS);
+  }
+
+  @Get('/attributions')
+  renderAttributions(@Res() res: Response) {
+    res.send(ATTRIBUTIONS);
   }
 }
