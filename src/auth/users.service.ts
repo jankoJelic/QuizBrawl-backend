@@ -197,14 +197,12 @@ export class UsersService {
 
   async getUsers(userIds: number[]) {
     let friends = [];
-
     for (let i = 0; i < userIds.length; i++) {
       const user = await this.usersRepository.findOne({
         where: {
           id: userIds[0],
         },
       });
-
       friends.push(user);
     }
     return friends.map((fr) => shallowUser(fr));
@@ -212,15 +210,11 @@ export class UsersService {
 
   async registerAnswer(user: User, correct: boolean, topic: Topic) {
     const myUser = await this.findOne(user.id);
-
     let updatedCorrectAnswers = myUser.correctAnswers || this.initialAnswers();
-
     if (correct)
       updatedCorrectAnswers[topic] = updatedCorrectAnswers[topic] + 1;
-
     let updatedTotalAnswers = myUser.totalAnswers || this.initialAnswers();
     updatedTotalAnswers[topic] = updatedTotalAnswers[topic] + 1;
-
     this.updateUser(user.id, {
       ...(correct && {
         correctAnswers: {
@@ -290,5 +284,10 @@ export class UsersService {
         isPremium: false,
       })
       .execute();
+  }
+
+  async getBots() {
+    const bots = await this.usersRepository.find({ where: { isBot: true } });
+    return bots;
   }
 }

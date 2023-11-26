@@ -30,4 +30,9 @@ export class GameController {
       body.topic,
     );
   }
+
+  @Get('/quick')
+  async startQuickGame(@CurrentUser() user: User) {
+    return await this.gameService.startQuickGame({ user });
+  }
 }

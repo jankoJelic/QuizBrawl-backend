@@ -193,4 +193,7 @@ export class User {
 
   @Column({ type: 'json', nullable: true })
   leagueIds: number[];
+
+  @Column({ default: false })
+  isBot: boolean;
 }

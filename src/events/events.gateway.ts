@@ -67,11 +67,10 @@ export class EventsGateway
     const { userId } = client.handshake.query || {};
     const user = await this.usersService.findOne(Number(userId));
 
-    if (!!user?.lobby) {
+    if (user?.lobby)
       this.server.emit(USER_LEFT_LOBBY, { user, lobbyId: user.lobby.id });
-    }
 
-    if (!!user?.leagueIds) {
+    if (user?.leagueIds) {
       removeDuplicatesFromArray(user.leagueIds).forEach((leagueId) => {
         this.leaguesService.changeUserReadyStatus(
           leagueId,
@@ -87,7 +86,7 @@ export class EventsGateway
       });
     }
 
-    if (!!user?.room) {
+    if (user?.room) {
       this.server.emit(USER_LEFT_ROOM, { room: user.room, user });
       if (user.room.gameStarted) {
         if (user.room.lobbyId === LOBBY_IDS.CASH_GAME) {

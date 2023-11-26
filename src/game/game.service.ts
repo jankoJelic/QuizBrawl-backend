@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { UsersService } from 'src/auth/users.service';
+import { LOBBY_IDS } from 'src/lobbies/constants/lobby-ids';
 import { QuestionsService } from 'src/questions/questions.service';
 import { RoomsService } from 'src/rooms/rooms.service';
 
@@ -22,5 +23,23 @@ export class GameService {
     userDailies[dailyId] = 0;
     this.usersService.updateUser(user.id, { dailies: userDailies });
     return questions;
+  }
+
+  async startQuickGame({ user }: { user: User }) {
+    const bots = await this.usersService.getBots();
+    const botsToInclude = bots.slice(0, 3);
+    const room = await this.roomsService.createRoom({
+      topic: 'General',
+      answerTime: 15,
+      hostName: user.firstName,
+      name: 'Quick game',
+      lobbyId: LOBBY_IDS.ARENA,
+      userId: user.id,
+      maxPlayers: 5,
+      users: [user, ...botsToInclude],
+      questionsCount: 3,
+    });
+    const questions = await this.questionsService.getQuestionsForRoom(room);
+    return { questions, room };
   }
 }

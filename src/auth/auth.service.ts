@@ -141,7 +141,6 @@ export class AuthService {
 
   async deleteMyAccount(email: string, password: string, userId: number) {
     const { accessToken } = await this.login({ email, password });
-    console.log(accessToken);
     if (accessToken) {
       this.usersService.deleteUser(String(userId));
       return true;

@@ -38,7 +38,7 @@ export class GameGateway extends EventsGateway {
     const { room, questions } = body || {};
     let questionsToUse = [];
 
-    if (!!questions) {
+    if (questions) {
       questionsToUse = questions;
     } else {
       const newQuestions = await this.questionsService.getQuestionsForRoom(
@@ -67,7 +67,7 @@ export class GameGateway extends EventsGateway {
   async handleCorrectAnswerSelected(
     @MessageBody() { roomId, answer, userId, topic, leagueId }: SelectAnswerDto,
   ) {
-    if (!!leagueId) {
+    if (leagueId) {
       this.server
         .to(leagueName(leagueId))
         .emit(SOCKET_EVENTS.CORRECT_ANSWER_SELECTED, { answer, userId });
@@ -85,7 +85,7 @@ export class GameGateway extends EventsGateway {
   async handleWrongAnswerSelected(
     @MessageBody() { roomId, answer, userId, topic, leagueId }: SelectAnswerDto,
   ) {
-    if (!!leagueId) {
+    if (leagueId) {
       this.server
         .to(leagueName(leagueId))
         .emit(SOCKET_EVENTS.WRONG_ANSWER_SELECTED, { answer, userId });
