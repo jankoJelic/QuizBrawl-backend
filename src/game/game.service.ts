@@ -37,7 +37,6 @@ export class GameService {
       userId: user.id,
       maxPlayers: 5,
       users: [user, ...botsToInclude],
-      questionsCount: 3,
     });
     const questions = await this.questionsService.getQuestionsForRoom(room);
     return { questions, room };
